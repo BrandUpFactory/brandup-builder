@@ -122,19 +122,13 @@ export default function Navbar() {
         ref={dropdownRef}
       >
         {!isLoggedIn ? (
-          <button
-            onClick={() =>
-              supabase.auth.signInWithOAuth({
-                provider: 'github',
-                options: {
-                  redirectTo: `${window.location.origin}/auth/callback`
-                }
-              })
-            }
+          <Link
+            href="/login"
             className="text-left hover:text-[#8db5d8] transition"
           >
             Login
-          </button>
+          </Link>
+
         ) : (
           <div className="relative">
             <button
