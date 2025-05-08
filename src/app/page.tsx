@@ -1,6 +1,3 @@
-import Navbar from "@/components/Navbar";
-import { ArrowRightIcon } from "@heroicons/react/24/outline"; // Falls Heroicons installiert sind
-
 export default function Home() {
   return (
     <div className="px-12 py-10">
