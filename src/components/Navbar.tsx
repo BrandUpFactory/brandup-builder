@@ -24,7 +24,6 @@ export default function Navbar() {
 
   const handleLockClick = (type: 'sections' | 'templates') => {
     showInfo('🔒 Bitte melde dich an, um die weiteren Zugriffe zu erhalten.')
-
     if (type === 'sections') {
       setShakeSection(true)
       setTimeout(() => setShakeSection(false), 500)
@@ -78,13 +77,11 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Info-Popup oben rechts */}
       {infoMessage && (
         <div className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-white text-orange-600 border border-orange-300 px-8 py-4 rounded-lg shadow-lg z-50 w-[500px] text-center">
           {infoMessage}
         </div>
       )}
-
 
       <div className="h-screen w-64 bg-white text-[#1c2838] flex flex-col justify-between p-6 border-r border-gray-200">
         {/* Logo */}
@@ -102,11 +99,11 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Hauptnavigation */}
+          {/* Navigation */}
           <nav className="flex flex-col gap-4 text-sm font-medium">
             <div className="flex justify-between items-center pr-1">
               {isLoggedIn ? (
-                <Link href="/" className="hover:text-[#8db5d8] transition">
+                <Link href="/mysections" className="hover:text-[#8db5d8] transition">
                   My Sections
                 </Link>
               ) : (
@@ -151,7 +148,7 @@ export default function Navbar() {
           </nav>
         </div>
 
-        {/* Login / Account */}
+        {/* Account / Login */}
         <nav
           className="flex flex-col gap-3 border-t border-gray-200 pt-4 text-sm text-[#1c2838] font-normal"
           ref={dropdownRef}
