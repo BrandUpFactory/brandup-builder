@@ -12,10 +12,26 @@ export default function Navbar() {
   const supabase = createClient()
   const [user, setUser] = useState<User | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [shakeSection, setShakeSection] = useState(false)
+  const [shakeTemplates, setShakeTemplates] = useState(false)
+  const [infoMessage, setInfoMessage] = useState<string | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  const handleLockClick = () => {
-    alert('🔒 Bitte melde dich an, um die weiteren Zugriffe zu erhalten.')
+  const showInfo = (msg: string) => {
+    setInfoMessage(msg)
+    setTimeout(() => setInfoMessage(null), 3000)
+  }
+
+  const handleLockClick = (type: 'sections' | 'templates') => {
+    showInfo('🔒 Bitte melde dich an, um die weiteren Zugriffe zu erhalten.')
+
+    if (type === 'sections') {
+      setShakeSection(true)
+      setTimeout(() => setShakeSection(false), 500)
+    } else {
+      setShakeTemplates(true)
+      setTimeout(() => setShakeTemplates(false), 500)
+    }
   }
 
   const handleLogout = async () => {
@@ -61,103 +77,122 @@ export default function Navbar() {
   const isLoggedIn = !!user
 
   return (
-    <div className="h-screen w-64 bg-white text-[#1c2838] flex flex-col justify-between p-6 border-r border-gray-200">
-      {/* Logo */}
-      <div>
-        <div className="mb-10">
-          <Link href="/">
-            <Image
-              src="/BrandUp_Elements_Logo_2000_800.png"
-              alt="BrandUp Logo"
-              width={160}
-              height={64}
-              priority
-              className="cursor-pointer"
-            />
-          </Link>
+    <>
+      {/* Info-Popup oben rechts */}
+      {infoMessage && (
+        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-white text-orange-600 border border-orange-300 px-8 py-4 rounded-lg shadow-lg z-50 w-[500px] text-center">
+          {infoMessage}
+        </div>
+      )}
+
+
+      <div className="h-screen w-64 bg-white text-[#1c2838] flex flex-col justify-between p-6 border-r border-gray-200">
+        {/* Logo */}
+        <div>
+          <div className="mb-10">
+            <Link href="/">
+              <Image
+                src="/BrandUp_Elements_Logo_2000_800.png"
+                alt="BrandUp Logo"
+                width={160}
+                height={64}
+                priority
+                className="cursor-pointer"
+              />
+            </Link>
+          </div>
+
+          {/* Hauptnavigation */}
+          <nav className="flex flex-col gap-4 text-sm font-medium">
+            <div className="flex justify-between items-center pr-1">
+              {isLoggedIn ? (
+                <Link href="/" className="hover:text-[#8db5d8] transition">
+                  My Sections
+                </Link>
+              ) : (
+                <button
+                  onClick={() => handleLockClick('sections')}
+                  className="flex justify-between items-center w-full text-left hover:text-[#8db5d8] transition"
+                >
+                  My Sections
+                  <FiLock
+                    size={16}
+                    className={`text-gray-400 ${shakeSection ? 'animate-shake' : ''}`}
+                  />
+                </button>
+              )}
+            </div>
+            <div className="flex justify-between items-center pr-1">
+              {isLoggedIn ? (
+                <Link href="/templates" className="hover:text-[#8db5d8] transition">
+                  Templates
+                </Link>
+              ) : (
+                <button
+                  onClick={() => handleLockClick('templates')}
+                  className="flex justify-between items-center w-full text-left hover:text-[#8db5d8] transition"
+                >
+                  Templates
+                  <FiLock
+                    size={16}
+                    className={`text-gray-400 ${shakeTemplates ? 'animate-shake' : ''}`}
+                  />
+                </button>
+              )}
+            </div>
+            <a
+              href="https://brandupelements.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#8db5d8] transition"
+            >
+              Shop
+            </a>
+          </nav>
         </div>
 
-        {/* Hauptnavigation */}
-        <nav className="flex flex-col gap-4 text-sm font-medium">
-          <div className="flex justify-between items-center pr-1">
-            <Link href="/" className="hover:text-[#8db5d8] transition">
-              My Sections
+        {/* Login / Account */}
+        <nav
+          className="flex flex-col gap-3 border-t border-gray-200 pt-4 text-sm text-[#1c2838] font-normal"
+          ref={dropdownRef}
+        >
+          {!isLoggedIn ? (
+            <Link
+              href="/login"
+              className="text-left hover:text-[#8db5d8] transition"
+            >
+              Login
             </Link>
-            {!isLoggedIn && (
+          ) : (
+            <div className="relative">
               <button
-                onClick={handleLockClick}
-                className="text-gray-400 hover:text-[#8db5d8]"
+                onClick={toggleDropdown}
+                className="flex justify-between items-center w-full hover:text-[#8db5d8] transition"
               >
-                <FiLock size={16} />
+                Account
+                <FaChevronDown size={12} className="ml-1" />
               </button>
-            )}
-          </div>
-          <div className="flex justify-between items-center pr-1">
-            <Link href="/templates" className="hover:text-[#8db5d8] transition">
-              Templates
-            </Link>
-            {!isLoggedIn && (
-              <button
-                onClick={handleLockClick}
-                className="text-gray-400 hover:text-[#8db5d8]"
-              >
-                <FiLock size={16} />
-              </button>
-            )}
-          </div>
-          <a
-            href="https://brandupelements.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-[#8db5d8] transition"
-          >
-            Shop
-          </a>
+              {dropdownOpen && (
+                <div className="absolute left-0 mt-2 bg-white shadow border rounded w-full z-10">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100"
+                  >
+                    Abmelden
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          <Link href="/license" className="hover:text-[#8db5d8] transition">
+            License
+          </Link>
+          <Link href="/settings" className="hover:text-[#8db5d8] transition">
+            Settings
+          </Link>
         </nav>
       </div>
-
-      {/* Login / Account */}
-      <nav
-        className="flex flex-col gap-3 border-t border-gray-200 pt-4 text-sm text-[#1c2838] font-normal"
-        ref={dropdownRef}
-      >
-        {!isLoggedIn ? (
-          <Link
-            href="/login"
-            className="text-left hover:text-[#8db5d8] transition"
-          >
-            Login
-          </Link>
-
-        ) : (
-          <div className="relative">
-            <button
-              onClick={toggleDropdown}
-              className="flex justify-between items-center w-full hover:text-[#8db5d8] transition"
-            >
-              Account
-              <FaChevronDown size={12} className="ml-1" />
-            </button>
-            {dropdownOpen && (
-              <div className="absolute left-0 mt-2 bg-white shadow border rounded w-full z-10">
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100"
-                >
-                  Abmelden
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        <Link href="/license" className="hover:text-[#8db5d8] transition">
-          License
-        </Link>
-        <Link href="/settings" className="hover:text-[#8db5d8] transition">
-          Settings
-        </Link>
-      </nav>
-    </div>
+    </>
   )
 }
