@@ -13,7 +13,6 @@ export default function Navbar() {
   const [user, setUser] = useState<User | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [shakeSection, setShakeSection] = useState(false)
-  const [shakeTemplates, setShakeTemplates] = useState(false)
   const [infoMessage, setInfoMessage] = useState<string | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -22,15 +21,10 @@ export default function Navbar() {
     setTimeout(() => setInfoMessage(null), 3000)
   }
 
-  const handleLockClick = (type: 'sections' | 'templates') => {
+  const handleLockClick = () => {
     showInfo('🔒 Bitte melde dich an, um die weiteren Zugriffe zu erhalten.')
-    if (type === 'sections') {
-      setShakeSection(true)
-      setTimeout(() => setShakeSection(false), 500)
-    } else {
-      setShakeTemplates(true)
-      setTimeout(() => setShakeTemplates(false), 500)
-    }
+    setShakeSection(true)
+    setTimeout(() => setShakeSection(false), 500)
   }
 
   const handleLogout = async () => {
@@ -83,7 +77,7 @@ export default function Navbar() {
         </div>
       )}
 
-      <div className="h-screen w-64 bg-white text-[#1c2838] flex flex-col justify-between p-6 border-r border-gray-200">
+      <div className="fixed top-0 left-0 h-screen w-64 bg-white text-[#1c2838] flex flex-col justify-between p-6 border-r border-gray-200 z-40">
         {/* Logo */}
         <div>
           <div className="mb-10">
@@ -108,7 +102,7 @@ export default function Navbar() {
                 </Link>
               ) : (
                 <button
-                  onClick={() => handleLockClick('sections')}
+                  onClick={handleLockClick}
                   className="flex justify-between items-center w-full text-left hover:text-[#8db5d8] transition"
                 >
                   My Sections
@@ -119,24 +113,14 @@ export default function Navbar() {
                 </button>
               )}
             </div>
-            <div className="flex justify-between items-center pr-1">
-              {isLoggedIn ? (
-                <Link href="/templates" className="hover:text-[#8db5d8] transition">
-                  Templates
-                </Link>
-              ) : (
-                <button
-                  onClick={() => handleLockClick('templates')}
-                  className="flex justify-between items-center w-full text-left hover:text-[#8db5d8] transition"
-                >
-                  Templates
-                  <FiLock
-                    size={16}
-                    className={`text-gray-400 ${shakeTemplates ? 'animate-shake' : ''}`}
-                  />
-                </button>
-              )}
+
+            {/* Templates - öffentlich sichtbar, ohne Icon */}
+            <div className="pr-1">
+              <Link href="/templates" className="hover:text-[#8db5d8] transition">
+                Templates
+              </Link>
             </div>
+
             <a
               href="https://brandupelements.com/"
               target="_blank"
