@@ -13,7 +13,8 @@ interface Template {
   description: string
   image_url: string
   unlock_code: string
-  slug: string
+  edit_url: string
+  buy_url: string
 }
 
 export default function TemplatesPage() {
@@ -26,41 +27,47 @@ export default function TemplatesPage() {
   const [notification, setNotification] = useState<{ success: boolean; message: string } | null>(null)
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
+    const fetchTemplates = async () => {
+      const { data, error } = await supabase
+        .from('templates')
+        .select('*')
+
+      if (error) {
+        console.error('Fehler beim Laden der Templates:', error)
+        return
+      }
+
+      setTemplates(data || [])
+    }
+
+    const fetchUser = async () => {
+      const { data } = await supabase.auth.getUser()
       if (data.user) {
         setUserId(data.user.id)
 
-        // Templates aus Supabase laden
-        const { data: fetchedTemplates } = await supabase
-          .from('templates')
-          .select('*')
-          .order('created_at', { ascending: true })
-
-        if (fetchedTemplates) {
-          setTemplates(fetchedTemplates)
-
-          // Zugriff prüfen
-          fetchedTemplates.forEach(async (template) => {
-            const access = await hasAccessToTemplate(data.user!.id, template.id)
-            if (access) {
-              setUnlockedIds((prev) => [...prev, template.id])
-            }
-          })
+        // Prüfen, welche Templates bereits freigeschaltet sind
+        const unlocked: string[] = []
+        const { data: templatesData } = await supabase.from('templates').select('id')
+        if (templatesData) {
+          for (const template of templatesData) {
+            const access = await hasAccessToTemplate(data.user.id, template.id)
+            if (access) unlocked.push(template.id)
+          }
         }
+
+        setUnlockedIds(unlocked)
       }
-    })
-  }, [])
-
-  const handleUnlock = async (templateId: string) => {
-    if (!userId) return
-
-    const result = await unlockTemplateWithCode(userId, templateId, inputCode[templateId])
-    setNotification(result)
-
-    if (result.success) {
-      setUnlockedIds((prev) => [...prev, templateId])
     }
 
+    fetchTemplates()
+    fetchUser()
+  }, [])
+
+  const handleUnlock = async (templateId: string, code: string) => {
+    if (!userId) return
+    const result = await unlockTemplateWithCode(userId, templateId, code)
+    setNotification(result)
+    if (result.success) setUnlockedIds(prev => [...prev, templateId])
     setTimeout(() => setNotification(null), 3000)
   }
 
@@ -77,15 +84,10 @@ export default function TemplatesPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
         {templates.map((template) => {
           const isUnlocked = unlockedIds.includes(template.id)
-
           return (
             <div key={template.id} className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col">
               <div className="aspect-square w-full relative">
-                <img
-                  src={template.image_url}
-                  alt={template.name}
-                  className="w-full h-full object-cover"
-                />
+                <img src={template.image_url} alt={template.name} className="w-full h-full object-cover" />
                 {!isUnlocked && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <FiLock size={32} className="text-black" />
@@ -98,7 +100,7 @@ export default function TemplatesPage() {
                 <p className="text-xs text-gray-500 mb-2">{template.description}</p>
 
                 {isUnlocked ? (
-                  <Link href={`/editor/${template.slug}`}>
+                  <Link href={template.edit_url || '#'}>
                     <button className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full hover:opacity-90 transition w-full">
                       Bearbeiten
                     </button>
@@ -115,7 +117,7 @@ export default function TemplatesPage() {
                           className="border px-3 py-1 text-sm rounded-md text-[#1c2838]"
                         />
                         <button
-                          onClick={() => handleUnlock(template.id)}
+                          onClick={() => handleUnlock(template.id, inputCode[template.id])}
                           className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full hover:opacity-90 transition"
                         >
                           Code prüfen
@@ -133,7 +135,7 @@ export default function TemplatesPage() {
                 )}
 
                 <Link
-                  href={`https://brandupelements.com/products/${template.slug}`}
+                  href={template.buy_url}
                   target="_blank"
                   className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full hover:opacity-90 transition text-center"
                 >
