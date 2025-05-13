@@ -1,23 +1,65 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { FiLock } from 'react-icons/fi'
-import { Template, templateData } from '@/lib/templateData' // ✅ Korrekte Imports
+import { Template, templateData } from '@/lib/templateData'
+import { createClient } from '@/utils/supabase/clients'
+
+const supabase = createClient()
 
 export default function TemplatesPage() {
   const [unlockedIds, setUnlockedIds] = useState<number[]>([])
   const [showInput, setShowInput] = useState<{ [key: number]: boolean }>({})
   const [inputCode, setInputCode] = useState<{ [key: number]: string }>({})
   const [notification, setNotification] = useState<{ success: boolean; message: string } | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
 
-  const handleUnlock = (id: number, expectedCode: string) => {
-    if (inputCode[id] === expectedCode) {
-      setUnlockedIds([...unlockedIds, id])
-      setNotification({ success: true, message: '✅ Template erfolgreich freigeschaltet!' })
-    } else {
-      setNotification({ success: false, message: '❌ Ungültiger Code. Bitte erneut versuchen.' })
+  // Hole eingeloggten User
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUserId(user?.id || null)
+
+      if (user?.id) {
+        const { data } = await supabase
+          .from('licenses')
+          .select('template_id')
+          .eq('user_id', user.id)
+
+        if (data) {
+          const ids = data.map((entry) => entry.template_id)
+          setUnlockedIds(ids)
+        }
+      }
     }
+    getUser()
+  }, [])
+
+  const handleUnlock = async (templateId: number, expectedCode: string) => {
+    if (!userId) {
+      setNotification({ success: false, message: '🔒 Bitte zuerst einloggen.' })
+      return
+    }
+
+    if (inputCode[templateId] === expectedCode) {
+      const { error } = await supabase.from('licenses').insert({
+        user_id: userId,
+        template_id: templateId,
+        code: expectedCode
+      })
+
+      if (!error) {
+        setUnlockedIds([...unlockedIds, templateId])
+        setNotification({ success: true, message: '✅ Template erfolgreich freigeschaltet!' })
+        setShowInput((prev) => ({ ...prev, [templateId]: false }))
+      } else {
+        setNotification({ success: false, message: '❌ Fehler beim Speichern in der Datenbank.' })
+      }
+    } else {
+      setNotification({ success: false, message: '❌ Ungültiger Code.' })
+    }
+
     setTimeout(() => setNotification(null), 2500)
   }
 
@@ -51,8 +93,8 @@ export default function TemplatesPage() {
                   className="w-full h-full object-cover"
                 />
                 {!isUnlocked && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <FiLock size={32} className="text-black" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <FiLock size={32} className="text-white" />
                   </div>
                 )}
               </div>
