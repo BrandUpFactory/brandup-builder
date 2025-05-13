@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/clients'
 import Link from 'next/link'
-import { Session, User } from '@supabase/supabase-js'
+import { User } from "@supabase/supabase-js"
+
 
 interface SectionEntry {
   id: number
