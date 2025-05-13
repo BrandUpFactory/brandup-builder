@@ -1,66 +1,47 @@
+// src/app/templates/page.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { FiLock } from 'react-icons/fi'
-import { Template, templateData } from '@/lib/templateData'
 import { createClient } from '@/utils/supabase/clients'
-
-const supabase = createClient()
+import { Template, templateData } from '@/lib/templateData'
+import { unlockTemplateWithCode } from '@/utils/supabase/unlockTemplate'
+import { hasAccessToTemplate } from '@/utils/supabase/checkTemplateAccess'
 
 export default function TemplatesPage() {
-  const [unlockedIds, setUnlockedIds] = useState<number[]>([])
-  const [showInput, setShowInput] = useState<{ [key: number]: boolean }>({})
-  const [inputCode, setInputCode] = useState<{ [key: number]: string }>({})
-  const [notification, setNotification] = useState<{ success: boolean; message: string } | null>(null)
+  const supabase = createClient()
   const [userId, setUserId] = useState<string | null>(null)
+  const [unlockedIds, setUnlockedIds] = useState<string[]>([])
+  const [showInput, setShowInput] = useState<{ [key: string]: boolean }>({})
+  const [inputCode, setInputCode] = useState<{ [key: string]: string }>({})
+  const [notification, setNotification] = useState<{ success: boolean; message: string } | null>(null)
 
-  // Hole eingeloggten User
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUserId(user?.id || null)
-
-      if (user?.id) {
-        const { data } = await supabase
-          .from('licenses')
-          .select('template_id')
-          .eq('user_id', user.id)
-
-        if (data) {
-          const ids = data.map((entry) => entry.template_id)
-          setUnlockedIds(ids)
-        }
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        setUserId(data.user.id)
+        templateData.forEach(async (template) => {
+          const hasAccess = await hasAccessToTemplate(data.user!.id, template.id)
+          if (hasAccess) {
+            setUnlockedIds((prev: string[]) => [...prev, template.id])
+          }
+        })
       }
-    }
-    getUser()
+    })
   }, [])
 
-  const handleUnlock = async (templateId: number, expectedCode: string) => {
-    if (!userId) {
-      setNotification({ success: false, message: '🔒 Bitte zuerst einloggen.' })
-      return
+  const handleUnlock = async (templateId: string) => {
+    if (!userId) return
+
+    const result = await unlockTemplateWithCode(userId, templateId, inputCode[templateId])
+    setNotification(result)
+
+    if (result.success) {
+      setUnlockedIds((prev: string[]) => [...prev, templateId])
     }
 
-    if (inputCode[templateId] === expectedCode) {
-      const { error } = await supabase.from('licenses').insert({
-        user_id: userId,
-        template_id: templateId,
-        code: expectedCode
-      })
-
-      if (!error) {
-        setUnlockedIds([...unlockedIds, templateId])
-        setNotification({ success: true, message: '✅ Template erfolgreich freigeschaltet!' })
-        setShowInput((prev) => ({ ...prev, [templateId]: false }))
-      } else {
-        setNotification({ success: false, message: '❌ Fehler beim Speichern in der Datenbank.' })
-      }
-    } else {
-      setNotification({ success: false, message: '❌ Ungültiger Code.' })
-    }
-
-    setTimeout(() => setNotification(null), 2500)
+    setTimeout(() => setNotification(null), 3000)
   }
 
   return (
@@ -68,11 +49,7 @@ export default function TemplatesPage() {
       <h1 className="text-2xl md:text-3xl font-bold text-[#1c2838] mb-6">Alle Templates</h1>
 
       {notification && (
-        <div
-          className={`mb-6 p-3 rounded-md text-sm text-white ${
-            notification.success ? 'bg-green-500' : 'bg-red-500'
-          }`}
-        >
+        <div className={`mb-6 p-3 rounded-md text-sm text-white ${notification.success ? 'bg-green-500' : 'bg-red-500'}`}>
           {notification.message}
         </div>
       )}
@@ -82,10 +59,7 @@ export default function TemplatesPage() {
           const isUnlocked = unlockedIds.includes(template.id)
 
           return (
-            <div
-              key={template.id}
-              className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col"
-            >
+            <div key={template.id} className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col">
               <div className="aspect-square w-full relative">
                 <img
                   src={template.image}
@@ -93,8 +67,8 @@ export default function TemplatesPage() {
                   className="w-full h-full object-cover"
                 />
                 {!isUnlocked && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                    <FiLock size={32} className="text-white" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <FiLock size={32} className="text-black" />
                   </div>
                 )}
               </div>
@@ -117,13 +91,11 @@ export default function TemplatesPage() {
                           type="text"
                           placeholder="Code eingeben"
                           value={inputCode[template.id] || ''}
-                          onChange={(e) =>
-                            setInputCode({ ...inputCode, [template.id]: e.target.value })
-                          }
+                          onChange={(e) => setInputCode({ ...inputCode, [template.id]: e.target.value })}
                           className="border px-3 py-1 text-sm rounded-md text-[#1c2838]"
                         />
                         <button
-                          onClick={() => handleUnlock(template.id, template.unlockCode)}
+                          onClick={() => handleUnlock(template.id)}
                           className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full hover:opacity-90 transition"
                         >
                           Code prüfen

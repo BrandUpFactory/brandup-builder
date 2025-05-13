@@ -1,5 +1,5 @@
 export interface Template {
-  id: number
+  id: string
   name: string
   description: string
   image: string
@@ -8,9 +8,10 @@ export interface Template {
   editUrl: string
 }
 
+
 export const templateData: Template[] = [
   {
-    id: 1,
+    id: 'hero',
     name: 'Hero Section',
     description: 'Eine aufmerksamkeitsstarke Headline-Sektion.',
     image: '/BG_Card_55.jpg',
