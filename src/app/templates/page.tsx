@@ -28,15 +28,11 @@ export default function TemplatesPage() {
 
   useEffect(() => {
     const fetchTemplates = async () => {
-      const { data, error } = await supabase
-        .from('templates')
-        .select('*')
-
+      const { data, error } = await supabase.from('templates').select('*')
       if (error) {
         console.error('Fehler beim Laden der Templates:', error)
         return
       }
-
       setTemplates(data || [])
     }
 
@@ -44,9 +40,8 @@ export default function TemplatesPage() {
       const { data } = await supabase.auth.getUser()
       if (data.user) {
         setUserId(data.user.id)
-
-        // Prüfen, welche Templates bereits freigeschaltet sind
         const unlocked: string[] = []
+
         const { data: templatesData } = await supabase.from('templates').select('id')
         if (templatesData) {
           for (const template of templatesData) {
@@ -64,10 +59,23 @@ export default function TemplatesPage() {
   }, [])
 
   const handleUnlock = async (templateId: string, code: string) => {
-    if (!userId) return
+    if (!userId) {
+      setNotification({ success: false, message: '⚠️ Du bist nicht eingeloggt.' })
+      return
+    }
+
+    if (!code || code.trim() === '') {
+      setNotification({ success: false, message: '⚠️ Bitte gib einen Code ein.' })
+      return
+    }
+
     const result = await unlockTemplateWithCode(userId, templateId, code)
     setNotification(result)
-    if (result.success) setUnlockedIds(prev => [...prev, templateId])
+
+    if (result.success) {
+      setUnlockedIds(prev => [...prev, templateId])
+    }
+
     setTimeout(() => setNotification(null), 3000)
   }
 
@@ -75,8 +83,12 @@ export default function TemplatesPage() {
     <div className="p-6 md:p-12">
       <h1 className="text-2xl md:text-3xl font-bold text-[#1c2838] mb-6">Alle Templates</h1>
 
-      {notification && (
-        <div className={`mb-6 p-3 rounded-md text-sm text-white ${notification.success ? 'bg-green-500' : 'bg-red-500'}`}>
+      {notification?.message && (
+        <div
+          className={`mb-6 p-3 rounded-md text-sm text-white ${
+            notification.success ? 'bg-green-500' : 'bg-red-500'
+          }`}
+        >
           {notification.message}
         </div>
       )}
@@ -84,6 +96,7 @@ export default function TemplatesPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
         {templates.map((template) => {
           const isUnlocked = unlockedIds.includes(template.id)
+
           return (
             <div key={template.id} className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col">
               <div className="aspect-square w-full relative">
@@ -113,7 +126,9 @@ export default function TemplatesPage() {
                           type="text"
                           placeholder="Code eingeben"
                           value={inputCode[template.id] || ''}
-                          onChange={(e) => setInputCode({ ...inputCode, [template.id]: e.target.value })}
+                          onChange={(e) =>
+                            setInputCode({ ...inputCode, [template.id]: e.target.value })
+                          }
                           className="border px-3 py-1 text-sm rounded-md text-[#1c2838]"
                         />
                         <button
