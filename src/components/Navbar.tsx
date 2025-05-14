@@ -5,11 +5,10 @@ import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import { FiLock } from 'react-icons/fi'
 import { FaChevronDown } from 'react-icons/fa'
-import { createClient } from '@/utils/supabase/clients'
+import { supabase } from '@/lib/supabaseClient'
 import { Session, User } from '@supabase/supabase-js'
 
 export default function Navbar() {
-  const supabase = createClient()
   const [user, setUser] = useState<User | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [shakeSection, setShakeSection] = useState(false)
@@ -32,16 +31,11 @@ export default function Navbar() {
     setDropdownOpen(false)
   }
 
-  const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev)
-  }
+  const toggleDropdown = () => setDropdownOpen((prev) => !prev)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownOpen(false)
       }
     }
@@ -50,21 +44,24 @@ export default function Navbar() {
   }, [])
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user ?? null)
-    })
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser()
+      if (error) {
+        console.error('Fehler beim Abrufen des Benutzers:', error)
+        return
+      }
+      setUser(data?.user ?? null)
+    }
+
+    fetchUser()
 
     const {
       data: { subscription }
-    } = supabase.auth.onAuthStateChange(
-      (_event: string, session: Session | null) => {
-        setUser(session?.user ?? null)
-      }
-    )
+    } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
+      setUser(session?.user ?? null)
+    })
 
-    return () => {
-      subscription.unsubscribe()
-    }
+    return () => subscription.unsubscribe()
   }, [])
 
   const isLoggedIn = !!user
@@ -106,15 +103,11 @@ export default function Navbar() {
                   className="flex justify-between items-center w-full text-left hover:text-[#8db5d8] transition"
                 >
                   My Sections
-                  <FiLock
-                    size={16}
-                    className={`text-gray-400 ${shakeSection ? 'animate-shake' : ''}`}
-                  />
+                  <FiLock size={16} className={`text-gray-400 ${shakeSection ? 'animate-shake' : ''}`} />
                 </button>
               )}
             </div>
 
-            {/* Templates - öffentlich sichtbar, ohne Icon */}
             <div className="pr-1">
               <Link href="/templates" className="hover:text-[#8db5d8] transition">
                 Templates
@@ -138,10 +131,7 @@ export default function Navbar() {
           ref={dropdownRef}
         >
           {!isLoggedIn ? (
-            <Link
-              href="/login"
-              className="text-left hover:text-[#8db5d8] transition"
-            >
+            <Link href="/login" className="text-left hover:text-[#8db5d8] transition">
               Login
             </Link>
           ) : (

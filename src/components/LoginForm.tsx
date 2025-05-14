@@ -10,8 +10,7 @@ export default function LoginForm() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     const { error } = await supabase.auth.signInWithOtp({ email })
-    if (error) setMessage('❌ Fehler beim Login')
-    else setMessage('✅ Magic Link gesendet – check deine Mail')
+    setMessage(error ? '❌ Fehler beim Login' : '✅ Magic Link gesendet – check deine Mail')
   }
 
   return (
@@ -22,6 +21,7 @@ export default function LoginForm() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         className="border p-2 rounded w-full"
+        required
       />
       <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
         Login
