@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabaseClient'
 import { Template } from './types'
 
-export async function fetchTemplates(): Promise<Template[]> {
+export async function getTemplates(): Promise<Template[]> {
   const { data, error } = await supabase
     .from('templates')
     .select('*')
@@ -9,7 +9,7 @@ export async function fetchTemplates(): Promise<Template[]> {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('❌ Fehler beim Laden der Templates:', error)
+    console.error('Fehler beim Laden der Templates:', error)
     return []
   }
 

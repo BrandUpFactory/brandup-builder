@@ -1,5 +1,5 @@
-export * from './fetchTemplates'
 export * from './access'
-export * from './unlock'
+export * from './fetchTemplates'
 export * from './manualLicense'
 export * from './types'
+export * from './unlock'

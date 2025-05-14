@@ -7,46 +7,30 @@ export async function unlockTemplateWithCode(
   ip?: string,
   userAgent?: string
 ): Promise<{ success: boolean; message: string }> {
-  // 🛡️ Vorprüfung & Logging
-  const trimmedCode = code.trim()
-  console.log('🔓 Unlock-Versuch:', { userId, templateId, code: trimmedCode })
-
-  // 🔍 Lizenz suchen
   const { data: license, error } = await supabase
     .from('licenses')
     .select('*')
     .eq('template_id', templateId)
-    .eq('license_code', trimmedCode)
+    .eq('license_code', code.trim())
     .eq('used', false)
     .maybeSingle()
 
-  if (error) {
-    console.error('❌ Fehler bei Lizenzabfrage:', error)
-    return {
-      success: false,
-      message: '❌ Ein technischer Fehler ist aufgetreten.'
-    }
-  }
-
-  if (!license) {
-    console.warn('⚠️ Keine gültige Lizenz gefunden für:', {
-      templateId,
-      code: trimmedCode
-    })
+  if (error || !license) {
+    console.error('Lizenzfehler:', error)
     return {
       success: false,
       message: '❌ Ungültiger oder bereits verwendeter Code.'
     }
   }
 
-  // 📝 Lizenz updaten
   const { error: updateError } = await supabase
     .from('licenses')
     .update({
       used: true,
       user_id: userId,
       activation_ip: ip || null,
-      activation_device: userAgent || null
+      activation_device: userAgent || null,
+      activated_at: new Date().toISOString()
     })
     .eq('id', license.id)
 
@@ -57,13 +41,6 @@ export async function unlockTemplateWithCode(
       message: '❌ Fehler beim Speichern der Freischaltung.'
     }
   }
-
-  // ✅ Erfolg
-  console.log('✅ Lizenz erfolgreich aktiviert:', {
-    licenseId: license.id,
-    userId,
-    templateId
-  })
 
   return {
     success: true,

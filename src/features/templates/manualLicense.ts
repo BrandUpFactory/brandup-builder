@@ -1,16 +1,14 @@
 import { supabase } from '@/lib/supabaseClient'
 
-interface CreateManualLicenseParams {
-  templateId: string
-  source?: string
-  notes?: string
-}
-
 export async function createManualLicense({
   templateId,
   source = 'manual',
   notes = ''
-}: CreateManualLicenseParams) {
+}: {
+  templateId: string
+  source?: string
+  notes?: string
+}) {
   const { data, error } = await supabase.from('licenses').insert([
     {
       template_id: templateId,
@@ -26,4 +24,3 @@ export async function createManualLicense({
 
   return data?.[0] ?? null
 }
-
