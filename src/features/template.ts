@@ -15,7 +15,7 @@ export async function hasAccessToTemplate(userId: string, templateId: string): P
     .maybeSingle()
 
   if (error) {
-    console.error('Zugriffsprüfung fehlgeschlagen:', error)
+    console.error('❌ Zugriffsprüfung fehlgeschlagen:', error)
     return false
   }
 
@@ -23,7 +23,8 @@ export async function hasAccessToTemplate(userId: string, templateId: string): P
 }
 
 /**
- * Aktiviert eine Lizenz mit Code, IP und Gerät.
+ * Aktiviert eine Lizenz anhand des Codes, der Template-ID und User-ID.
+ * Gibt präzisere Fehlermeldungen zurück zur besseren Diagnose.
  */
 export async function unlockTemplateWithCode(
   userId: string,
@@ -35,16 +36,35 @@ export async function unlockTemplateWithCode(
   const { data: license, error } = await supabase
     .from('licenses')
     .select('*')
-    .eq('template_id', templateId)
     .eq('license_code', code.trim())
-    .eq('used', false)
     .maybeSingle()
 
-  if (error || !license) {
-    console.error('❌ Lizenz nicht gefunden oder schon verwendet:', error)
+  if (error) {
+    console.error('❌ Fehler beim Abrufen der Lizenz:', error)
     return {
       success: false,
-      message: '❌ Ungültiger oder bereits verwendeter Code.'
+      message: '❌ Fehler beim Zugriff auf die Datenbank.'
+    }
+  }
+
+  if (!license) {
+    return {
+      success: false,
+      message: '❌ Dieser Code existiert nicht.'
+    }
+  }
+
+  if (license.used) {
+    return {
+      success: false,
+      message: '⚠️ Dieser Code wurde bereits verwendet.'
+    }
+  }
+
+  if (license.template_id !== templateId) {
+    return {
+      success: false,
+      message: '⚠️ Dieser Code gehört zu einem anderen Template.'
     }
   }
 
