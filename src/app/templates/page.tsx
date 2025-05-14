@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { FiLock } from 'react-icons/fi'
-import { supabase } from '@/lib/supabaseClient'
+import { createClient } from '@/utils/supabase/clients'
 import { hasAccessToTemplate, unlockTemplateWithCode } from '@/features/template'
 
 interface Template {
@@ -17,6 +17,8 @@ interface Template {
 }
 
 export default function TemplatesPage() {
+  const supabase = createClient()
+
   const [userId, setUserId] = useState<string | null>(null)
   const [templates, setTemplates] = useState<Template[]>([])
   const [unlockedIds, setUnlockedIds] = useState<string[]>([])
@@ -27,10 +29,11 @@ export default function TemplatesPage() {
   useEffect(() => {
     const init = async () => {
       const { data: userData } = await supabase.auth.getUser()
-      if (!userData?.user?.id) return
+      const currentUser = userData?.user
 
-      const userId = userData.user.id
-      setUserId(userId)
+      if (!currentUser) return
+
+      setUserId(currentUser.id)
 
       const { data: templatesData, error } = await supabase
         .from('templates')
@@ -46,7 +49,7 @@ export default function TemplatesPage() {
 
       const unlocked: string[] = []
       for (const template of templatesData || []) {
-        const access = await hasAccessToTemplate(userId, template.id)
+        const access = await hasAccessToTemplate(currentUser.id, template.id)
         if (access) unlocked.push(template.id)
       }
 
@@ -124,7 +127,9 @@ export default function TemplatesPage() {
                           type="text"
                           placeholder="Code eingeben"
                           value={inputCode[template.id] || ''}
-                          onChange={(e) => setInputCode({ ...inputCode, [template.id]: e.target.value })}
+                          onChange={(e) =>
+                            setInputCode({ ...inputCode, [template.id]: e.target.value })
+                          }
                           className="border px-3 py-1 text-sm rounded-md text-[#1c2838]"
                         />
                         <button
