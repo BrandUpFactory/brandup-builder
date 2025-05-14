@@ -10,7 +10,7 @@ export async function hasAccessToTemplate(userId: string, templateId: string): P
     .maybeSingle()
 
   if (error) {
-    console.error('❌ Fehler bei Zugriffskontrolle:', error)
+    console.error('Zugriffsprüfung fehlgeschlagen:', error)
     return false
   }
 
@@ -24,29 +24,27 @@ export async function unlockTemplateWithCode(
   ip?: string,
   userAgent?: string
 ): Promise<{ success: boolean; message: string }> {
-  const cleanedCode = code.trim()
-
   const { data: license, error } = await supabase
     .from('licenses')
     .select('*')
-    .eq('license_code', cleanedCode)
-    .eq('template_id', templateId)
-    .eq('used', false) // 🔥 Wichtig, sonst blockt die Policy!
+    .eq('license_code', code.trim())
     .maybeSingle()
 
   if (error) {
-    console.error('❌ Fehler beim Abrufen der Lizenz:', error)
-    return {
-      success: false,
-      message: '❌ Fehler bei der Datenbankabfrage.'
-    }
+    console.error('Lizenzabruf fehlgeschlagen:', error)
+    return { success: false, message: 'Fehler bei der Code-Prüfung.' }
   }
 
   if (!license) {
-    return {
-      success: false,
-      message: '❌ Dieser Code existiert nicht.'
-    }
+    return { success: false, message: '❌ Dieser Code existiert nicht.' }
+  }
+
+  if (license.used) {
+    return { success: false, message: '⚠️ Dieser Code wurde bereits verwendet.' }
+  }
+
+  if (license.template_id !== templateId) {
+    return { success: false, message: '⚠️ Code gehört zu einem anderen Template.' }
   }
 
   const { error: updateError } = await supabase
@@ -55,20 +53,14 @@ export async function unlockTemplateWithCode(
       used: true,
       user_id: userId,
       activation_ip: ip || null,
-      activation_device: userAgent || null
+      activation_device: userAgent || null,
     })
     .eq('id', license.id)
 
   if (updateError) {
-    console.error('❌ Fehler beim Speichern:', updateError)
-    return {
-      success: false,
-      message: '❌ Fehler beim Speichern der Freischaltung.'
-    }
+    console.error('Fehler beim Speichern:', updateError)
+    return { success: false, message: '❌ Fehler beim Speichern der Freischaltung.' }
   }
 
-  return {
-    success: true,
-    message: '✅ Template erfolgreich freigeschaltet!'
-  }
+  return { success: true, message: '✅ Template erfolgreich freigeschaltet!' }
 }

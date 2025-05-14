@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { FiLock } from 'react-icons/fi'
 import { createClient } from '@/utils/supabase/clients'
-import { unlockTemplateWithCode, hasAccessToTemplate } from '@/features/template'
-
+import { hasAccessToTemplate, unlockTemplateWithCode } from '@/features/template'
 
 interface Template {
   id: string
@@ -22,16 +21,16 @@ export default function TemplatesPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const [templates, setTemplates] = useState<Template[]>([])
   const [unlockedIds, setUnlockedIds] = useState<string[]>([])
-  const [showInput, setShowInput] = useState<{ [key: string]: boolean }>({})
   const [inputCode, setInputCode] = useState<{ [key: string]: string }>({})
+  const [showInput, setShowInput] = useState<{ [key: string]: boolean }>({})
   const [notification, setNotification] = useState<{ success: boolean; message: string } | null>(null)
 
   useEffect(() => {
-    const loadInitialData = async () => {
+    const init = async () => {
       const { data: userData } = await supabase.auth.getUser()
-      if (!userData.user) return
-
-      setUserId(userData.user.id)
+      if (!userData?.user?.id) return
+      const userId = userData.user.id
+      setUserId(userId)
 
       const { data: templatesData, error } = await supabase
         .from('templates')
@@ -47,52 +46,43 @@ export default function TemplatesPage() {
 
       const unlocked: string[] = []
       for (const template of templatesData || []) {
-        const access = await hasAccessToTemplate(userData.user.id, template.id)
+        const access = await hasAccessToTemplate(userId, template.id)
         if (access) unlocked.push(template.id)
       }
 
       setUnlockedIds(unlocked)
     }
 
-    loadInitialData()
+    init()
   }, [])
 
   const handleUnlock = async (templateId: string, code: string) => {
-  if (!userId) {
-    setNotification({ success: false, message: '⚠️ Du bist nicht eingeloggt.' })
-    return
+    if (!userId) {
+      setNotification({ success: false, message: '⚠️ Du bist nicht eingeloggt.' })
+      return
+    }
+
+    if (!code.trim()) {
+      setNotification({ success: false, message: '⚠️ Bitte Code eingeben.' })
+      return
+    }
+
+    const result = await unlockTemplateWithCode(userId, templateId, code.trim())
+    setNotification(result)
+
+    if (result.success) {
+      setUnlockedIds(prev => [...prev, templateId])
+      setShowInput(prev => ({ ...prev, [templateId]: false }))
+    }
+
+    setTimeout(() => setNotification(null), 4000)
   }
-
-  if (!code || code.trim() === '') {
-    setNotification({ success: false, message: '⚠️ Bitte gib einen Code ein.' })
-    return
-  }
-
-  console.log('🔍 Unlock-Versuch gestartet:')
-  console.log('📄 Eingabe-Code:', code)
-  console.log('👤 User-ID:', userId)
-  console.log('📦 Template-ID:', templateId)
-
-  const result = await unlockTemplateWithCode(userId, templateId, code)
-
-  console.log('✅ Ergebnis von unlockTemplateWithCode:', result)
-
-  setNotification(result)
-
-  if (result.success) {
-    setUnlockedIds(prev => [...prev, templateId])
-    setShowInput(prev => ({ ...prev, [templateId]: false }))
-  }
-
-  setTimeout(() => setNotification(null), 4000)
-}
-
 
   return (
     <div className="p-6 md:p-12">
       <h1 className="text-2xl md:text-3xl font-bold text-[#1c2838] mb-6">Alle Templates</h1>
 
-      {notification?.message && (
+      {notification && (
         <div
           className={`mb-6 p-3 rounded-md text-sm text-white ${
             notification.success ? 'bg-green-500' : 'bg-red-500'
@@ -105,7 +95,6 @@ export default function TemplatesPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
         {templates.map((template) => {
           const isUnlocked = unlockedIds.includes(template.id)
-
           return (
             <div key={template.id} className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col">
               <div className="aspect-square w-full relative">
@@ -123,7 +112,7 @@ export default function TemplatesPage() {
 
                 {isUnlocked ? (
                   <Link href={template.edit_url || '#'}>
-                    <button className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full hover:opacity-90 transition w-full">
+                    <button className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full w-full">
                       Bearbeiten
                     </button>
                   </Link>
@@ -135,22 +124,20 @@ export default function TemplatesPage() {
                           type="text"
                           placeholder="Code eingeben"
                           value={inputCode[template.id] || ''}
-                          onChange={(e) =>
-                            setInputCode({ ...inputCode, [template.id]: e.target.value })
-                          }
+                          onChange={(e) => setInputCode({ ...inputCode, [template.id]: e.target.value })}
                           className="border px-3 py-1 text-sm rounded-md text-[#1c2838]"
                         />
                         <button
                           onClick={() => handleUnlock(template.id, inputCode[template.id])}
-                          className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full hover:opacity-90 transition"
+                          className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full mt-1"
                         >
-                          Code prüfen
+                          Freischalten
                         </button>
                       </>
                     ) : (
                       <button
                         onClick={() => setShowInput({ ...showInput, [template.id]: true })}
-                        className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full hover:opacity-90 transition"
+                        className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full"
                       >
                         Freischalten
                       </button>
@@ -161,7 +148,7 @@ export default function TemplatesPage() {
                 <Link
                   href={template.buy_url}
                   target="_blank"
-                  className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full hover:opacity-90 transition text-center"
+                  className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full text-center"
                 >
                   Kaufen
                 </Link>
