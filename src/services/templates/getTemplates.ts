@@ -1,8 +1,5 @@
 import { supabase } from '@/lib/supabaseClient'
 
-/**
- * Holt alle aktiven Templates aus der Datenbank.
- */
 export async function getTemplates() {
   const { data, error } = await supabase
     .from('templates')

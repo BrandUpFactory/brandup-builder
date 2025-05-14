@@ -3,8 +3,11 @@ import { supabase } from '@/lib/supabaseClient'
 export async function unlockTemplateWithCode(
   userId: string,
   templateId: string,
-  code: string
+  code: string,
+  ip?: string,
+  userAgent?: string
 ): Promise<{ success: boolean; message: string }> {
+  // Lizenz prüfen
   const { data, error } = await supabase
     .from('licenses')
     .select('*')
@@ -14,17 +17,32 @@ export async function unlockTemplateWithCode(
     .maybeSingle()
 
   if (error || !data) {
-    return { success: false, message: '❌ Ungültiger oder bereits verwendeter Code.' }
+    return {
+      success: false,
+      message: '❌ Ungültiger oder bereits verwendeter Code.'
+    }
   }
 
-  const update = await supabase
+  // Lizenz updaten
+  const { error: updateError } = await supabase
     .from('licenses')
-    .update({ used: true, user_id: userId })
+    .update({
+      used: true,
+      user_id: userId,
+      activation_ip: ip || null,
+      activation_device: userAgent || null
+    })
     .eq('id', data.id)
 
-  if (update.error) {
-    return { success: false, message: '❌ Fehler beim Speichern der Freischaltung.' }
+  if (updateError) {
+    return {
+      success: false,
+      message: '❌ Fehler beim Speichern der Freischaltung.'
+    }
   }
 
-  return { success: true, message: '✅ Template erfolgreich freigeschaltet!' }
+  return {
+    success: true,
+    message: '✅ Template erfolgreich freigeschaltet!'
+  }
 }

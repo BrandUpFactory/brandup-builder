@@ -6,9 +6,6 @@ interface CreateManualLicenseParams {
   notes?: string
 }
 
-/**
- * Erstellt eine neue Lizenz manuell (z. B. für Tests oder manuelle Vergabe).
- */
 export async function createManualLicense({
   templateId,
   source = 'manual',
