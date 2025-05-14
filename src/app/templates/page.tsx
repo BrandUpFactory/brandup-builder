@@ -12,9 +12,9 @@ interface Template {
   name: string
   description: string
   image_url: string
-  unlock_code: string
   edit_url: string
   buy_url: string
+  active: boolean
 }
 
 export default function TemplatesPage() {
@@ -27,35 +27,34 @@ export default function TemplatesPage() {
   const [notification, setNotification] = useState<{ success: boolean; message: string } | null>(null)
 
   useEffect(() => {
-    const fetchTemplates = async () => {
-      const { data, error } = await supabase.from('templates').select('*')
+    const loadInitialData = async () => {
+      const { data: userData } = await supabase.auth.getUser()
+      if (!userData.user) return
+
+      setUserId(userData.user.id)
+
+      const { data: templatesData, error } = await supabase
+        .from('templates')
+        .select('*')
+        .eq('active', true)
+
       if (error) {
         console.error('Fehler beim Laden der Templates:', error)
         return
       }
-      setTemplates(data || [])
-    }
 
-    const fetchUser = async () => {
-      const { data } = await supabase.auth.getUser()
-      if (data.user) {
-        setUserId(data.user.id)
-        const unlocked: string[] = []
+      setTemplates(templatesData || [])
 
-        const { data: templatesData } = await supabase.from('templates').select('id')
-        if (templatesData) {
-          for (const template of templatesData) {
-            const access = await hasAccessToTemplate(data.user.id, template.id)
-            if (access) unlocked.push(template.id)
-          }
-        }
-
-        setUnlockedIds(unlocked)
+      const unlocked: string[] = []
+      for (const template of templatesData || []) {
+        const access = await hasAccessToTemplate(userData.user.id, template.id)
+        if (access) unlocked.push(template.id)
       }
+
+      setUnlockedIds(unlocked)
     }
 
-    fetchTemplates()
-    fetchUser()
+    loadInitialData()
   }, [])
 
   const handleUnlock = async (templateId: string, code: string) => {
@@ -74,9 +73,10 @@ export default function TemplatesPage() {
 
     if (result.success) {
       setUnlockedIds(prev => [...prev, templateId])
+      setShowInput(prev => ({ ...prev, [templateId]: false }))
     }
 
-    setTimeout(() => setNotification(null), 3000)
+    setTimeout(() => setNotification(null), 4000)
   }
 
   return (

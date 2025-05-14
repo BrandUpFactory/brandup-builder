@@ -7,32 +7,34 @@ export async function unlockTemplateWithCode(
   templateId: string,
   code: string
 ): Promise<{ success: boolean; message: string }> {
-  const { data, error } = await supabase
+  // Suche nach passender, noch nicht verwendeter Lizenz
+  const { data: license, error: licenseError } = await supabase
     .from('licenses')
-    .select('*')
+    .select('id')
     .eq('template_id', templateId)
     .eq('license_code', code)
     .eq('used', false)
-    .single()
+    .maybeSingle()
 
-  if (error || !data) {
+  if (licenseError || !license) {
     return { success: false, message: '❌ Ungültiger oder bereits verwendeter Code.' }
   }
 
-  const insertResult = await supabase.from('template_access').insert({
+  // Berechtigung in template_access eintragen
+  const { error: insertError } = await supabase.from('template_access').insert({
     user_id: userId,
-    template_id: templateId,
-    code
+    template_id: templateId
   })
 
-  if (insertResult.error) {
-    return { success: false, message: '❌ Fehler beim Speichern in der Datenbank.' }
+  if (insertError) {
+    return { success: false, message: '❌ Fehler beim Speichern der Freischaltung.' }
   }
 
+  // Lizenz als verwendet markieren
   await supabase
     .from('licenses')
     .update({ used: true })
-    .eq('id', data.id)
+    .eq('id', license.id)
 
   return { success: true, message: '✅ Template erfolgreich freigeschaltet!' }
 }
