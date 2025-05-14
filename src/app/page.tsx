@@ -1,12 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { createClient } from '@/utils/supabase/clients'
+import { supabase } from '@/lib/supabaseClient'
 import { Session, User } from '@supabase/supabase-js'
 import Link from 'next/link'
 
 export default function Home() {
-  const supabase = createClient()
   const [user, setUser] = useState<User | null>(null)
   const [showNotifications, setShowNotifications] = useState(false)
   const notificationRef = useRef<HTMLDivElement>(null)
@@ -16,12 +15,23 @@ export default function Home() {
   const popularSections = ['Landing Hero XL', 'Icon Grid Pro', 'Sticky CTA Footer']
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user ?? null)
-    })
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
+    const init = async () => {
+      const { data, error } = await supabase.auth.getUser()
+      if (error) {
+        console.error('❌ Fehler beim Abrufen des Users:', error)
+        return
+      }
+      setUser(data?.user ?? null)
+    }
+
+    init()
+
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
       setUser(session?.user ?? null)
     })
+
     return () => subscription.unsubscribe()
   }, [])
 
