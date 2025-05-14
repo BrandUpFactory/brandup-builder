@@ -27,10 +27,10 @@ export default function TemplatesPage() {
   useEffect(() => {
     const init = async () => {
       const { data: userData } = await supabase.auth.getUser()
-      const currentUser = userData?.user
-      if (!currentUser) return
+      const user = userData?.user
+      if (!user) return
 
-      setUserId(currentUser.id)
+      setUserId(user.id)
 
       const { data: templatesData, error } = await supabase
         .from('templates')
@@ -38,7 +38,7 @@ export default function TemplatesPage() {
         .eq('active', true)
 
       if (error) {
-        console.error('Fehler beim Laden der Templates:', error)
+        console.error('❌ Fehler beim Laden der Templates:', error)
         return
       }
 
@@ -46,7 +46,7 @@ export default function TemplatesPage() {
 
       const unlocked: string[] = []
       for (const template of templatesData || []) {
-        const access = await hasAccessToTemplate(currentUser.id, template.id)
+        const access = await hasAccessToTemplate(user.id, template.id)
         if (access) unlocked.push(template.id)
       }
 
@@ -62,12 +62,13 @@ export default function TemplatesPage() {
       return
     }
 
-    if (!code.trim()) {
-      setNotification({ success: false, message: '⚠️ Bitte Code eingeben.' })
+    const trimmed = code.trim()
+    if (!trimmed) {
+      setNotification({ success: false, message: '⚠️ Bitte gib einen Code ein.' })
       return
     }
 
-    const result = await unlockTemplateWithCode(userId, templateId, code.trim())
+    const result = await unlockTemplateWithCode(userId, templateId, trimmed)
     setNotification(result)
 
     if (result.success) {
@@ -89,7 +90,7 @@ export default function TemplatesPage() {
       )}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-        {templates.map((template) => {
+        {templates.map(template => {
           const isUnlocked = unlockedIds.includes(template.id)
           return (
             <div key={template.id} className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col">
@@ -108,7 +109,9 @@ export default function TemplatesPage() {
 
                 {isUnlocked ? (
                   <Link href={template.edit_url || '#'}>
-                    <button className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full w-full">Bearbeiten</button>
+                    <button className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full w-full">
+                      Bearbeiten
+                    </button>
                   </Link>
                 ) : (
                   <>
@@ -118,7 +121,7 @@ export default function TemplatesPage() {
                           type="text"
                           placeholder="Code eingeben"
                           value={inputCode[template.id] || ''}
-                          onChange={(e) => setInputCode({ ...inputCode, [template.id]: e.target.value })}
+                          onChange={e => setInputCode({ ...inputCode, [template.id]: e.target.value })}
                           className="border px-3 py-1 text-sm rounded-md text-[#1c2838]"
                         />
                         <button

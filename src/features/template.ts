@@ -2,9 +2,6 @@
 
 import { supabase } from '@/lib/supabaseClient'
 
-/**
- * Prüft, ob ein Benutzer bereits Zugriff auf ein Template hat.
- */
 export async function hasAccessToTemplate(userId: string, templateId: string): Promise<boolean> {
   const { data, error } = await supabase
     .from('licenses')
@@ -22,9 +19,6 @@ export async function hasAccessToTemplate(userId: string, templateId: string): P
   return !!data
 }
 
-/**
- * Aktiviert eine Lizenz über einen Code für einen Benutzer.
- */
 export async function unlockTemplateWithCode(
   userId: string,
   templateId: string,
@@ -45,13 +39,9 @@ export async function unlockTemplateWithCode(
     return { success: false, message: '❌ Fehler beim Abrufen des Codes.' }
   }
 
-  if (!license) {
-    return { success: false, message: '❌ Dieser Code existiert nicht.' }
-  }
+  if (!license) return { success: false, message: '❌ Dieser Code existiert nicht.' }
 
-  if (license.used) {
-    return { success: false, message: '⚠️ Dieser Code wurde bereits verwendet.' }
-  }
+  if (license.used) return { success: false, message: '⚠️ Dieser Code wurde bereits verwendet.' }
 
   if (license.template_id !== templateId) {
     return { success: false, message: '⚠️ Dieser Code gehört zu einem anderen Template.' }
