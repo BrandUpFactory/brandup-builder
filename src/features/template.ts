@@ -1,5 +1,30 @@
+// src/features/template.ts
+
 import { supabase } from '@/lib/supabaseClient'
 
+/**
+ * Prüft, ob ein Benutzer Zugriff auf ein bestimmtes Template hat.
+ */
+export async function hasAccessToTemplate(userId: string, templateId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('licenses')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('template_id', templateId)
+    .eq('used', true)
+    .maybeSingle()
+
+  if (error) {
+    console.error('Zugriffsprüfung fehlgeschlagen:', error)
+    return false
+  }
+
+  return !!data
+}
+
+/**
+ * Aktiviert eine Lizenz mit Code, IP und Gerät.
+ */
 export async function unlockTemplateWithCode(
   userId: string,
   templateId: string,
@@ -16,7 +41,7 @@ export async function unlockTemplateWithCode(
     .maybeSingle()
 
   if (error || !license) {
-    console.error('Lizenzfehler:', error)
+    console.error('❌ Lizenz nicht gefunden oder schon verwendet:', error)
     return {
       success: false,
       message: '❌ Ungültiger oder bereits verwendeter Code.'
@@ -29,8 +54,7 @@ export async function unlockTemplateWithCode(
       used: true,
       user_id: userId,
       activation_ip: ip || null,
-      activation_device: userAgent || null,
-      activated_at: new Date().toISOString()
+      activation_device: userAgent || null
     })
     .eq('id', license.id)
 

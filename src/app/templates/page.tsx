@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { FiLock } from 'react-icons/fi'
 import { createClient } from '@/utils/supabase/clients'
-import { unlockTemplateWithCode, hasAccessToTemplate } from '@/features/templates'
-
+import { unlockTemplateWithCode, hasAccessToTemplate } from '@/features/template'
 
 
 interface Template {
