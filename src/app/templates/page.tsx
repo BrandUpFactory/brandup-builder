@@ -26,9 +26,18 @@ export default function TemplatesPage() {
 
   useEffect(() => {
     const init = async () => {
-      const { data: userData } = await supabase.auth.getUser()
+      const { data: userData, error: authError } = await supabase.auth.getUser()
       const user = userData?.user
-      if (!user) return
+
+      if (authError) {
+        console.error('❌ Auth-Fehler:', authError)
+        return
+      }
+
+      if (!user) {
+        console.warn('⚠️ Kein eingeloggter User gefunden')
+        return
+      }
 
       setUserId(user.id)
 
@@ -97,7 +106,7 @@ export default function TemplatesPage() {
               <div className="aspect-square w-full relative">
                 <img src={template.image_url} alt={template.name} className="w-full h-full object-cover" />
                 {!isUnlocked && (
-                  <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/70">
                     <FiLock size={32} className="text-black" />
                   </div>
                 )}

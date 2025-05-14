@@ -3,6 +3,11 @@
 import { supabase } from '@/lib/supabaseClient'
 
 export async function hasAccessToTemplate(userId: string, templateId: string): Promise<boolean> {
+  if (!userId || !templateId) {
+    console.warn('hasAccessToTemplate: Ungültige Parameter', { userId, templateId })
+    return false
+  }
+
   const { data, error } = await supabase
     .from('licenses')
     .select('id')
@@ -27,6 +32,8 @@ export async function unlockTemplateWithCode(
   userAgent?: string
 ): Promise<{ success: boolean; message: string }> {
   const cleanedCode = code.trim()
+
+  if (!cleanedCode) return { success: false, message: '⚠️ Der Code darf nicht leer sein.' }
 
   const { data: license, error } = await supabase
     .from('licenses')
