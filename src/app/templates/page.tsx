@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { FiLock } from 'react-icons/fi'
-import { createClient } from '@/utils/supabase/clients'
+import { supabase } from '@/lib/supabaseClient'
 import { hasAccessToTemplate, unlockTemplateWithCode } from '@/features/template'
 
 interface Template {
@@ -17,8 +17,6 @@ interface Template {
 }
 
 export default function TemplatesPage() {
-  const supabase = createClient()
-
   const [userId, setUserId] = useState<string | null>(null)
   const [templates, setTemplates] = useState<Template[]>([])
   const [unlockedIds, setUnlockedIds] = useState<string[]>([])
@@ -30,7 +28,6 @@ export default function TemplatesPage() {
     const init = async () => {
       const { data: userData } = await supabase.auth.getUser()
       const currentUser = userData?.user
-
       if (!currentUser) return
 
       setUserId(currentUser.id)
@@ -86,11 +83,7 @@ export default function TemplatesPage() {
       <h1 className="text-2xl md:text-3xl font-bold text-[#1c2838] mb-6">Alle Templates</h1>
 
       {notification && (
-        <div
-          className={`mb-6 p-3 rounded-md text-sm text-white ${
-            notification.success ? 'bg-green-500' : 'bg-red-500'
-          }`}
-        >
+        <div className={`mb-6 p-3 rounded-md text-sm text-white ${notification.success ? 'bg-green-500' : 'bg-red-500'}`}>
           {notification.message}
         </div>
       )}
@@ -115,9 +108,7 @@ export default function TemplatesPage() {
 
                 {isUnlocked ? (
                   <Link href={template.edit_url || '#'}>
-                    <button className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full w-full">
-                      Bearbeiten
-                    </button>
+                    <button className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full w-full">Bearbeiten</button>
                   </Link>
                 ) : (
                   <>
@@ -127,9 +118,7 @@ export default function TemplatesPage() {
                           type="text"
                           placeholder="Code eingeben"
                           value={inputCode[template.id] || ''}
-                          onChange={(e) =>
-                            setInputCode({ ...inputCode, [template.id]: e.target.value })
-                          }
+                          onChange={(e) => setInputCode({ ...inputCode, [template.id]: e.target.value })}
                           className="border px-3 py-1 text-sm rounded-md text-[#1c2838]"
                         />
                         <button

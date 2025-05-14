@@ -1,8 +1,6 @@
 'use client'
 
-import { createClient } from '@/utils/supabase/clients'
-
-const supabase = createClient()
+import { supabase } from '@/lib/supabaseClient'
 
 /**
  * Prüft, ob ein Benutzer bereits Zugriff auf ein Template hat.
