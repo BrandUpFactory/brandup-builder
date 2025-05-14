@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { FiLock } from 'react-icons/fi'
-import { supabase } from '@/lib/supabaseClient'
+import { createClient } from '@/utils/supabase/client'
 import { hasAccessToTemplate, unlockTemplateWithCode } from '@/features/template'
 
 interface Template {
@@ -17,6 +17,8 @@ interface Template {
 }
 
 export default function TemplatesPage() {
+  const supabase = createClient()
+
   const [userId, setUserId] = useState<string | null>(null)
   const [templates, setTemplates] = useState<Template[]>([])
   const [unlockedIds, setUnlockedIds] = useState<string[]>([])

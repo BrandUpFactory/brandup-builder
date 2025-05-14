@@ -1,19 +1,32 @@
 'use client'
 
-import { supabase } from '@/lib/supabaseClient'
+import { createClient } from '@/utils/supabase/client'
 
 export default function LoginPage() {
+  const supabase = createClient()
+
   const signInWithGithub = async () => {
-    await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
     })
+
+    if (error) {
+      alert('❌ GitHub Login fehlgeschlagen.')
+      console.error('GitHub Login Error:', error)
+    }
   }
 
   const signInWithEmail = async () => {
     const email = prompt('Bitte gib deine E-Mail-Adresse ein:')
-    if (email) {
-      await supabase.auth.signInWithOtp({ email })
-      alert('Ein Login-Link wurde an deine E-Mail geschickt.')
+    if (!email) return
+
+    const { error } = await supabase.auth.signInWithOtp({ email })
+
+    if (error) {
+      alert('❌ Fehler beim Versenden des Login-Links.')
+      console.error('Magic Link Error:', error)
+    } else {
+      alert('✅ Ein Login-Link wurde an deine E-Mail geschickt.')
     }
   }
 

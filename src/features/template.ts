@@ -1,6 +1,8 @@
 'use client'
 
-import { supabase } from '@/lib/supabaseClient'
+import { createClient } from '@/utils/supabase/client'
+
+const supabase = createClient()
 
 export async function hasAccessToTemplate(userId: string, templateId: string): Promise<boolean> {
   if (!userId || !templateId) {

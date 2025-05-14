@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabaseClient'
+import { createClient } from '@/utils/supabase/client'
 import Link from 'next/link'
 import { User } from '@supabase/supabase-js'
 
@@ -13,6 +13,7 @@ interface SectionEntry {
 }
 
 export default function MySectionsPage() {
+  const supabase = createClient()
   const [user, setUser] = useState<User | null>(null)
   const [sections, setSections] = useState<SectionEntry[]>([])
   const [loading, setLoading] = useState(true)

@@ -5,10 +5,11 @@ import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import { FiLock } from 'react-icons/fi'
 import { FaChevronDown } from 'react-icons/fa'
-import { supabase } from '@/lib/supabaseClient'
+import { createClient } from '@/utils/supabase/client'
 import { Session, User } from '@supabase/supabase-js'
 
 export default function Navbar() {
+  const supabase = createClient()
   const [user, setUser] = useState<User | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [shakeSection, setShakeSection] = useState(false)

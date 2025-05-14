@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { supabase } from '@/lib/supabaseClient'
-import { Session, User } from '@supabase/supabase-js'
 import Link from 'next/link'
+import { Session, User } from '@supabase/supabase-js'
+import { createClient } from '@/utils/supabase/client'
 
 export default function Home() {
+  const supabase = createClient()
   const [user, setUser] = useState<User | null>(null)
   const [showNotifications, setShowNotifications] = useState(false)
   const notificationRef = useRef<HTMLDivElement>(null)
@@ -15,16 +16,16 @@ export default function Home() {
   const popularSections = ['Landing Hero XL', 'Icon Grid Pro', 'Sticky CTA Footer']
 
   useEffect(() => {
-    const init = async () => {
+    const fetchUser = async () => {
       const { data, error } = await supabase.auth.getUser()
       if (error) {
         console.error('❌ Fehler beim Abrufen des Users:', error)
         return
       }
-      setUser(data?.user ?? null)
+      setUser(data.user ?? null)
     }
 
-    init()
+    fetchUser()
 
     const {
       data: { subscription }
@@ -37,29 +38,26 @@ export default function Home() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        notificationRef.current &&
-        !notificationRef.current.contains(event.target as Node)
-      ) {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
         setShowNotifications(false)
       }
     }
+
     if (showNotifications) {
       document.addEventListener('mousedown', handleClickOutside)
     }
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [showNotifications])
-
-  const toggleNotifications = () => setShowNotifications(!showNotifications)
 
   return (
     <div className="px-6 md:px-12 py-8 bg-white min-h-screen relative">
       {/* Notifications */}
       <div className="flex justify-end mb-6">
         <button
-          onClick={toggleNotifications}
+          onClick={() => setShowNotifications(!showNotifications)}
           className="relative bg-gray-100 hover:bg-gray-200 transition p-2 rounded-full"
         >
           <svg
@@ -98,7 +96,7 @@ export default function Home() {
         Effortlessly build & customize Shopify sections. Design visually, export instantly, sell confidently.
       </p>
 
-      {/* CTA aligned right */}
+      {/* CTA */}
       <div className="flex justify-end gap-4 mb-10 flex-wrap">
         <a
           href="/mysections"
@@ -114,9 +112,8 @@ export default function Home() {
         </a>
       </div>
 
-      {/* Grid Layout */}
+      {/* Zuletzt erstellt */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch mb-10">
-        {/* Zuletzt erstellt – Größte Card */}
         <div className="p-6 border rounded-xl shadow-sm bg-white md:col-span-2 flex flex-col justify-between">
           <h3 className="text-xl font-semibold text-[#1c2838] mb-4">Zuletzt erstellt</h3>
           {!isLoggedIn ? (
@@ -138,7 +135,7 @@ export default function Home() {
           )}
         </div>
 
-        {/* Updates & News – Hoch */}
+        {/* Updates & News */}
         <div className="p-6 border rounded-xl shadow-sm bg-white h-[500px] relative overflow-hidden w-full flex flex-col">
           <div className="absolute top-4 right-4 flex items-center space-x-2 z-10">
             <span className="relative flex h-3 w-3">
@@ -150,18 +147,21 @@ export default function Home() {
           <h3 className="text-lg font-semibold text-[#1c2838] mb-4">Updates & News</h3>
           <div className="overflow-hidden h-[420px] relative">
             <div className="scroll-track animate-marquee space-y-3 pr-2">
-              {Array(2).fill([
-                '✨ Dark mode now available for exports',
-                '🛠 Improved template rendering speed',
-                '🧱 New: Premium section pack "Spark"',
-                '📦 Export history dashboard added',
-                '💡 Metafield editor integration beta',
-                '🧭 New onboarding experience launched'
-              ].map((text, index) => (
-                <div key={text + index} className="bg-[#f4f4f4] text-[#1c2838] text-sm px-4 py-3 rounded-md shadow">
-                  {text}
-                </div>
-              )))}
+              {Array(2)
+                .fill([
+                  '✨ Dark mode now available for exports',
+                  '🛠 Improved template rendering speed',
+                  '🧱 New: Premium section pack "Spark"',
+                  '📦 Export history dashboard added',
+                  '💡 Metafield editor integration beta',
+                  '🧭 New onboarding experience launched'
+                ])
+                .flat()
+                .map((text, index) => (
+                  <div key={`${text}-${index}`} className="bg-[#f4f4f4] text-[#1c2838] text-sm px-4 py-3 rounded-md shadow">
+                    {text}
+                  </div>
+                ))}
             </div>
           </div>
         </div>
@@ -189,7 +189,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Animation */}
+      {/* Animation Styles */}
       <style jsx>{`
         @keyframes marquee {
           0% {

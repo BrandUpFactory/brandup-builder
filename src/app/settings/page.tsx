@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabaseClient'
+import { createClient } from '@/utils/supabase/client'
 import { Session, User } from '@supabase/supabase-js'
 
 export default function SettingsPage() {
+  const supabase = createClient()
   const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
