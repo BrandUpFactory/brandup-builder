@@ -26,3 +26,4 @@ export async function createManualLicense({
 
   return data?.[0] ?? null
 }
+

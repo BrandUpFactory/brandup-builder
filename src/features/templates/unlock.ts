@@ -7,7 +7,6 @@ export async function unlockTemplateWithCode(
   ip?: string,
   userAgent?: string
 ): Promise<{ success: boolean; message: string }> {
-  // Lizenz prüfen
   const { data, error } = await supabase
     .from('licenses')
     .select('*')
@@ -23,7 +22,6 @@ export async function unlockTemplateWithCode(
     }
   }
 
-  // Lizenz updaten
   const { error: updateError } = await supabase
     .from('licenses')
     .update({

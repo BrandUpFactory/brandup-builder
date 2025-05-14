@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabaseClient'
+import { Template } from './types'
 
-export async function getTemplates() {
+export async function fetchTemplates(): Promise<Template[]> {
   const { data, error } = await supabase
     .from('templates')
     .select('*')
@@ -12,5 +13,5 @@ export async function getTemplates() {
     return []
   }
 
-  return data
+  return data as Template[]
 }
