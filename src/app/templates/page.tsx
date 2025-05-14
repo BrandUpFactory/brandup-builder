@@ -7,6 +7,7 @@ import { createClient } from '@/utils/supabase/clients'
 import { unlockTemplateWithCode, hasAccessToTemplate } from '@/features/templates'
 
 
+
 interface Template {
   id: string
   name: string
