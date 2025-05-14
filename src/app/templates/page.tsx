@@ -58,26 +58,35 @@ export default function TemplatesPage() {
   }, [])
 
   const handleUnlock = async (templateId: string, code: string) => {
-    if (!userId) {
-      setNotification({ success: false, message: '⚠️ Du bist nicht eingeloggt.' })
-      return
-    }
-
-    if (!code || code.trim() === '') {
-      setNotification({ success: false, message: '⚠️ Bitte gib einen Code ein.' })
-      return
-    }
-
-    const result = await unlockTemplateWithCode(userId, templateId, code)
-    setNotification(result)
-
-    if (result.success) {
-      setUnlockedIds(prev => [...prev, templateId])
-      setShowInput(prev => ({ ...prev, [templateId]: false }))
-    }
-
-    setTimeout(() => setNotification(null), 4000)
+  if (!userId) {
+    setNotification({ success: false, message: '⚠️ Du bist nicht eingeloggt.' })
+    return
   }
+
+  if (!code || code.trim() === '') {
+    setNotification({ success: false, message: '⚠️ Bitte gib einen Code ein.' })
+    return
+  }
+
+  console.log('🔍 Unlock-Versuch gestartet:')
+  console.log('📄 Eingabe-Code:', code)
+  console.log('👤 User-ID:', userId)
+  console.log('📦 Template-ID:', templateId)
+
+  const result = await unlockTemplateWithCode(userId, templateId, code)
+
+  console.log('✅ Ergebnis von unlockTemplateWithCode:', result)
+
+  setNotification(result)
+
+  if (result.success) {
+    setUnlockedIds(prev => [...prev, templateId])
+    setShowInput(prev => ({ ...prev, [templateId]: false }))
+  }
+
+  setTimeout(() => setNotification(null), 4000)
+}
+
 
   return (
     <div className="p-6 md:p-12">
