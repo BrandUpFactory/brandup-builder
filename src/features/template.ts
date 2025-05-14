@@ -30,6 +30,8 @@ export async function unlockTemplateWithCode(
     .from('licenses')
     .select('*')
     .eq('license_code', cleanedCode)
+    .eq('template_id', templateId)
+    .eq('used', false) // 🔥 Wichtig, sonst blockt die Policy!
     .maybeSingle()
 
   if (error) {
@@ -44,20 +46,6 @@ export async function unlockTemplateWithCode(
     return {
       success: false,
       message: '❌ Dieser Code existiert nicht.'
-    }
-  }
-
-  if (license.used) {
-    return {
-      success: false,
-      message: '⚠️ Dieser Code wurde bereits verwendet.'
-    }
-  }
-
-  if (license.template_id !== templateId) {
-    return {
-      success: false,
-      message: '⚠️ Dieser Code gehört zu einem anderen Template.'
     }
   }
 
