@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/utils/supabase/clients'
+import { supabase } from '@/lib/supabaseClient'
 import { Session, User } from '@supabase/supabase-js'
 
 export default function SettingsPage() {
-  const supabase = createClient()
   const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
@@ -17,19 +16,24 @@ export default function SettingsPage() {
   }, [])
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user ?? null)
-    })
+    const loadUser = async () => {
+      const { data, error } = await supabase.auth.getUser()
+      if (error) {
+        console.error('Fehler beim Laden des Users:', error)
+        return
+      }
+      setUser(data?.user ?? null)
+    }
+
+    loadUser()
 
     const {
-      data: { subscription }
+      data: { subscription },
     } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
       setUser(session?.user ?? null)
     })
 
-    return () => {
-      subscription.unsubscribe()
-    }
+    return () => subscription.unsubscribe()
   }, [])
 
   const isLoggedIn = !!user
@@ -37,9 +41,7 @@ export default function SettingsPage() {
   return (
     <div className="h-screen bg-white px-10 py-10 text-[#1c2838] overflow-hidden">
       <h1 className="text-2xl font-semibold mb-8">Einstellungen</h1>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100%-5rem)]">
-        {/* Linke Spalte: Lizenzen */}
         <div className="md:col-span-2 bg-gray-50 border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
           <div>
             <h2 className="text-lg font-medium mb-4">Deine Lizenzen</h2>
@@ -73,11 +75,9 @@ export default function SettingsPage() {
           </Link>
         </div>
 
-        {/* Rechte Spalte */}
         <div className="flex flex-col gap-6">
           {isLoggedIn ? (
             <>
-              {/* Profilinformationen */}
               <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 shadow-sm flex-1">
                 <h2 className="text-lg font-medium mb-2">Profilinformationen</h2>
                 <p className="text-sm text-gray-700 mb-2">
@@ -89,7 +89,6 @@ export default function SettingsPage() {
                 </p>
               </div>
 
-              {/* Sicherheit & Login */}
               <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 shadow-sm flex-1">
                 <h2 className="text-lg font-medium mb-2">Sicherheit & Login</h2>
                 <p className="text-sm text-gray-700 mb-2">

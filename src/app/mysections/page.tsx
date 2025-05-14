@@ -1,10 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/utils/supabase/clients'
+import { supabase } from '@/lib/supabaseClient'
 import Link from 'next/link'
-import { User } from "@supabase/supabase-js"
-
+import { User } from '@supabase/supabase-js'
 
 interface SectionEntry {
   id: number
@@ -14,17 +13,21 @@ interface SectionEntry {
 }
 
 export default function MySectionsPage() {
-  const supabase = createClient()
   const [user, setUser] = useState<User | null>(null)
   const [sections, setSections] = useState<SectionEntry[]>([])
   const [loading, setLoading] = useState(true)
 
-  // 👤 Benutzer setzen
   useEffect(() => {
-    const getUser = async () => {
-      const { data } = await supabase.auth.getUser()
-      setUser(data.user ?? null)
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser()
+      if (error) {
+        console.error('Fehler beim Abrufen des Users:', error)
+        return
+      }
+      setUser(data?.user ?? null)
     }
+
+    fetchUser()
 
     const {
       data: { subscription },
@@ -32,12 +35,9 @@ export default function MySectionsPage() {
       setUser(session?.user ?? null)
     })
 
-    getUser()
-
     return () => subscription.unsubscribe()
   }, [])
 
-  // 🔄 Sections laden
   useEffect(() => {
     if (!user) return
 
@@ -49,9 +49,12 @@ export default function MySectionsPage() {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      if (!error && data) {
-        setSections(data)
+      if (error) {
+        console.error('Fehler beim Laden der Sections:', error)
+      } else {
+        setSections(data ?? [])
       }
+
       setLoading(false)
     }
 
