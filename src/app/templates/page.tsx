@@ -28,11 +28,7 @@ export default function TemplatesPage() {
 
   useEffect(() => {
     const init = async () => {
-      const { data: userData } = await supabase.auth.getUser().catch(() => ({ data: null }))
-      const user = userData?.user ?? null
-
-      setUserId(user?.id ?? null)
-
+      // ✅ Templates immer laden – egal ob eingeloggt oder nicht
       const { data: templatesData, error } = await supabase
         .from('templates')
         .select('*')
@@ -45,12 +41,19 @@ export default function TemplatesPage() {
 
       setTemplates(templatesData || [])
 
-      if (user?.id && templatesData?.length) {
+      // Versuche Login abzufragen, aber nur falls möglich
+      const { data: userData } = await supabase.auth.getUser().catch(() => ({ data: null }))
+      const user = userData?.user ?? null
+
+      if (user) {
+        setUserId(user.id)
+
         const unlocked: string[] = []
-        for (const template of templatesData) {
+        for (const template of templatesData || []) {
           const access = await hasAccessToTemplate(user.id, template.id)
           if (access) unlocked.push(template.id)
         }
+
         setUnlockedIds(unlocked)
       }
     }
@@ -98,7 +101,7 @@ export default function TemplatesPage() {
             <div key={template.id} className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col">
               <div className="aspect-square w-full relative">
                 <img src={template.image_url} alt={template.name} className="w-full h-full object-cover" />
-                {!isUnlocked && userId && (
+                {!isUnlocked && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/70">
                     <FiLock size={32} className="text-black" />
                   </div>
@@ -109,7 +112,7 @@ export default function TemplatesPage() {
                 <h2 className="text-sm font-medium text-[#1c2838]">{template.name}</h2>
                 <p className="text-xs text-gray-500 mb-2">{template.description}</p>
 
-                {userId && isUnlocked ? (
+                {isUnlocked ? (
                   <Link href={template.edit_url || '#'}>
                     <button className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full w-full">
                       Bearbeiten
@@ -142,7 +145,9 @@ export default function TemplatesPage() {
                       </button>
                     )}
                   </>
-                ) : null}
+                ) : (
+                  <p className="text-xs text-gray-400 text-center italic">🔒 Login erforderlich für Freischaltung</p>
+                )}
 
                 <Link
                   href={template.buy_url}
