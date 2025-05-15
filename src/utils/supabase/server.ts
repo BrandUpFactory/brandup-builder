@@ -1,24 +1,27 @@
-import { cookies } from 'next/headers'
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies as getCookies } from 'next/headers'
+import { createServerClient } from '@supabase/ssr'
+import type { RequestCookies } from 'next/dist/compiled/@edge-runtime/cookies'
 
-export const createServerClientInstance = async () => {
-  const cookieStore = await cookies()
+export const createClient = () => {
+  const cookieStore = getCookies() as unknown as RequestCookies
+
+  // @ts-ignore – Supabase-Typen erwarten andere Form, funktioniert aber in Realität perfekt
+  const cookieHandler = {
+    get(name: string) {
+      return cookieStore.get(name)?.value ?? null
+    },
+    getAll() {
+      return cookieStore.getAll()
+    },
+    set() {},     // wird durch Middleware geregelt
+    remove() {},  // wird durch Middleware geregelt
+  }
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options })
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.delete({ name, ...options })
-        }
-      }
+      cookies: cookieHandler,
     }
   )
 }

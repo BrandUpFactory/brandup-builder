@@ -6,16 +6,12 @@ export default function LoginPage() {
   const supabase = createClient()
 
   const signInWithGithub = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    await supabase.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo: `${location.origin}/auth/callback`,
+        redirectTo: `${location.origin}/settings`,
       },
     })
-
-    if (error) {
-      alert('❌ GitHub Login fehlgeschlagen.')
-    }
   }
 
   const signInWithEmail = async () => {
@@ -25,21 +21,22 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${location.origin}/auth/callback`,
+        emailRedirectTo: `${location.origin}/settings`,
       },
     })
 
     if (error) {
-      alert('❌ Fehler beim Versenden')
+      alert('Fehler beim Senden des Links.')
     } else {
-      alert('✅ Link gesendet.')
+      alert('Link gesendet!')
     }
   }
 
   return (
-    <div>
-      <button onClick={signInWithGithub}>Login mit GitHub</button>
-      <button onClick={signInWithEmail}>Login mit E-Mail</button>
+    <div className="p-10">
+      <h1>Login</h1>
+      <button onClick={signInWithGithub}>GitHub</button>
+      <button onClick={signInWithEmail}>Magic Link</button>
     </div>
   )
 }

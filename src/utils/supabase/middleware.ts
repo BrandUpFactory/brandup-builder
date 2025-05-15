@@ -1,7 +1,8 @@
+// src/utils/supabase/middleware.ts
 import { createServerClient } from '@supabase/ssr'
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
-export async function updateSession(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const response = NextResponse.next()
 
   const supabase = createServerClient(
@@ -9,19 +10,22 @@ export async function updateSession(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
-        },
-        set(name, value, options) {
-          response.cookies.set(name, value, options)
-        },
-        remove(name, options) {
-          response.cookies.set(name, '', { ...options, maxAge: -1 })
+        getAll: () => request.cookies.getAll(),
+        setAll: (cookiesToSet) => {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options)
+          })
         }
       }
     }
   )
 
+  // optional: sorgt dafür, dass session gecached wird
   await supabase.auth.getSession()
+
   return response
+}
+
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)']
 }
