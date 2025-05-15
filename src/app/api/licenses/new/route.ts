@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
+import { randomUUID } from 'crypto'
 
 export async function POST() {
-  const supabase = createClient()
+  const supabase = await createClient() // ✅ await!
 
   const {
     data: { user },
@@ -13,7 +14,7 @@ export async function POST() {
     return NextResponse.json({ error: 'Nicht eingeloggt' }, { status: 401 })
   }
 
-  const licenseKey = `BRUP-${new Date().getFullYear()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
+  const licenseKey = `BRUP-${new Date().getFullYear()}-${randomUUID().slice(0, 4).toUpperCase()}`
 
   const { data, error: insertError } = await supabase
     .from('licenses')
@@ -21,10 +22,11 @@ export async function POST() {
       {
         user_id: user.id,
         license_key: licenseKey,
-        is_active: true
+        valid_until: '2025-12-31',
+        template_id: null // optional: später zuweisen
       }
     ])
-    .select('*')
+    .select()
     .single()
 
   if (insertError) {

@@ -21,19 +21,22 @@ export default function TemplatesPage() {
 
   useEffect(() => {
     const loadTemplates = async () => {
-      const { data, error } = await supabase
-        .from('templates')
-        .select('*')
-        .eq('active', true)
+      try {
+        const { data, error } = await supabase
+          .from('templates')
+          .select('*')
+          .eq('active', true)
 
-      if (error) {
-        console.error('❌ Fehler beim Laden der Templates:', error)
+        if (error) {
+          console.error('❌ Fehler beim Laden der Templates:', error)
+        } else {
+          setTemplates(data || [])
+        }
+      } catch (err) {
+        console.error('❌ Allgemeiner Fehler beim Laden:', err)
+      } finally {
         setLoading(false)
-        return
       }
-
-      setTemplates(data || [])
-      setLoading(false)
     }
 
     loadTemplates()
@@ -49,7 +52,7 @@ export default function TemplatesPage() {
         <p className="text-sm text-gray-500">Keine Templates gefunden.</p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-          {templates.map(template => (
+          {templates.map((template) => (
             <div key={template.id} className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col">
               <div className="aspect-square w-full relative">
                 <img
