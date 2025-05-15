@@ -15,31 +15,28 @@ interface Template {
 }
 
 export default function TemplatesPage() {
-  const supabase = createClient()
   const [templates, setTemplates] = useState<Template[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const loadTemplates = async () => {
+    const fetchTemplates = async () => {
       try {
+        const supabase = createClient()
         const { data, error } = await supabase
           .from('templates')
           .select('*')
           .eq('active', true)
 
-        if (error) {
-          console.error('❌ Fehler beim Laden der Templates:', error)
-        } else {
-          setTemplates(data || [])
-        }
+        if (error) console.error('Fehler beim Laden:', error)
+        else setTemplates(data || [])
       } catch (err) {
-        console.error('❌ Allgemeiner Fehler beim Laden:', err)
+        console.error('Allgemeiner Fehler:', err)
       } finally {
         setLoading(false)
       }
     }
 
-    loadTemplates()
+    fetchTemplates()
   }, [])
 
   return (
@@ -55,23 +52,16 @@ export default function TemplatesPage() {
           {templates.map((template) => (
             <div key={template.id} className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col">
               <div className="aspect-square w-full relative">
-                <img
-                  src={template.image_url}
-                  alt={template.name}
-                  className="w-full h-full object-cover"
-                />
+                <img src={template.image_url} alt={template.name} className="w-full h-full object-cover" />
               </div>
-
               <div className="p-4 flex flex-col gap-2 flex-grow">
                 <h2 className="text-sm font-medium text-[#1c2838]">{template.name}</h2>
                 <p className="text-xs text-gray-500 mb-2">{template.description}</p>
-
                 <Link href={template.edit_url || '#'}>
                   <button className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full w-full">
                     Bearbeiten
                   </button>
                 </Link>
-
                 <Link
                   href={template.buy_url}
                   target="_blank"
