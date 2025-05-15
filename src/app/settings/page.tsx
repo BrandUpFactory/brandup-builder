@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
-import { Session, User } from '@supabase/supabase-js'
+import { User } from '@supabase/supabase-js'
 
 export default function SettingsPage() {
   const supabase = createClient()
@@ -29,8 +29,8 @@ export default function SettingsPage() {
     loadUser()
 
     const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
     })
 
@@ -38,6 +38,18 @@ export default function SettingsPage() {
   }, [])
 
   const isLoggedIn = !!user
+
+  const handleCreateLicense = async () => {
+    const res = await fetch('/api/licenses/new', { method: 'POST' })
+    const json = await res.json()
+
+    if (json.success) {
+      alert(`✅ Neue Lizenz erstellt: ${json.license.license_key}`)
+      // Optional: State aktualisieren, neu laden etc.
+    } else {
+      alert(`❌ Fehler: ${json.error}`)
+    }
+  }
 
   return (
     <div className="h-screen bg-white px-10 py-10 text-[#1c2838] overflow-hidden">
@@ -58,9 +70,17 @@ export default function SettingsPage() {
                   Aktiv bis: <span className="text-gray-500">15.03.2026</span><br />
                   Lizenz-ID: <code>BRUP-2026-HA52</code>
                 </div>
+
                 <div className="text-xs text-gray-500 mt-1">
                   Für jede erworbene Section erhältst du eine eigene Lizenz.
                 </div>
+
+                <button
+                  onClick={handleCreateLicense}
+                  className="mt-2 inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition"
+                >
+                  ➕ Neue Lizenz generieren
+                </button>
               </div>
             ) : (
               <p className="text-sm text-gray-500">Bitte melde dich an, um deine Lizenzen zu sehen.</p>

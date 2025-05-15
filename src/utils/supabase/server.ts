@@ -1,22 +1,27 @@
-import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies'
 
-export const createClient = async () => {
-  const cookieStore = await cookies() // ⬅️ await ist wichtig!
+export const createClient = () => {
+  const cookieStore = cookies() as unknown as ReadonlyRequestCookies // 👉 FORCE TYPE HERE
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name) {
+        get(name: string) {
           return cookieStore.get(name)?.value
         },
-        set(name, value, options) {
-          cookieStore.set({ name, value, ...options })
+        set(name: string, value: string, options: CookieOptions) {
+          try {
+            cookieStore.set({ name, value, ...options })
+          } catch {}
         },
-        remove(name, options) {
-          cookieStore.delete({ name, ...options })
+        remove(name: string, options: CookieOptions) {
+          try {
+            cookieStore.delete({ name, ...options })
+          } catch {}
         }
       }
     }
