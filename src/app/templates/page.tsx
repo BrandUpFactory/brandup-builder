@@ -28,20 +28,10 @@ export default function TemplatesPage() {
 
   useEffect(() => {
     const init = async () => {
-      const { data: userData, error: authError } = await supabase.auth.getUser()
-      const user = userData?.user
+      const { data: userData } = await supabase.auth.getUser().catch(() => ({ data: null }))
+      const user = userData?.user ?? null
 
-      if (authError) {
-        console.error('❌ Auth-Fehler:', authError)
-        return
-      }
-
-      if (!user) {
-        console.warn('⚠️ Kein eingeloggter User gefunden')
-        return
-      }
-
-      setUserId(user.id)
+      setUserId(user?.id ?? null)
 
       const { data: templatesData, error } = await supabase
         .from('templates')
@@ -55,13 +45,14 @@ export default function TemplatesPage() {
 
       setTemplates(templatesData || [])
 
-      const unlocked: string[] = []
-      for (const template of templatesData || []) {
-        const access = await hasAccessToTemplate(user.id, template.id)
-        if (access) unlocked.push(template.id)
+      if (user?.id && templatesData?.length) {
+        const unlocked: string[] = []
+        for (const template of templatesData) {
+          const access = await hasAccessToTemplate(user.id, template.id)
+          if (access) unlocked.push(template.id)
+        }
+        setUnlockedIds(unlocked)
       }
-
-      setUnlockedIds(unlocked)
     }
 
     init()
@@ -107,7 +98,7 @@ export default function TemplatesPage() {
             <div key={template.id} className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col">
               <div className="aspect-square w-full relative">
                 <img src={template.image_url} alt={template.name} className="w-full h-full object-cover" />
-                {!isUnlocked && (
+                {!isUnlocked && userId && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/70">
                     <FiLock size={32} className="text-black" />
                   </div>
@@ -118,13 +109,13 @@ export default function TemplatesPage() {
                 <h2 className="text-sm font-medium text-[#1c2838]">{template.name}</h2>
                 <p className="text-xs text-gray-500 mb-2">{template.description}</p>
 
-                {isUnlocked ? (
+                {userId && isUnlocked ? (
                   <Link href={template.edit_url || '#'}>
                     <button className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full w-full">
                       Bearbeiten
                     </button>
                   </Link>
-                ) : (
+                ) : userId ? (
                   <>
                     {showInput[template.id] ? (
                       <>
@@ -151,7 +142,7 @@ export default function TemplatesPage() {
                       </button>
                     )}
                   </>
-                )}
+                ) : null}
 
                 <Link
                   href={template.buy_url}
