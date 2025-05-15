@@ -18,6 +18,7 @@ export default function TemplatesPage() {
   const [templates, setTemplates] = useState<Template[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -45,51 +46,70 @@ export default function TemplatesPage() {
     fetchTemplates()
   }, [])
 
+  const filteredTemplates = templates.filter((template) =>
+    template.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
   return (
     <div className="p-6 md:p-12">
-      <h1 className="text-2xl md:text-3xl font-bold text-[#1c2838] mb-6">Alle Templates</h1>
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-[#1c2838]">
+          Alle Templates
+        </h1>
+
+        <input
+          type="text"
+          placeholder="🔎 Suchen..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="px-4 py-2 border border-gray-300 rounded-full text-sm w-full sm:w-64 md:w-72 bg-[#f4f7fa] text-[#1c2838] focus:outline-none focus:ring-2 focus:ring-[#1c2838]"
+        />
+      </div>
 
       {loading ? (
         <p className="text-sm text-gray-500">⏳ Lade Templates...</p>
       ) : error ? (
         <p className="text-sm text-red-500">{error}</p>
-      ) : templates.length === 0 ? (
-        <p className="text-sm text-gray-500">Keine Templates gefunden.</p>
+      ) : filteredTemplates.length === 0 ? (
+        <p className="text-sm text-gray-500">Keine passenden Templates gefunden.</p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-          {templates.map((template) => (
+          {filteredTemplates.map((template) => (
             <div
               key={template.id}
               className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col hover:shadow-md transition"
             >
               <div className="aspect-square w-full relative">
+                {/* 🔒 Schloss exakt in der Mitte des Bildes */}
+                <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                  <img
+                    src="/Schloss_Icon.png"
+                    alt="Locked"
+                    className="w-10 h-10 object-contain opacity-90"
+                  />
+                </div>
                 <img
                   src={template.image_url}
                   alt={template.name}
                   className="w-full h-full object-cover"
                 />
               </div>
+
               <div className="p-4 flex flex-col gap-2 flex-grow">
                 <h2 className="text-sm font-medium text-[#1c2838]">{template.name}</h2>
                 <p className="text-xs text-gray-500 mb-2">{template.description}</p>
 
-                {template.edit_url && (
-                  <Link href={template.edit_url}>
-                    <button className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full w-full">
-                      Bearbeiten
-                    </button>
-                  </Link>
-                )}
+                <button className="bg-[#676058] hover:opacity-90 text-white text-xs px-4 py-1.5 rounded-full w-full transition">
+                  Freischalten
+                </button>
 
-                {template.buy_url && (
-                  <Link
-                    href={template.buy_url}
-                    target="_blank"
-                    className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full text-center"
-                  >
-                    Kaufen
-                  </Link>
-                )}
+                <Link
+                  href={template.buy_url || '#'}
+                  target="_blank"
+                  className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full text-center w-full"
+                >
+                  Kaufen
+                </Link>
               </div>
             </div>
           ))}
