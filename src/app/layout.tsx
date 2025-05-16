@@ -1,5 +1,6 @@
 import './globals.css'
 import Navbar from '../components/Navbar'
+import { Analytics } from '@vercel/analytics/react' // ✅ Import hinzufügen
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,7 +12,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 ml-64 p-8 overflow-y-auto">{children}</main>
+        <main className="flex-1 ml-64 p-8 overflow-y-auto">
+          {children}
+          <Analytics /> {/* ✅ Analytics Komponente einfügen */}
+        </main>
       </body>
     </html>
   )
