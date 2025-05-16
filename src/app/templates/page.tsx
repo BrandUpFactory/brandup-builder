@@ -73,14 +73,13 @@ export default function TemplatesPage() {
       ) : filteredTemplates.length === 0 ? (
         <p className="text-sm text-gray-500">Keine passenden Templates gefunden.</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6">
           {filteredTemplates.map((template) => (
             <div
               key={template.id}
               className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col hover:shadow-md transition"
             >
-              <div className="aspect-square w-full relative">
-                {/* 🔒 Schloss exakt in der Mitte des Bildes */}
+              <div className="aspect-square w-full relative bg-gray-50">
                 <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
                   <img
                     src="/Schloss_Icon.png"
@@ -95,21 +94,23 @@ export default function TemplatesPage() {
                 />
               </div>
 
-              <div className="p-4 flex flex-col gap-2 flex-grow">
-                <h2 className="text-sm font-medium text-[#1c2838]">{template.name}</h2>
-                <p className="text-xs text-gray-500 mb-2">{template.description}</p>
+              <div className="p-3 flex flex-col gap-2 flex-grow">
+                <h2 className="text-sm font-medium text-[#1c2838] truncate">{template.name}</h2>
+                <p className="text-xs text-gray-500 line-clamp-2">{template.description}</p>
 
-                <button className="bg-[#676058] hover:opacity-90 text-white text-xs px-4 py-1.5 rounded-full w-full transition">
-                  Freischalten
-                </button>
+                <div className="mt-auto flex flex-col gap-2">
+                  <button className="bg-[#676058] hover:opacity-90 text-white text-xs px-4 py-1.5 rounded-full w-full transition">
+                    Freischalten
+                  </button>
 
-                <Link
-                  href={template.buy_url || '#'}
-                  target="_blank"
-                  className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full text-center w-full"
-                >
-                  Kaufen
-                </Link>
+                  <Link
+                    href={template.buy_url || '#'}
+                    target="_blank"
+                    className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full text-center w-full"
+                  >
+                    Kaufen
+                  </Link>
+                </div>
               </div>
             </div>
           ))}
