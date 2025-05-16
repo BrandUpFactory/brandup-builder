@@ -5,7 +5,7 @@ import type { RequestCookies } from 'next/dist/compiled/@edge-runtime/cookies'
 export const createClient = () => {
   const cookieStore = getCookies() as unknown as RequestCookies
 
-  // @ts-ignore – Supabase-Typen erwarten andere Form, funktioniert aber in Realität perfekt
+  // Supabase erwartet set/remove, aber Middleware regelt das
   const cookieHandler = {
     get(name: string) {
       return cookieStore.get(name)?.value ?? null
@@ -13,8 +13,8 @@ export const createClient = () => {
     getAll() {
       return cookieStore.getAll()
     },
-    set() {},     // wird durch Middleware geregelt
-    remove() {},  // wird durch Middleware geregelt
+    set() {},     // handled by middleware
+    remove() {},  // handled by middleware
   }
 
   return createServerClient(

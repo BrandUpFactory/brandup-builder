@@ -1,4 +1,3 @@
-// src/utils/supabase/middleware.ts
 import { createServerClient } from '@supabase/ssr'
 import { type NextRequest, NextResponse } from 'next/server'
 
@@ -15,12 +14,12 @@ export async function middleware(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options)
           })
-        }
-      }
+        },
+      },
     }
   )
 
-  // optional: sorgt dafür, dass session gecached wird
+  // Holt Session und cached sie im Hintergrund
   await supabase.auth.getSession()
 
   return response
