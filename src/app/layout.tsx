@@ -1,6 +1,9 @@
+'use client'
+
 import './globals.css'
 import Navbar from '../components/Navbar'
-import { Analytics } from '@vercel/analytics/react' // ✅ Import hinzufügen
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,7 +17,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Main Content */}
         <main className="flex-1 ml-64 p-8 overflow-y-auto">
           {children}
-          <Analytics /> {/* ✅ Analytics Komponente einfügen */}
+          <Analytics />        {/* ✅ Analytics von Vercel */}
+          <SpeedInsights />    {/* ✅ Speed Insights von Vercel */}
         </main>
       </body>
     </html>
