@@ -67,3 +67,31 @@ body {
 .animate-slideUp {
   animation: slideUp 0.3s ease-out;
 }
+
+/* Dropdown menu styles */
+.dropdown-container.active .dropdown-menu {
+  display: block;
+}
+
+/* Add a click overlay to handle clicks outside the dropdown */
+.dropdown-container.active::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 90;
+}
+
+/* Keep dropdown visible for a brief period after leaving */
+.dropdown-menu {
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dropdown-container.active .dropdown-menu {
+  opacity: 1;
+  pointer-events: auto;
+}

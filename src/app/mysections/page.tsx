@@ -30,6 +30,21 @@ export default function MySectionsPage() {
   const [renameDialogOpen, setRenameDialogOpen] = useState(false)
   const [sectionToRename, setSectionToRename] = useState<SectionEntry | null>(null)
 
+  // Add event listener to close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const dropdowns = document.querySelectorAll('.dropdown-container.active');
+      dropdowns.forEach(dropdown => {
+        if (!dropdown.contains(event.target as Node)) {
+          dropdown.classList.remove('active');
+        }
+      });
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   useEffect(() => {
     const fetchUser = async () => {
       const { data, error } = await supabase.auth.getUser()
@@ -258,15 +273,19 @@ export default function MySectionsPage() {
                               >
                                 Bearbeiten
                               </Link>
-                              <div className="relative group" tabIndex={0} style={{ position: 'relative', overflow: 'visible' }}>
+                              <div className="dropdown-container relative" style={{ overflow: 'visible' }}>
                                 <button 
                                   className="bg-[#1c2838] text-white px-3 py-2 text-xs rounded-lg hover:opacity-90 transition shadow-sm"
+                                  onClick={(e) => {
+                                    e.currentTarget.parentElement?.classList.toggle('active');
+                                    e.stopPropagation();
+                                  }}
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                                   </svg>
                                 </button>
-                                <div className="absolute top-full right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-[100] hidden group-hover:block transition-opacity duration-300 group-focus-within:block">
+                                <div className="absolute top-full right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-[100] hidden dropdown-menu">
                                   <div className="py-1">
                                     <button 
                                       className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 rounded-t-lg text-gray-700 transition flex items-center"

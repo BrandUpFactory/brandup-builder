@@ -78,7 +78,15 @@ export default function EditorLayout({
   // Save function that will be called by a keyboard shortcut or from other components
   const handleSave = () => {
     if (onSave) {
-      onSave()
+      onSave();
+      // Show save success notification
+      const saveSuccessNotification = document.getElementById('saveSuccessNotification');
+      if (saveSuccessNotification) {
+        saveSuccessNotification.classList.remove('hidden');
+        setTimeout(() => {
+          saveSuccessNotification.classList.add('hidden');
+        }, 2000);
+      }
     }
   }
   
@@ -221,6 +229,10 @@ export default function EditorLayout({
           Versionsname erfolgreich geändert!
         </div>
       )}
+      {/* Save success notification */}
+      <div id="saveSuccessNotification" className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn hidden">
+        Änderungen erfolgreich gespeichert!
+      </div>
       
       {/* Editor Header with Title and Version Control */}
       <div className="mb-6 flex flex-col md:flex-row justify-between gap-3">

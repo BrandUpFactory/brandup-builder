@@ -57,6 +57,7 @@ export default function TemplateEditorClient({
   // Update currentSectionData when sectionData changes
   useEffect(() => {
     if (Object.keys(sectionData).length > 0) {
+      console.log("Setting current section data:", sectionData);
       setCurrentSectionData(sectionData);
     }
   }, [sectionData]);
@@ -71,10 +72,15 @@ export default function TemplateEditorClient({
     if (!section) return false
     
     try {
+      // Ensure we're storing stringified JSON data
+      const dataToSave = typeof newData === 'string' ? newData : JSON.stringify(newData);
+      
+      console.log("Saving data:", dataToSave);
+      
       const { error } = await supabase
         .from('sections')
         .update({ 
-          data: newData,
+          data: dataToSave,
           updated_at: new Date().toISOString()
         })
         .eq('id', section.id)
@@ -178,7 +184,11 @@ export default function TemplateEditorClient({
           }
           
           setSection(sectionData)
-          setSectionData(sectionData.data || {})
+          const parsedData = typeof sectionData.data === 'string' 
+            ? JSON.parse(sectionData.data) 
+            : (sectionData.data || {});
+          setSectionData(parsedData)
+          setCurrentSectionData(parsedData)
           setSectionTitle(sectionData.title || template.name || '')
         } else {
           // If no section ID is provided, find the first section for this template
@@ -192,7 +202,11 @@ export default function TemplateEditorClient({
           
           if (!sectionsError && sections && sections.length > 0) {
             setSection(sections[0])
-            setSectionData(sections[0].data || {})
+            const parsedData = typeof sections[0].data === 'string' 
+              ? JSON.parse(sections[0].data) 
+              : (sections[0].data || {});
+            setSectionData(parsedData)
+            setCurrentSectionData(parsedData)
             setSectionTitle(sections[0].title || template.name || '')
             
             // Update URL to include section ID for better navigation
@@ -246,6 +260,11 @@ export default function TemplateEditorClient({
       
       if (error) {
         console.error('Fehler beim Speichern des Versionsnamens:', error)
+      } else {
+        // Update local section state immediately
+        section.title = newName;
+        // Create a new object to trigger a re-render
+        setSection({...section});
       }
       
     } catch (err) {
