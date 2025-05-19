@@ -8,7 +8,7 @@ interface DevicePreviewProps {
 
 export default function DevicePreview({ children }: DevicePreviewProps) {
   const [device, setDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
+  // Dark mode removed as per requirements
 
   // Device dimensions mapping
   const deviceStyles = {
@@ -29,16 +29,10 @@ export default function DevicePreview({ children }: DevicePreviewProps) {
     }
   }
 
-  // Theme styles
+  // Theme styles (light only as per requirements)
   const themeStyles = {
-    light: {
-      background: 'white',
-      color: '#1c2838'
-    },
-    dark: {
-      background: '#1c2838',
-      color: 'white'
-    }
+    background: 'white',
+    color: '#1c2838'
   }
 
   return (
@@ -74,23 +68,7 @@ export default function DevicePreview({ children }: DevicePreviewProps) {
             </svg>
           </button>
         </div>
-        <div>
-          <button
-            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            className="p-1.5 rounded hover:bg-gray-200"
-            title={theme === 'light' ? 'Zum dunklen Modus wechseln' : 'Zum hellen Modus wechseln'}
-          >
-            {theme === 'light' ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            )}
-          </button>
-        </div>
+        {/* Dark mode button removed as per requirements */}
       </div>
 
       {/* Device Preview Frame */}
@@ -99,11 +77,11 @@ export default function DevicePreview({ children }: DevicePreviewProps) {
           className={`transition-all duration-300 overflow-auto ${device !== 'desktop' ? 'border-2 rounded-lg shadow-lg' : ''}`}
           style={{
             ...deviceStyles[device],
-            ...themeStyles[theme]
+            ...themeStyles
           }}
         >
-          {/* If theme is dark, we need to wrap the children to apply theme styles */}
-          <div className={`h-full ${theme === 'dark' ? 'theme-dark' : ''}`}>
+          {/* Container for content */}
+          <div className="h-full">
             {children}
           </div>
         </div>
@@ -111,7 +89,7 @@ export default function DevicePreview({ children }: DevicePreviewProps) {
 
       {/* Device Info */}
       <div className="text-xs text-gray-500 mt-2 text-center">
-        {device === 'desktop' ? 'Desktop' : device === 'tablet' ? 'Tablet (768px)' : 'Mobile (375px)'} - {theme === 'light' ? 'Heller Modus' : 'Dunkler Modus'}
+        {device === 'desktop' ? 'Desktop' : device === 'tablet' ? 'Tablet (768px)' : 'Mobile (375px)'}
       </div>
     </div>
   )

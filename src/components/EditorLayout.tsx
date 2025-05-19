@@ -207,41 +207,9 @@ export default function EditorLayout({
             </span>
           </h1>
           <div className="flex items-center mt-1">
-            {editing ? (
-              <div className="flex items-center">
-                <input
-                  type="text"
-                  value={editingName}
-                  onChange={(e) => setEditingName(e.target.value)}
-                  className="border border-blue-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  autoFocus
-                  onBlur={handleNameSave}
-                  onKeyDown={(e) => e.key === 'Enter' && handleNameSave()}
-                />
-                <button 
-                  onClick={handleNameSave}
-                  className="ml-1 text-[#1c2838] hover:text-blue-800"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </button>
-              </div>
-            ) : (
-              <>
-                <span className="text-sm text-gray-600 mr-1">Version:</span>
-                <span className="text-sm font-medium">{versionName || 'Unbenannte Version'}</span>
-                <button 
-                  onClick={() => setEditing(true)}
-                  className="ml-1.5 text-gray-400 hover:text-[#1c2838] transition"
-                  title="Version umbenennen"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                </button>
-              </>
-            )}
+            <span className="text-sm text-gray-600 mr-1">Version:</span>
+            <span className="text-sm font-medium">{versionName || 'Unbenannte Version'}</span>
+          </div>
           </div>
         </div>
         

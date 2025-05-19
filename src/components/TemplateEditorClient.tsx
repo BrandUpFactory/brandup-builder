@@ -52,6 +52,7 @@ export default function TemplateEditorClient({
   const [currentSectionData, setCurrentSectionData] = useState<any>({})
   const [isSaving, setIsSaving] = useState(false)
   const [saveMessage, setSaveMessage] = useState<{text: string, type: 'success' | 'error'} | null>(null)
+  const [sectionTitle, setSectionTitle] = useState<string>('')
   
   // Update currentSectionData when sectionData changes
   useEffect(() => {
@@ -74,6 +75,7 @@ export default function TemplateEditorClient({
         .from('sections')
         .update({ 
           data: newData,
+          title: sectionTitle,
           updated_at: new Date().toISOString()
         })
         .eq('id', section.id)
@@ -90,7 +92,7 @@ export default function TemplateEditorClient({
       console.error('Unerwarteter Fehler beim Speichern:', err)
       return false
     }
-  }, [section, supabase]);
+  }, [section, supabase, sectionTitle]);
 
   // Handle save button click
   const handleSave = useCallback(async () => {
@@ -178,6 +180,7 @@ export default function TemplateEditorClient({
           
           setSection(sectionData)
           setSectionData(sectionData.data || {})
+          setSectionTitle(sectionData.title || template.name || '')
         } else {
           // If no section ID is provided, find the first section for this template
           const { data: sections, error: sectionsError } = await supabase
@@ -191,6 +194,7 @@ export default function TemplateEditorClient({
           if (!sectionsError && sections && sections.length > 0) {
             setSection(sections[0])
             setSectionData(sections[0].data || {})
+            setSectionTitle(sections[0].title || template.name || '')
             
             // Update URL to include section ID for better navigation
             router.replace(`/editor/${templateId}?id=${sections[0].id}`)
@@ -295,17 +299,11 @@ function EditorWrapper({
             <div className="flex items-center gap-2">
               <input 
                 type="text"
-                value={section.title || template.name}
+                value={sectionTitle}
                 className="text-lg font-bold text-[#1c2838] bg-transparent border-b border-transparent hover:border-gray-200 focus:border-blue-500 outline-none transition-colors px-0 py-0.5 max-w-[250px]"
                 placeholder="Versionstitel eingeben"
-                onChange={(e) => {
-                  // Hier würde später die Funktionalität zum Ändern des Namens implementiert werden
-                  // section.title = e.target.value
-                }}
+                onChange={(e) => setSectionTitle(e.target.value)}
               />
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-              </svg>
             </div>
             <p className="text-xs text-gray-500">Template: {template.name}</p>
           </div>
@@ -323,25 +321,6 @@ function EditorWrapper({
           )}
           
           <div className="flex items-center gap-2">
-            <button 
-              onClick={onSave}
-              disabled={isSaving}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 text-sm rounded-lg hover:opacity-90 transition flex items-center gap-1 shadow-sm"
-            >
-              {isSaving ? (
-                <>
-                  <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                  Speichern...
-                </>
-              ) : (
-                <>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                  </svg>
-                  Speichern
-                </>
-              )}
-            </button>
             <button 
               onClick={onBack}
               className="bg-gray-100 text-gray-800 px-4 py-2 text-sm rounded-lg hover:bg-gray-200 transition shadow-sm flex items-center gap-1"
