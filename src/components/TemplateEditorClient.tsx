@@ -138,10 +138,23 @@ export default function TemplateEditorClient({
 
   // Create a new section version
   const createNewSectionVersion = async () => {
-    if (!user || !template) return;
-    
     try {
       setIsLoading(true);
+      
+      // Check if user and template are available
+      if (!user) {
+        console.error('No user found when creating new version');
+        setError('Benutzer nicht gefunden. Bitte melden Sie sich an.');
+        setIsLoading(false);
+        return;
+      }
+      
+      if (!template) {
+        console.error('No template found when creating new version');
+        setError('Template nicht gefunden. Bitte laden Sie die Seite neu.');
+        setIsLoading(false);
+        return;
+      }
       
       // Default section data
       const defaultData = {
@@ -157,12 +170,17 @@ export default function TemplateEditorClient({
         showButton: true
       };
       
+      const userId = user.id;
+      const templateId = template.id;
+      
+      console.log(`Creating new version for user ${userId} and template ${templateId}`);
+      
       // Count existing sections for this template
       const { data: existingSections, error: countError } = await supabase
         .from('sections')
         .select('id')
-        .eq('user_id', user.id)
-        .eq('template_id', template.id);
+        .eq('user_id', userId)
+        .eq('template_id', templateId);
       
       if (countError) {
         console.error('Error counting sections:', countError);
@@ -173,33 +191,48 @@ export default function TemplateEditorClient({
       
       // Check if max limit reached (5 versions)
       if (existingSections && existingSections.length >= 5) {
+        console.error('Maximum version limit reached:', existingSections.length);
         setError('Sie haben das Maximum von 5 Versionen für dieses Template erreicht. Bitte löschen Sie eine vorhandene Version, um eine neue zu erstellen.');
         setIsLoading(false);
         throw new Error('Maximum von 5 Versionen für dieses Template erreicht. Bitte löschen Sie eine vorhandene Version, um eine neue zu erstellen.');
       }
       
       // Create a new section
+      const newVersionNumber = existingSections ? existingSections.length + 1 : 1;
+      const newVersionTitle = `${template.name} ${newVersionNumber}`;
+      
+      console.log(`Creating new section with title: ${newVersionTitle}`);
+      
       const { data: newSection, error: newSectionError } = await supabase
         .from('sections')
         .insert({
-          user_id: user.id,
-          template_id: template.id,
-          title: `${template.name} ${existingSections ? existingSections.length + 1 : 1}`,
+          user_id: userId,
+          template_id: templateId,
+          title: newVersionTitle,
           data: JSON.stringify(defaultData),
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
         .select();
       
-      if (newSectionError || !newSection || newSection.length === 0) {
+      if (newSectionError) {
         console.error('Error creating new section:', newSectionError);
         setError('Fehler beim Erstellen einer neuen Version. Bitte versuchen Sie es später erneut.');
         setIsLoading(false);
         return;
       }
       
+      if (!newSection || newSection.length === 0) {
+        console.error('No section created despite successful request');
+        setError('Fehler beim Erstellen einer neuen Version. Die Datenbank hat keine Version zurückgegeben.');
+        setIsLoading(false);
+        return;
+      }
+      
+      console.log('New section created successfully:', newSection[0].id);
+      
       // Redirect to the new section
-      router.push(`/editor/${template.id}?id=${newSection[0].id}`);
+      router.push(`/editor/${templateId}?id=${newSection[0].id}`);
       
     } catch (err) {
       console.error('Unexpected error creating new section:', err);
@@ -317,24 +350,38 @@ export default function TemplateEditorClient({
             
             // Create a new section
             try {
+              const userId = authUser.id; // Use authUser which is guaranteed to exist at this point
+              const versionTitle = templateData.name; // Use template name for first version
+              
+              console.log(`Automatically creating first version "${versionTitle}" for user ${userId} and template ${templateId}`);
+              
               const { data: newSection, error: newSectionError } = await supabase
                 .from('sections')
                 .insert({
-                  user_id: user.id,
+                  user_id: userId,
                   template_id: templateId,
-                  title: templateData.name,
+                  title: versionTitle,
                   data: JSON.stringify(defaultData),
                   created_at: new Date().toISOString(),
                   updated_at: new Date().toISOString()
                 })
-                .select()
+                .select();
               
-              if (newSectionError || !newSection || newSection.length === 0) {
+              if (newSectionError) {
                 console.error('Fehler beim Erstellen einer neuen Section:', newSectionError);
                 setError('Fehler beim Erstellen einer neuen Section. Bitte versuchen Sie es später erneut.');
                 setIsLoading(false);
                 return;
               }
+              
+              if (!newSection || newSection.length === 0) {
+                console.error('No section created despite successful request');
+                setError('Fehler beim Erstellen einer neuen Section. Die Datenbank hat keine Section zurückgegeben.');
+                setIsLoading(false);
+                return;
+              }
+              
+              console.log('New section created successfully:', newSection[0].id);
               
               // Use the new section
               setSection(newSection[0]);

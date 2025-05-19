@@ -48,6 +48,7 @@ export default function EditorLayout({
   const [nameSuccess, setNameSuccess] = useState(false)
   const [creatingVersion, setCreatingVersion] = useState(false)
   const [versionLimitError, setVersionLimitError] = useState(false)
+  const [versionCreateError, setVersionCreateError] = useState(false)
   
   // Update editingName when versionName changes
   useEffect(() => {
@@ -99,17 +100,29 @@ export default function EditorLayout({
     if (onVersionCreate && !creatingVersion) {
       setCreatingVersion(true);
       try {
+        console.log('Creating new version - button clicked');
         await onVersionCreate();
+        console.log('Version creation successful - redirecting...');
       } catch (error: any) {
-        // Check if it's a version limit error by looking at the error message
+        console.error('Error creating new version:', error);
+        
+        // Specific error handling based on error message
         if (error?.message?.includes('Maximum') || error?.message?.includes('maximum') || error?.message?.includes('limit')) {
+          console.log('Showing version limit error notification');
           setVersionLimitError(true);
           setTimeout(() => setVersionLimitError(false), 5000);
+        } else {
+          // For other errors, show a generic error notification
+          console.log('Showing generic version create error notification');
+          setVersionCreateError(true);
+          setTimeout(() => setVersionCreateError(false), 5000);
         }
-        console.error('Error creating new version:', error);
       } finally {
-        // Reset the creating state
-        setCreatingVersion(false);
+        // Reset the creating state after a short delay
+        // This prevents flashing of button states during navigation
+        setTimeout(() => {
+          setCreatingVersion(false);
+        }, 500);
       }
     }
   }
@@ -261,6 +274,12 @@ export default function EditorLayout({
       {versionLimitError && (
         <div className="fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn">
           Sie haben das Maximum von 5 Versionen für dieses Template erreicht. Bitte löschen Sie eine vorhandene Version.
+        </div>
+      )}
+      {/* Generic version create error notification */}
+      {versionCreateError && (
+        <div className="fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn">
+          Fehler beim Erstellen einer neuen Version. Bitte versuchen Sie es später erneut.
         </div>
       )}
       
