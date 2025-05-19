@@ -53,6 +53,7 @@ export default function TemplateEditorClient({
   const [isSaving, setIsSaving] = useState(false)
   const [saveMessage, setSaveMessage] = useState<{text: string, type: 'success' | 'error'} | null>(null)
   const [sectionTitle, setSectionTitle] = useState<string>('')
+  const [user, setUser] = useState<any>(null)
   
   // Update currentSectionData when sectionData changes
   useEffect(() => {
@@ -63,9 +64,10 @@ export default function TemplateEditorClient({
   }, [sectionData]);
 
   // Handle data changes from section components
-  const handleDataChange = useCallback((newData: any) => {
-    setCurrentSectionData(newData)
-  }, []);
+  const handleDataChange = (newData: any) => {
+    console.log("Data changed:", newData);
+    setCurrentSectionData(newData);
+  };
 
   // Save section data function as a regular function to avoid dependency issues
   const saveSection = async (newData: any) => {
@@ -76,6 +78,7 @@ export default function TemplateEditorClient({
       const dataToSave = typeof newData === 'string' ? newData : JSON.stringify(newData);
       
       console.log("Saving data:", dataToSave);
+      console.log("Current section data:", currentSectionData);
       
       const { error } = await supabase
         .from('sections')
@@ -108,6 +111,15 @@ export default function TemplateEditorClient({
       const success = await saveSection(currentSectionData)
       if (success) {
         setSaveMessage({ text: 'Änderungen gespeichert', type: 'success' })
+        
+        // Show save success notification
+        const saveSuccessNotification = document.getElementById('saveSuccessNotification');
+        if (saveSuccessNotification) {
+          saveSuccessNotification.classList.remove('hidden');
+          setTimeout(() => {
+            saveSuccessNotification.classList.add('hidden');
+          }, 2000);
+        }
       } else {
         setSaveMessage({ text: 'Fehler beim Speichern', type: 'error' })
       }
@@ -124,6 +136,78 @@ export default function TemplateEditorClient({
     }
   };
 
+  // Create a new section version
+  const createNewSectionVersion = async () => {
+    if (!user || !template) return;
+    
+    try {
+      setIsLoading(true);
+      
+      // Default section data
+      const defaultData = {
+        title: "Hero Section",
+        subtitle: "Erstelle professionelle Shopify-Sektionen mit unserem intuitiven Builder.",
+        color: "#f5f7fa",
+        buttonText: "Jetzt entdecken",
+        buttonLink: "#",
+        imageUrl: "/BG_Card_55.jpg",
+        alignment: "center",
+        textColor: "#ffffff",
+        padding: "80px",
+        showButton: true
+      };
+      
+      // Count existing sections for this template
+      const { data: existingSections, error: countError } = await supabase
+        .from('sections')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('template_id', template.id);
+      
+      if (countError) {
+        console.error('Error counting sections:', countError);
+        setError('Fehler beim Zählen der vorhandenen Versionen.');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Check if max limit reached (5 versions)
+      if (existingSections && existingSections.length >= 5) {
+        setError('Sie haben das Maximum von 5 Versionen für dieses Template erreicht. Bitte löschen Sie eine vorhandene Version, um eine neue zu erstellen.');
+        setIsLoading(false);
+        throw new Error('Maximum von 5 Versionen für dieses Template erreicht. Bitte löschen Sie eine vorhandene Version, um eine neue zu erstellen.');
+      }
+      
+      // Create a new section
+      const { data: newSection, error: newSectionError } = await supabase
+        .from('sections')
+        .insert({
+          user_id: user.id,
+          template_id: template.id,
+          title: `${template.name} ${existingSections ? existingSections.length + 1 : 1}`,
+          data: JSON.stringify(defaultData),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select();
+      
+      if (newSectionError || !newSection || newSection.length === 0) {
+        console.error('Error creating new section:', newSectionError);
+        setError('Fehler beim Erstellen einer neuen Version. Bitte versuchen Sie es später erneut.');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Redirect to the new section
+      router.push(`/editor/${template.id}?id=${newSection[0].id}`);
+      
+    } catch (err) {
+      console.error('Unexpected error creating new section:', err);
+      setError('Ein unerwarteter Fehler ist aufgetreten.');
+      setIsLoading(false);
+    }
+  };
+
   // Load editor data
   useEffect(() => {
     const loadData = async () => {
@@ -131,16 +215,18 @@ export default function TemplateEditorClient({
         setIsLoading(true)
         
         // Check authentication
-        const { data: { user } } = await supabase.auth.getUser()
+        const { data: { user: authUser } } = await supabase.auth.getUser()
         
-        if (!user) {
+        if (!authUser) {
           setError('Sie müssen angemeldet sein, um auf diesen Bereich zuzugreifen.')
           setIsLoading(false)
           return
         }
+        
+        setUser(authUser)
 
         // Check if user has access to this template
-        const canAccess = await hasAccessToTemplate(user.id, templateId)
+        const canAccess = await hasAccessToTemplate(authUser.id, templateId)
         
         if (!canAccess) {
           setError('Sie haben keinen Zugriff auf dieses Template.')
@@ -172,7 +258,7 @@ export default function TemplateEditorClient({
             .from('sections')
             .select('*')
             .eq('id', sectionId)
-            .eq('user_id', user.id)
+            .eq('user_id', authUser.id)
             .eq('template_id', templateId)
             .single()
           
@@ -195,7 +281,7 @@ export default function TemplateEditorClient({
           const { data: sections, error: sectionsError } = await supabase
             .from('sections')
             .select('*')
-            .eq('user_id', user.id)
+            .eq('user_id', authUser.id)
             .eq('template_id', templateId)
             .order('created_at', { ascending: false })
             .limit(1)
@@ -212,10 +298,58 @@ export default function TemplateEditorClient({
             // Update URL to include section ID for better navigation
             router.replace(`/editor/${templateId}?id=${sections[0].id}`)
           } else {
-            // No sections found for this template
-            setError('Keine Abschnitte für dieses Template gefunden.')
-            setIsLoading(false)
-            return
+            // No sections found for this template - create a new one
+            console.log("No sections found, creating new section for template:", templateId);
+            
+            // Default section data
+            const defaultData = {
+              title: "Hero Section",
+              subtitle: "Erstelle professionelle Shopify-Sektionen mit unserem intuitiven Builder.",
+              color: "#f5f7fa",
+              buttonText: "Jetzt entdecken",
+              buttonLink: "#",
+              imageUrl: "/BG_Card_55.jpg",
+              alignment: "center",
+              textColor: "#ffffff",
+              padding: "80px",
+              showButton: true
+            };
+            
+            // Create a new section
+            try {
+              const { data: newSection, error: newSectionError } = await supabase
+                .from('sections')
+                .insert({
+                  user_id: user.id,
+                  template_id: templateId,
+                  title: templateData.name,
+                  data: JSON.stringify(defaultData),
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString()
+                })
+                .select()
+              
+              if (newSectionError || !newSection || newSection.length === 0) {
+                console.error('Fehler beim Erstellen einer neuen Section:', newSectionError);
+                setError('Fehler beim Erstellen einer neuen Section. Bitte versuchen Sie es später erneut.');
+                setIsLoading(false);
+                return;
+              }
+              
+              // Use the new section
+              setSection(newSection[0]);
+              setSectionData(defaultData);
+              setCurrentSectionData(defaultData);
+              setSectionTitle(newSection[0].title || templateData.name || '');
+              
+              // Update URL to include section ID
+              router.replace(`/editor/${templateId}?id=${newSection[0].id}`);
+            } catch (err) {
+              console.error('Unerwarteter Fehler beim Erstellen einer neuen Section:', err);
+              setError('Ein unerwarteter Fehler ist aufgetreten.');
+              setIsLoading(false);
+              return;
+            }
           }
         }
         
@@ -285,6 +419,7 @@ export default function TemplateEditorClient({
       onBack={() => router.push('/mysections')}
       versionName={section?.title}
       onVersionNameChange={handleVersionNameChange}
+      onVersionCreate={createNewSectionVersion}
     />
   );
 }
@@ -300,7 +435,8 @@ function EditorWrapper({
   saveMessage,
   onBack,
   versionName,
-  onVersionNameChange
+  onVersionNameChange,
+  onVersionCreate
 }: {
   section: any;
   template: any;
@@ -312,7 +448,10 @@ function EditorWrapper({
   onBack: () => void;
   versionName?: string;
   onVersionNameChange?: (name: string) => void;
+  onVersionCreate?: () => void;
 }) {
+  // Check if we have a version create function
+  const hasVersionCreate = !!onVersionCreate;
   // Create the hero section component
   const editorContent = () => {
     // For now, we always use HeroSection
@@ -386,6 +525,7 @@ function EditorWrapper({
           code={code}
           versionName={versionName}
           onVersionNameChange={onVersionNameChange}
+          onVersionCreate={onVersionCreate}
         />
       </div>
     </div>

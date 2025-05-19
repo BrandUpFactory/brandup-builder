@@ -40,7 +40,7 @@ export default function HeroSection({ initialData, onDataChange }: HeroSectionPr
   // Update parent component when data changes
   useEffect(() => {
     if (onDataChange) {
-      onDataChange({
+      const data = {
         title,
         subtitle,
         color,
@@ -51,11 +51,13 @@ export default function HeroSection({ initialData, onDataChange }: HeroSectionPr
         textColor,
         padding,
         showButton
-      })
+      };
+      console.log("Updating data in HeroSection:", data);
+      onDataChange(data);
     }
   }, [
     title, subtitle, color, buttonText, buttonLink,
-    imageUrl, alignment, textColor, padding, showButton, onDataChange
+    imageUrl, alignment, textColor, padding, showButton
   ])
 
   // Text alignment classes based on the alignment setting

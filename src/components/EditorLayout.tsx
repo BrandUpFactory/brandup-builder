@@ -38,12 +38,16 @@ export default function EditorLayout({
   exportData = {},
   onImportData
 }: EditorLayoutProps) {
+  // Check if we have a version create function
+  const hasVersionCreate = !!onVersionCreate;
   const [activeTab, setActiveTab] = useState<'settings' | 'preview' | 'code' | 'history'>('settings')
   const [editing, setEditing] = useState(false)
   const [editingName, setEditingName] = useState(versionName || 'Unbenannte Version')
   const [showSettings, setShowSettings] = useState(true)
   const [copySuccess, setCopySuccess] = useState(false)
   const [nameSuccess, setNameSuccess] = useState(false)
+  const [creatingVersion, setCreatingVersion] = useState(false)
+  const [versionLimitError, setVersionLimitError] = useState(false)
   
   // Update editingName when versionName changes
   useEffect(() => {
@@ -86,6 +90,26 @@ export default function EditorLayout({
         setTimeout(() => {
           saveSuccessNotification.classList.add('hidden');
         }, 2000);
+      }
+    }
+  }
+  
+  // Handle creating a new version
+  const handleCreateVersion = async () => {
+    if (onVersionCreate && !creatingVersion) {
+      setCreatingVersion(true);
+      try {
+        await onVersionCreate();
+      } catch (error: any) {
+        // Check if it's a version limit error by looking at the error message
+        if (error?.message?.includes('Maximum') || error?.message?.includes('maximum') || error?.message?.includes('limit')) {
+          setVersionLimitError(true);
+          setTimeout(() => setVersionLimitError(false), 5000);
+        }
+        console.error('Error creating new version:', error);
+      } finally {
+        // Reset the creating state
+        setCreatingVersion(false);
       }
     }
   }
@@ -233,6 +257,12 @@ export default function EditorLayout({
       <div id="saveSuccessNotification" className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn hidden">
         Änderungen erfolgreich gespeichert!
       </div>
+      {/* Version limit error notification */}
+      {versionLimitError && (
+        <div className="fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn">
+          Sie haben das Maximum von 5 Versionen für dieses Template erreicht. Bitte löschen Sie eine vorhandene Version.
+        </div>
+      )}
       
       {/* Editor Header with Title and Version Control */}
       <div className="mb-6 flex flex-col md:flex-row justify-between gap-3">
@@ -307,6 +337,28 @@ export default function EditorLayout({
                 Hilfe
               </button>
             </div>
+            
+            {hasVersionCreate && (
+              <button 
+                onClick={handleCreateVersion}
+                disabled={creatingVersion}
+                className={`${creatingVersion ? 'bg-blue-400' : 'bg-blue-600'} text-white px-4 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium shadow-sm flex items-center gap-1.5`}
+              >
+                {creatingVersion ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-1"></div>
+                    Wird erstellt...
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Neue Version
+                  </>
+                )}
+              </button>
+            )}
             
             <button 
               onClick={handleSave}
