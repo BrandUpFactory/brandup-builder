@@ -60,7 +60,7 @@ export default function RenameDialog({
         
         <form onSubmit={handleSubmit} className="p-6">
           <div className="mb-5">
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="name" className="block text-sm font-semibold text-gray-800 mb-1">
               Name
             </label>
             <input
@@ -69,7 +69,7 @@ export default function RenameDialog({
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 font-medium"
               placeholder="Version name"
             />
           </div>

@@ -43,6 +43,7 @@ export default function EditorLayout({
   const [editingName, setEditingName] = useState(versionName || 'Unbenannte Version')
   const [showSettings, setShowSettings] = useState(true)
   const [copySuccess, setCopySuccess] = useState(false)
+  const [nameSuccess, setNameSuccess] = useState(false)
   
   // Update editingName when versionName changes
   useEffect(() => {
@@ -68,6 +69,9 @@ export default function EditorLayout({
     setEditing(false)
     if (onVersionNameChange && editingName.trim() !== '') {
       onVersionNameChange(editingName)
+      // Show success notification
+      setNameSuccess(true)
+      setTimeout(() => setNameSuccess(false), 2000)
     }
   }
 
@@ -206,10 +210,15 @@ export default function EditorLayout({
 
   return (
     <div className="p-4 md:p-6 bg-white text-[#1c2838]">
-      {/* Notification for copy success */}
+      {/* Notifications */}
       {copySuccess && (
-        <div className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50">
+        <div className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn">
           Code wurde in die Zwischenablage kopiert!
+        </div>
+      )}
+      {nameSuccess && (
+        <div className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn">
+          Versionsname erfolgreich geändert!
         </div>
       )}
       
@@ -236,7 +245,7 @@ export default function EditorLayout({
                 />
                 <button 
                   onClick={handleNameSave}
-                  className="ml-1 text-[#1c2838] hover:text-blue-800"
+                  className="ml-2 bg-[#1c2838] hover:bg-opacity-80 transition text-white rounded-full p-1 shadow-sm"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -262,31 +271,40 @@ export default function EditorLayout({
         </div>
         
         <div className="flex items-center gap-2">
-          <div className="bg-gray-50 rounded-lg flex overflow-hidden shadow-sm">
+            <div className="bg-gray-50 rounded-lg flex overflow-hidden shadow-sm">
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(code?.toString() || '');
+                  setCopySuccess(true);
+                  setTimeout(() => setCopySuccess(false), 2000);
+                }}
+                className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-1.5 transition font-medium"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+                Code kopieren
+              </button>
+              <button 
+                onClick={() => window.open('https://www.brandupfactory.com/help-center', '_blank')}
+                className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-1.5 transition font-medium border-l border-gray-200"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Hilfe
+              </button>
+            </div>
+            
             <button 
-              onClick={() => {
-                navigator.clipboard.writeText(code?.toString() || '');
-                setCopySuccess(true);
-                setTimeout(() => setCopySuccess(false), 2000);
-              }}
-              className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-1.5 transition font-medium"
+              onClick={handleSave}
+              className="bg-[#1c2838] text-white px-4 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium shadow-sm flex items-center gap-1.5"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
               </svg>
-              Code kopieren
+              Speichern
             </button>
-            <button 
-              onClick={() => window.open('https://www.brandupfactory.com/help-center', '_blank')}
-              className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-1.5 transition font-medium border-l border-gray-200"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Hilfe
-            </button>
-          </div>
-          
         </div>
       </div>
       
