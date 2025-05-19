@@ -387,26 +387,26 @@ export default function MySectionsPage() {
                                   </button>
                                   {activeDropdown === section.id && (
                                     <div className="absolute top-full right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-[100]">
-                                    <div className="py-1">
-                                      <button 
-                                        className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 rounded-t-lg text-gray-700 transition flex items-center cursor-pointer"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setSectionToRename(section);
-                                          setRenameDialogOpen(true);
-                                          setActiveDropdown(null);
-                                        }}
-                                      >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                        Umbenennen
-                                      </button>
-                                      <button 
-                                        className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 text-red-600 rounded-b-lg transition flex items-center cursor-pointer"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          if (confirm('Möchtest du diese Version wirklich löschen?')) {
+                                      <div className="py-1">
+                                        <button 
+                                          className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 rounded-t-lg text-gray-700 transition flex items-center cursor-pointer"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSectionToRename(section);
+                                            setRenameDialogOpen(true);
+                                            setActiveDropdown(null);
+                                          }}
+                                        >
+                                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                          </svg>
+                                          Umbenennen
+                                        </button>
+                                        <button 
+                                          className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 text-red-600 rounded-b-lg transition flex items-center cursor-pointer"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (confirm('Möchtest du diese Version wirklich löschen?')) {
                                             // Implementiere das tatsächliche Löschen
                                             const deleteSection = async () => {
                                               try {
@@ -441,8 +441,9 @@ export default function MySectionsPage() {
                                         </svg>
                                         Löschen
                                       </button>
+                                      </div>
                                     </div>
-                                  </div>
+                                  )}
                                 </div>
                               </div>
                             </div>
