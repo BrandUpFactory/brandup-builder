@@ -4,18 +4,36 @@ import './globals.css'
 import Navbar from '../components/Navbar'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { useEffect, useState } from 'react'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    // Prüfen der Bildschirmgröße und Setzen des Mobile-Status
+    const checkIfMobile = () => setIsMobile(window.innerWidth < 1024)
+    
+    // Initial Check
+    checkIfMobile()
+    
+    // Listener für Größenänderungen
+    window.addEventListener('resize', checkIfMobile)
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkIfMobile)
+  }, [])
+
   return (
     <html lang="en" className="w-full h-full bg-white">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      </head>
       <body className="flex w-full h-full bg-white overflow-hidden">
-        {/* Fixed Sidebar */}
-        <div className="fixed top-0 left-0 h-screen w-64 z-50 bg-white">
-          <Navbar />
-        </div>
+        {/* Navbar für mobile und desktop */}
+        <Navbar />
 
-        {/* Main Content */}
-        <main className="flex-1 ml-64 p-8 overflow-y-auto">
+        {/* Main Content - mit bedingter Klasse für Abstand */}
+        <main className={`flex-1 ${isMobile ? 'mt-16' : 'ml-64'} p-4 md:p-8 overflow-y-auto`}>
           {children}
           <Analytics />        {/* ✅ Analytics von Vercel */}
           <SpeedInsights />    {/* ✅ Speed Insights von Vercel */}

@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
+import { User } from '@supabase/supabase-js'
+import AccessCodeModal from '@/components/AccessCodeModal'
 
 interface Template {
   id: string
@@ -15,18 +18,44 @@ interface Template {
 }
 
 export default function TemplatesPage() {
+  const supabase = createClient()
+  const router = useRouter()
+  
   const [templates, setTemplates] = useState<Template[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [user, setUser] = useState<User | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null)
 
+  // Benutzer prüfen
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser()
+      if (!error && data.user) {
+        setUser(data.user)
+      }
+    }
+
+    fetchUser()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [supabase])
+
+  // Templates laden
   useEffect(() => {
     const fetchTemplates = async () => {
       setLoading(true)
       setError(null)
 
       try {
-        const supabase = createClient()
         const { data, error } = await supabase.from('templates').select('*')
 
         if (error) {
@@ -44,11 +73,23 @@ export default function TemplatesPage() {
     }
 
     fetchTemplates()
-  }, [])
+  }, [supabase])
 
   const filteredTemplates = templates.filter((template) =>
     template.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
+  
+  const handleUnlockClick = (template: Template) => {
+    if (!user) {
+      // Wenn nicht eingeloggt, zur Login-Seite weiterleiten
+      router.push('/login')
+      return
+    }
+    
+    // Modal öffnen mit dem ausgewählten Template
+    setSelectedTemplate(template)
+    setIsModalOpen(true)
+  }
 
   return (
     <div className="p-6 md:p-12">
@@ -99,7 +140,10 @@ export default function TemplatesPage() {
                 <p className="text-xs text-gray-500 line-clamp-2">{template.description}</p>
 
                 <div className="mt-auto flex flex-col gap-2">
-                  <button className="bg-[#676058] hover:opacity-90 text-white text-xs px-4 py-1.5 rounded-full w-full transition">
+                  <button 
+                    onClick={() => handleUnlockClick(template)}
+                    className="bg-[#676058] hover:opacity-90 text-white text-xs px-4 py-1.5 rounded-full w-full transition"
+                  >
                     Freischalten
                   </button>
 
@@ -115,6 +159,17 @@ export default function TemplatesPage() {
             </div>
           ))}
         </div>
+      )}
+      
+      {/* Access Code Modal */}
+      {selectedTemplate && (
+        <AccessCodeModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          templateId={selectedTemplate.id}
+          templateName={selectedTemplate.name}
+          user={user}
+        />
       )}
     </div>
   )

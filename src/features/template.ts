@@ -32,7 +32,7 @@ export async function unlockTemplateWithCode(
   code: string,
   ip?: string,
   userAgent?: string
-): Promise<{ success: boolean; message: string }> {
+): Promise<{ success: boolean; message: string; sectionId?: number }> {
   const cleanedCode = code.trim()
 
   if (!cleanedCode) return { success: false, message: '⚠️ Der Code darf nicht leer sein.' }
@@ -56,6 +56,18 @@ export async function unlockTemplateWithCode(
     return { success: false, message: '⚠️ Dieser Code gehört zu einem anderen Template.' }
   }
 
+  // Prüfen ob bereits eine Sektion mit diesem Template existiert
+  const { data: existingSection } = await supabase
+    .from('sections')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('template_id', templateId)
+    .maybeSingle()
+  
+  // Transaktion starten - wir wollen sicherstellen, dass sowohl die Lizenz als auch
+  // die neue Sektion korrekt gespeichert werden
+  
+  // 1. Lizenz aktualisieren
   const { error: updateError } = await supabase
     .from('licenses')
     .update({
@@ -63,6 +75,7 @@ export async function unlockTemplateWithCode(
       user_id: userId,
       activation_ip: ip ?? null,
       activation_device: userAgent ?? null,
+      activation_date: new Date().toISOString()
     })
     .eq('id', license.id)
 
@@ -70,6 +83,48 @@ export async function unlockTemplateWithCode(
     console.error('❌ Fehler beim Aktualisieren der Lizenz:', updateError)
     return { success: false, message: '❌ Fehler beim Speichern der Freischaltung.' }
   }
+  
+  // 2. Neue Section erstellen, wenn keine existiert
+  let sectionId = existingSection?.id
+  
+  if (!existingSection) {
+    // Template-Details abrufen für den Titel
+    const { data: templateData } = await supabase
+      .from('templates')
+      .select('name')
+      .eq('id', templateId)
+      .single()
+    
+    const templateName = templateData?.name || 'Unnamed Template';
+    
+    // Neue Section erstellen
+    const { data: newSection, error: sectionError } = await supabase
+      .from('sections')
+      .insert({
+        user_id: userId,
+        template_id: templateId,
+        title: templateName,
+        data: {}, // Leere Daten, die im Editor gefüllt werden
+        license_id: license.id,
+      })
+      .select('id')
+      .single()
+    
+    if (sectionError) {
+      console.error('❌ Fehler beim Erstellen der Section:', sectionError)
+      // Wir geben trotzdem Erfolg zurück, da die Lizenz aktiviert wurde
+      return { 
+        success: true, 
+        message: '✅ Template freigeschaltet, aber es konnte keine Section erstellt werden.'
+      }
+    }
+    
+    sectionId = newSection.id
+  }
 
-  return { success: true, message: '✅ Template erfolgreich freigeschaltet!' }
+  return { 
+    success: true, 
+    message: '✅ Template erfolgreich freigeschaltet!',
+    sectionId
+  }
 }
