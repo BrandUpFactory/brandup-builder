@@ -66,8 +66,8 @@ export default function TemplateEditorClient({
     setCurrentSectionData(newData)
   }, []);
 
-  // Save section data function
-  const saveSection = useCallback(async (newData: any) => {
+  // Save section data function as a regular function to avoid dependency issues
+  const saveSection = async (newData: any) => {
     if (!section) return false
     
     try {
@@ -91,10 +91,10 @@ export default function TemplateEditorClient({
       console.error('Unerwarteter Fehler beim Speichern:', err)
       return false
     }
-  }, [section, supabase]);
+  };
 
-  // Handle save button click
-  const handleSave = useCallback(async () => {
+  // Handle save button click as a regular function to avoid dependency issues
+  const handleSave = async () => {
     setIsSaving(true)
     setSaveMessage(null)
     
@@ -116,7 +116,7 @@ export default function TemplateEditorClient({
         setSaveMessage(null)
       }, 3000)
     }
-  }, [currentSectionData, saveSection]);
+  };
 
   // Load editor data
   useEffect(() => {
@@ -231,8 +231,8 @@ export default function TemplateEditorClient({
     return <ErrorDisplay message="Zugriff verweigert oder fehlende Daten" />
   }
 
-  // Handle version name change
-  const handleVersionNameChange = useCallback(async (newName: string) => {
+  // Handle version name change as a regular function to avoid dependency issues
+  const handleVersionNameChange = async (newName: string) => {
     if (!section) return
     
     try {
@@ -251,7 +251,7 @@ export default function TemplateEditorClient({
     } catch (err) {
       console.error('Unerwarteter Fehler beim Speichern des Versionsnamens:', err)
     }
-  }, [section, supabase]);
+  };
 
   // Render the editor with a wrapper component to handle HeroSection properly
   return (

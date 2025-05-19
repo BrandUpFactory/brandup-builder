@@ -5,6 +5,7 @@ import { createClient } from '@/utils/supabase/client'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { User } from '@supabase/supabase-js'
+import RenameDialog from '@/components/RenameDialog'
 
 interface SectionEntry {
   id: number
@@ -26,6 +27,8 @@ export default function MySectionsPage() {
   const [sections, setSections] = useState<SectionEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [checkingAuth, setCheckingAuth] = useState(true)
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false)
+  const [sectionToRename, setSectionToRename] = useState<SectionEntry | null>(null)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -133,8 +136,45 @@ export default function MySectionsPage() {
     return acc;
   }, {} as Record<string, SectionEntry[]>);
 
+  // Handle rename
+  const handleRename = async (newName: string) => {
+    if (!sectionToRename) return;
+    
+    try {
+      const { error } = await supabase
+        .from('sections')
+        .update({ title: newName })
+        .eq('id', sectionToRename.id);
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Update the local view without reloading
+      const updatedSections = [...sections];
+      const sectionIndex = updatedSections.findIndex(s => s.id === sectionToRename.id);
+      if (sectionIndex !== -1) {
+        updatedSections[sectionIndex].title = newName;
+        setSections(updatedSections);
+      }
+      
+    } catch (error) {
+      console.error('Fehler beim Umbenennen:', error);
+      alert('Fehler beim Umbenennen. Bitte versuche es erneut.');
+    }
+  };
+
   return (
     <div className="p-6 md:p-10 h-screen bg-[#f9f9f9]" style={{ overflow: 'visible' }}>
+      {/* Rename Dialog */}
+      <RenameDialog
+        isOpen={renameDialogOpen}
+        onClose={() => setRenameDialogOpen(false)}
+        onRename={handleRename}
+        currentName={sectionToRename?.title || ''}
+        title="Version umbenennen"
+      />
+      
       <div className="bg-white shadow rounded-xl p-6 md:p-8 w-full max-w-5xl mx-auto" style={{ overflow: 'visible' }}>
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -231,36 +271,8 @@ export default function MySectionsPage() {
                                     <button 
                                       className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 rounded-t-lg text-gray-700 transition flex items-center"
                                       onClick={() => {
-                                        const newName = prompt('Neuer Name für die Version:', section.title || `Version ${templateSections.indexOf(section) + 1}`);
-                                        if (newName && newName.trim()) {
-                                          // Implementiere das tatsächliche Umbenennen
-                                          const updateSectionName = async () => {
-                                            try {
-                                              const { error } = await supabase
-                                                .from('sections')
-                                                .update({ title: newName })
-                                                .eq('id', section.id);
-                                              
-                                              if (error) {
-                                                throw error;
-                                              }
-                                              
-                                              // Aktualisiere die lokale Ansicht ohne Neuladen
-                                              const updatedSections = [...sections];
-                                              const sectionIndex = updatedSections.findIndex(s => s.id === section.id);
-                                              if (sectionIndex !== -1) {
-                                                updatedSections[sectionIndex].title = newName;
-                                                setSections(updatedSections);
-                                              }
-                                              
-                                              alert(`Version wurde in "${newName}" umbenannt!`);
-                                            } catch (error) {
-                                              console.error('Fehler beim Umbenennen:', error);
-                                              alert('Fehler beim Umbenennen. Bitte versuche es erneut.');
-                                            }
-                                          };
-                                          updateSectionName();
-                                        }
+                                        setSectionToRename(section);
+                                        setRenameDialogOpen(true);
                                       }}
                                     >
                                       <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
