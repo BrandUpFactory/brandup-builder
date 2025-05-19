@@ -6,7 +6,6 @@ import { createClient } from '@/utils/supabase/client'
 import { hasAccessToTemplate } from '@/features/template'
 import EditorLayout from '@/components/EditorLayout'
 import HeroSection from '@/sections/HeroSection'
-import dynamic from 'next/dynamic'
 
 // Error component 
 const ErrorDisplay = ({ message }: { message: string }) => (
@@ -29,11 +28,19 @@ const LoadingDisplay = () => (
   </div>
 )
 
-export default function TemplateEditorPage({ params }: { params: { templateId: string } }) {
+interface TemplateEditorPageProps {
+  params: {
+    templateId: string;
+  };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export default function TemplateEditorPage({ params, searchParams }: TemplateEditorPageProps) {
   const supabase = createClient()
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const sectionId = searchParams.get('id')
+  const urlSearchParams = useSearchParams()
+  // Use URL search params first, then fall back to server provided searchParams
+  const sectionId = urlSearchParams.get('id') || (searchParams.id as string)
   
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
