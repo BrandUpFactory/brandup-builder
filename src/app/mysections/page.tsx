@@ -76,7 +76,10 @@ export default function MySectionsPage() {
       // Daten umformen, damit templates unter template steht
       const formattedData = data?.map(item => ({
         ...item,
-        template: item.templates,
+        template: item.templates ? {
+          name: item.templates.name,
+          image_url: item.templates.image_url
+        } : undefined,
         templates: undefined
       })) ?? []
 
