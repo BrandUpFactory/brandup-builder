@@ -11,6 +11,7 @@ interface SectionEntry {
   title: string
   template_id: string
   created_at: string
+  templates?: any // Der Typ, wie er direkt von Supabase kommt
   template?: {
     name: string
     image_url: string
@@ -74,14 +75,33 @@ export default function MySectionsPage() {
         .order('created_at', { ascending: false })
       
       // Daten umformen, damit templates unter template steht
-      const formattedData = data?.map(item => ({
-        ...item,
-        template: item.templates ? {
-          name: item.templates.name,
-          image_url: item.templates.image_url
-        } : undefined,
-        templates: undefined
-      })) ?? []
+      const formattedData = data?.map(item => {
+        // Überprüfen, welche Form die zurückgegebenen Daten haben
+        let templateData = undefined;
+        
+        if (item.templates) {
+          // Wenn templates ein Array ist
+          if (Array.isArray(item.templates)) {
+            templateData = item.templates[0] ? {
+              name: item.templates[0]?.name || '',
+              image_url: item.templates[0]?.image_url || ''
+            } : undefined;
+          } 
+          // Wenn templates ein Objekt ist
+          else if (typeof item.templates === 'object' && item.templates !== null) {
+            templateData = {
+              name: (item.templates as { name?: string }).name || '',
+              image_url: (item.templates as { image_url?: string }).image_url || ''
+            };
+          }
+        }
+        
+        return {
+          ...item,
+          template: templateData,
+          templates: undefined
+        };
+      }) ?? []
 
       if (error) {
         console.error('Fehler beim Laden der Sections:', error)
