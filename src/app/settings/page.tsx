@@ -12,7 +12,7 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [lastLogin, setLastLogin] = useState<string | null>(null)
   const [notification, setNotification] = useState<{
-    type: 'success' | 'error',
+    type: 'success' | 'error' | 'info',
     message: string
   } | null>(null)
 
@@ -86,14 +86,35 @@ export default function SettingsPage() {
 
   const handleCreateLicense = async () => {
     try {
-      const res = await fetch('/api/licenses/new', { method: 'POST' })
-      const json = await res.json()
+      setNotification({
+        type: 'info',
+        message: 'Erstelle neue Lizenz...'
+      });
+      
+      const res = await fetch('/api/licenses/new', { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
+      let json;
+      try {
+        json = await res.json();
+      } catch (e) {
+        console.error('Failed to parse JSON response:', e);
+        throw new Error('Die Serverantwort konnte nicht verarbeitet werden');
+      }
 
       if (json.success) {
         setNotification({
           type: 'success',
           message: `Neue Lizenz erstellt: ${json.license.license_key}`
-        })
+        });
         
         // Reload licenses
         if (user) {
@@ -101,28 +122,28 @@ export default function SettingsPage() {
             .from('licenses')
             .select('*, templates(name, description)')
             .eq('user_id', user.id)
-            .order('activation_date', { ascending: false })
+            .order('activation_date', { ascending: false });
           
-          setLicenses(data || [])
+          setLicenses(data || []);
         }
       } else {
         setNotification({
           type: 'error',
           message: json.error || 'Ein Fehler ist aufgetreten'
-        })
+        });
       }
     } catch (error) {
+      console.error('License creation error:', error);
       setNotification({
         type: 'error',
-        message: 'Ein unerwarteter Fehler ist aufgetreten'
-      })
-      console.error('License creation error:', error)
+        message: error instanceof Error ? error.message : 'Ein unerwarteter Fehler ist aufgetreten'
+      });
     }
     
-    // Clear notification after 3 seconds
+    // Clear notification after 5 seconds
     setTimeout(() => {
-      setNotification(null)
-    }, 3000)
+      setNotification(null);
+    }, 5000);
   }
 
   return (
@@ -133,7 +154,9 @@ export default function SettingsPage() {
         
         {notification && (
           <div className={`mt-2 sm:mt-0 px-4 py-2 rounded-lg text-sm ${
-            notification.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+            notification.type === 'success' ? 'bg-green-50 text-green-700' : 
+            notification.type === 'error' ? 'bg-red-50 text-red-700' : 
+            'bg-blue-50 text-blue-700'
           }`}>
             {notification.message}
           </div>

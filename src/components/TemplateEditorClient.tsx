@@ -41,12 +41,23 @@ export default function TemplateEditorClient({
   // Use URL search params first, then fall back to server provided searchParams
   const sectionId = urlSearchParams.get('id') || (searchParams.id as string)
   
+  // Initialize ALL state variables at the top level
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [template, setTemplate] = useState<any>(null)
   const [section, setSection] = useState<any>(null)
   const [sectionData, setSectionData] = useState<any>({})
   const [hasAccess, setHasAccess] = useState(false)
+  const [currentSectionData, setCurrentSectionData] = useState<any>({})
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveMessage, setSaveMessage] = useState<{text: string, type: 'success' | 'error'} | null>(null)
+  
+  // Update currentSectionData when sectionData changes
+  useEffect(() => {
+    if (Object.keys(sectionData).length > 0) {
+      setCurrentSectionData(sectionData);
+    }
+  }, [sectionData]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -178,15 +189,6 @@ export default function TemplateEditorClient({
     return <ErrorDisplay message={error} />
   }
 
-  // State for tracking current section data - initialize at the top level
-  const [currentSectionData, setCurrentSectionData] = useState<any>({})
-  const [isSaving, setIsSaving] = useState(false)
-  const [saveMessage, setSaveMessage] = useState<{text: string, type: 'success' | 'error'} | null>(null)
-  
-  // Update currentSectionData when sectionData changes
-  useEffect(() => {
-    setCurrentSectionData(sectionData);
-  }, [sectionData]);
 
   if (!hasAccess || !template || !section) {
     return <ErrorDisplay message="Zugriff verweigert oder fehlende Daten" />
