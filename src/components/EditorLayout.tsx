@@ -49,6 +49,19 @@ export default function EditorLayout({
     setEditingName(versionName || 'Unbenannte Version')
   }, [versionName])
   
+  // Add keyboard shortcut for saving (Ctrl+S)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault()
+        handleSave()
+      }
+    }
+    
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onSave])
+  
   const handleNameSave = () => {
     setEditing(false)
     if (onVersionNameChange && editingName.trim() !== '') {
@@ -56,6 +69,7 @@ export default function EditorLayout({
     }
   }
 
+  // Save function that will be called by a keyboard shortcut or from other components
   const handleSave = () => {
     if (onSave) {
       onSave()
