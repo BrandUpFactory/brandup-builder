@@ -43,9 +43,11 @@ function HeroEditor() {
     padding: "80px",
     showButton: true
   })
+  const [originalSectionData, setOriginalSectionData] = useState({})
   const [isLoading, setIsLoading] = useState(!!sectionId)
   const [currentVersionId, setCurrentVersionId] = useState<number | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   
   // Load existing section data if we have an ID
   useEffect(() => {
@@ -63,10 +65,15 @@ function HeroEditor() {
         } else if (data) {
           // Load section data from JSON stored in database
           const parsedData = data.data ? JSON.parse(data.data) : {}
-          setSectionData({
+          const newSectionData = {
             ...sectionData,
             ...parsedData
-          })
+          };
+          
+          setSectionData(newSectionData);
+          
+          // Store the original data to compare for changes
+          setOriginalSectionData(JSON.parse(JSON.stringify(newSectionData)));
           
           // Set version name
           setVersionName(data.title || 'Unbenannte Version')
@@ -124,6 +131,18 @@ function HeroEditor() {
     }))
   }
   
+  // Track if there are unsaved changes
+  useEffect(() => {
+    if (Object.keys(originalSectionData).length > 0) {
+      try {
+        const hasChanges = JSON.stringify(sectionData) !== JSON.stringify(originalSectionData);
+        setHasUnsavedChanges(hasChanges);
+      } catch (e) {
+        console.error("Error comparing section data:", e);
+      }
+    }
+  }, [sectionData, originalSectionData])
+  
   // Save current section data
   const handleSave = async () => {
     if (!sectionId) {
@@ -150,6 +169,10 @@ function HeroEditor() {
       // Create a new version snapshot - comment this out to avoid duplicate versions
       // Instead we'll just save the section without creating a new version
       // await handleCreateVersion()
+      
+      // Update original data to match current data (no more unsaved changes)
+      setOriginalSectionData(JSON.parse(JSON.stringify(sectionData)));
+      setHasUnsavedChanges(false);
       
       // Wait a moment to show the saving state
       setTimeout(() => {
@@ -294,6 +317,7 @@ function HeroEditor() {
         // Removed version controls to simplify
         exportData={sectionData}
         onImportData={handleImportData}
+        hasUnsavedChanges={hasUnsavedChanges}
       />
     );
   };

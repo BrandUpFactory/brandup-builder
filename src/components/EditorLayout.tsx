@@ -20,6 +20,7 @@ interface EditorLayoutProps {
   currentVersionId?: number | null
   exportData?: object
   onImportData?: (data: any) => void
+  hasUnsavedChanges?: boolean
 }
 
 export default function EditorLayout({ 
@@ -36,7 +37,8 @@ export default function EditorLayout({
   onVersionDelete,
   currentVersionId,
   exportData = {},
-  onImportData
+  onImportData,
+  hasUnsavedChanges = false
 }: EditorLayoutProps) {
   // Check if we have a version create function
   const hasVersionCreate = !!onVersionCreate;
