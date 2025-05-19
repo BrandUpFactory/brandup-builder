@@ -52,12 +52,20 @@ export default function HeroSection({ initialData, onDataChange }: HeroSectionPr
         padding,
         showButton
       };
-      console.log("⚡ HeroSection: Updating data with:", JSON.stringify(data, null, 2));
+      
+      // Check if this is actually a change compared to initial data
+      if (JSON.stringify(data) !== JSON.stringify(safeInitialData)) {
+        console.log("⚡ HeroSection: Changes detected, updating data with:", JSON.stringify(data, null, 2));
+      } else {
+        console.log("⚡ HeroSection: No changes detected compared to initial data");
+      }
+      
+      // Always notify parent to handle the data
       onDataChange(data);
     }
   }, [
     title, subtitle, color, buttonText, buttonLink,
-    imageUrl, alignment, textColor, padding, showButton, onDataChange
+    imageUrl, alignment, textColor, padding, showButton, onDataChange, safeInitialData
   ])
 
   // Text alignment classes based on the alignment setting

@@ -270,6 +270,13 @@ export default function EditorLayout({
       <div id="saveSuccessNotification" className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn hidden">
         Änderungen erfolgreich gespeichert!
       </div>
+      
+      {/* Unsaved changes indicator */}
+      {hasUnsavedChanges && (
+        <div className="fixed top-16 right-4 bg-yellow-500 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn">
+          Ungespeicherte Änderungen!
+        </div>
+      )}
       {/* Version limit error notification */}
       {versionLimitError && (
         <div className="fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn">
@@ -360,12 +367,12 @@ export default function EditorLayout({
             
             <button 
               onClick={handleSave}
-              className="bg-[#1c2838] text-white px-4 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium shadow-sm flex items-center gap-1.5 cursor-pointer"
+              className={`${hasUnsavedChanges ? 'bg-red-600 animate-pulse' : 'bg-[#1c2838]'} text-white px-4 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium shadow-sm flex items-center gap-1.5 cursor-pointer`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
               </svg>
-              Speichern
+              {hasUnsavedChanges ? 'Änderungen speichern!' : 'Speichern'}
             </button>
         </div>
       </div>

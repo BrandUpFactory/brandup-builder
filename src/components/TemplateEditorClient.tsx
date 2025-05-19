@@ -82,6 +82,7 @@ export default function TemplateEditorClient({
   const saveSection = async (newData: any) => {
     if (!section) {
       console.error('⚡ SaveSection: No section available to save');
+      alert('Fehler: Keine Section zum Speichern gefunden');
       return false;
     }
     
@@ -89,8 +90,17 @@ export default function TemplateEditorClient({
       // Make sure newData is a valid object
       if (!newData || typeof newData !== 'object') {
         console.error('⚡ SaveSection: Invalid data format for saving:', newData);
+        alert('Fehler: Ungültiges Datenformat');
         return false;
       }
+      
+      // Print out current section info
+      console.log("⚡ SaveSection: Current section:", {
+        id: section.id,
+        title: section.title,
+        user_id: section.user_id,
+        template_id: section.template_id
+      });
       
       // Force create a clean object with exactly the properties we need
       const cleanData = {
@@ -110,45 +120,113 @@ export default function TemplateEditorClient({
       const dataToSave = JSON.stringify(cleanData);
       
       console.log("⚡ SaveSection: Saving section with ID:", section.id);
-      console.log("⚡ SaveSection: Clean data created:", cleanData);
+      console.log("⚡ SaveSection: Clean data being saved:", cleanData);
       console.log("⚡ SaveSection: Stringified data:", dataToSave);
       
-      // Direct raw SQL query as a fallback if the ORM method fails
-      const { error } = await supabase
-        .from('sections')
-        .update({ 
-          data: dataToSave,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', section.id);
-      
-      if (error) {
-        console.error('⚡ SaveSection: Error saving section with ORM:', error);
+      // Simple approach - store as string first
+      try {
+        console.log("⚡ SaveSection: Using straightforward update approach");
+        const { error: simpleError } = await supabase
+          .from('sections')
+          .update({ 
+            data: dataToSave,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', section.id);
         
-        // Fallback to raw SQL if needed
-        console.log('⚡ SaveSection: Attempting direct SQL update as fallback');
+        if (simpleError) {
+          console.error('⚡ SaveSection: Error with simple update:', simpleError);
+          throw simpleError;
+        } else {
+          console.log("⚡ SaveSection: Simple update successful!");
+          // Update local state to ensure UI is consistent
+          setSectionData(cleanData);
+          return true;
+        }
+      } catch (simpleError) {
+        console.error("⚡ SaveSection: Simple update failed, trying alternative:", simpleError);
         
-        const { error: sqlError } = await supabase.rpc('update_section_data', { 
-          section_id: section.id,
-          section_data: dataToSave
-        });
-        
-        if (sqlError) {
-          console.error('⚡ SaveSection: SQL fallback also failed:', sqlError);
-          return false;
+        // Try direct API endpoint as fallback
+        console.log("⚡ SaveSection: Trying API endpoint fallback");
+        try {
+          const response = await fetch('/api/update-section', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              sectionId: section.id,
+              data: dataToSave
+            }),
+          });
+          
+          if (!response.ok) {
+            throw new Error(`API response: ${response.status} ${response.statusText}`);
+          }
+          
+          const result = await response.json();
+          console.log("⚡ SaveSection: API endpoint result:", result);
+          setSectionData(cleanData);
+          return true;
+        } catch (apiError) {
+          console.error("⚡ SaveSection: API endpoint fallback failed:", apiError);
+          
+          // Last resort - try direct update
+          console.log("⚡ SaveSection: Trying direct update as last resort");
+          try {
+            const { error: directError } = await supabase
+              .from('sections')
+              .update({ data: dataToSave })
+              .eq('id', section.id);
+              
+            if (directError) {
+              console.error("⚡ SaveSection: Direct update failed:", directError);
+              throw directError;
+            }
+            
+            console.log("⚡ SaveSection: Direct update succeeded!");
+            setSectionData(cleanData);
+            return true;
+          } catch (directError) {
+            console.error("⚡ SaveSection: All update attempts failed");
+            throw directError;
+          }
         }
       }
-      
-      console.log("⚡ SaveSection: Section saved successfully!");
-      
-      // Update local state to ensure UI is consistent
-      setSectionData(cleanData);
-      return true;
     } catch (err) {
-      console.error('⚡ SaveSection: Unexpected error while saving section:', err);
+      console.error('⚡ SaveSection: Final catch - unexpected error during save:', err);
+      alert('Fehler beim Speichern der Section. Details in der Konsole.');
       return false;
     }
   };
+
+  // Track if there are unsaved changes
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  
+  // Handle navigation prevention
+  useEffect(() => {
+    // Function to confirm exit if there are unsaved changes
+    const beforeUnloadHandler = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        // Standard message for modern browsers
+        const message = 'Es gibt ungespeicherte Änderungen. Möchten Sie wirklich die Seite verlassen?';
+        e.preventDefault();
+        e.returnValue = message;
+        return message;
+      }
+    };
+
+    window.addEventListener('beforeunload', beforeUnloadHandler);
+    return () => window.removeEventListener('beforeunload', beforeUnloadHandler);
+  }, [hasUnsavedChanges]);
+  
+  // Mark changes as unsaved when data changes
+  useEffect(() => {
+    if (Object.keys(currentSectionData).length > 0 && Object.keys(sectionData).length > 0) {
+      // Check if current data is different from original data
+      setHasUnsavedChanges(JSON.stringify(currentSectionData) !== JSON.stringify(sectionData));
+    }
+  }, [currentSectionData, sectionData]);
 
   // Handle save button click as a regular function to avoid dependency issues
   const handleSave = async () => {
@@ -186,6 +264,9 @@ export default function TemplateEditorClient({
             saveSuccessNotification.classList.add('hidden');
           }, 3000);
         }
+        
+        // Mark that there are no unsaved changes
+        setHasUnsavedChanges(false);
         
         // Also show as an alert for better visibility
         alert('Änderungen wurden erfolgreich gespeichert!');
@@ -525,6 +606,18 @@ export default function TemplateEditorClient({
     }
   };
 
+  // Handle back navigation with unsaved changes check
+  const handleBack = () => {
+    if (hasUnsavedChanges) {
+      const confirmLeave = window.confirm('Es gibt ungespeicherte Änderungen. Möchten Sie wirklich zurückgehen?');
+      if (confirmLeave) {
+        router.push('/mysections');
+      }
+    } else {
+      router.push('/mysections');
+    }
+  };
+
   // Render the editor with a wrapper component to handle HeroSection properly
   return (
     <EditorWrapper 
@@ -535,10 +628,11 @@ export default function TemplateEditorClient({
       onSave={handleSave}
       isSaving={isSaving}
       saveMessage={saveMessage}
-      onBack={() => router.push('/mysections')}
+      onBack={handleBack}
       versionName={section?.title}
       onVersionNameChange={handleVersionNameChange}
       onVersionCreate={createNewSectionVersion}
+      hasUnsavedChanges={hasUnsavedChanges}
     />
   );
 }
@@ -555,7 +649,8 @@ function EditorWrapper({
   onBack,
   versionName,
   onVersionNameChange,
-  onVersionCreate
+  onVersionCreate,
+  hasUnsavedChanges
 }: {
   section: any;
   template: any;
@@ -568,6 +663,7 @@ function EditorWrapper({
   versionName?: string;
   onVersionNameChange?: (name: string) => void;
   onVersionCreate?: () => void;
+  hasUnsavedChanges?: boolean;
 }) {
   // Check if we have a version create function
   const hasVersionCreate = !!onVersionCreate;
