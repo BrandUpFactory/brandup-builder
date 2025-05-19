@@ -178,7 +178,7 @@ export default function MySectionsPage() {
                           <img 
                             src={templateInfo.image_url} 
                             alt={templateInfo.name} 
-                            className="w-full h-full object-contain"
+                            className="w-full h-full object-cover"
                           />
                         ) : (
                           <span className="text-gray-400 text-lg">📄</span>
@@ -213,18 +213,48 @@ export default function MySectionsPage() {
                             <div className="flex justify-between mt-4">
                               <Link
                                 href={`/editor/${section.template_id}?id=${section.id}`}
-                                className="bg-[#1c2838] text-white px-3 py-1.5 text-xs rounded-lg hover:opacity-90 transition flex-grow text-center mr-2"
+                                className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-2 text-xs rounded-lg hover:opacity-95 transition flex-grow text-center mr-2 shadow-sm"
                               >
                                 Bearbeiten
                               </Link>
-                              <button 
-                                className="bg-gray-100 text-gray-700 px-3 py-1.5 text-xs rounded-lg hover:bg-gray-200 transition"
-                                onClick={() => alert('Diese Funktion wird bald verfügbar sein')}
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                                </svg>
-                              </button>
+                              <div className="relative group">
+                                <button 
+                                  className="bg-gray-100 text-gray-700 px-3 py-2 text-xs rounded-lg hover:bg-gray-200 transition shadow-sm"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                                  </svg>
+                                </button>
+                                <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10 hidden group-hover:block">
+                                  <button 
+                                    className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 rounded-t-lg text-gray-700 transition flex items-center"
+                                    onClick={() => {
+                                      const newName = prompt('Neuer Name für die Version:', section.title || `Version ${templateSections.indexOf(section) + 1}`);
+                                      if (newName && newName.trim()) {
+                                        alert(`Umbenennen in "${newName}" - Funktion wird bald verfügbar sein`);
+                                      }
+                                    }}
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    Umbenennen
+                                  </button>
+                                  <button 
+                                    className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 text-red-600 rounded-b-lg transition flex items-center"
+                                    onClick={() => {
+                                      if (confirm('Möchtest du diese Version wirklich löschen?')) {
+                                        alert('Löschen - Funktion wird bald verfügbar sein');
+                                      }
+                                    }}
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Löschen
+                                  </button>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -233,15 +263,16 @@ export default function MySectionsPage() {
                       {/* Neue Version erstellen, wenn weniger als 5 Versionen */}
                       {templateSections.length < 5 && (
                         <div
-                          className="bg-white rounded-lg border border-dashed border-gray-300 p-4 flex flex-col items-center justify-center h-40 hover:bg-gray-50 cursor-pointer transition"
+                          className="bg-white rounded-lg border border-dashed border-gray-300 p-4 flex flex-col items-center justify-center h-40 hover:bg-gray-50 cursor-pointer transition group shadow-sm hover:shadow-md"
                           onClick={() => router.push(`/editor/${templateId}`)}
                         >
-                          <div className="bg-gray-100 rounded-full p-2 mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <div className="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full p-3 mb-3 group-hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
                           </div>
-                          <span className="text-sm text-gray-700">Neue Version erstellen</span>
+                          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Neue Version erstellen</span>
+                          <span className="text-xs text-gray-500 mt-1">({5 - templateSections.length} von 5 verfügbar)</span>
                         </div>
                       )}
                     </div>

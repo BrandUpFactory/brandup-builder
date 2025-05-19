@@ -145,9 +145,16 @@ export default function TemplatesPage() {
               key={template.id}
               className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col hover:shadow-md transition"
             >
-              <div className="h-48 w-full relative bg-gray-50 flex items-center justify-center p-0">
+              <div className="relative bg-gray-50 h-48 w-full overflow-hidden">
+                <div className="h-full w-full flex items-center justify-center">
+                  <img
+                    src={template.image_url}
+                    alt={template.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 {!hasAccessToTemplate(template.id) && (
-                  <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                  <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none bg-black bg-opacity-20">
                     <img
                       src="/Schloss_Icon.png"
                       alt="Locked"
@@ -156,17 +163,12 @@ export default function TemplatesPage() {
                   </div>
                 )}
                 {hasAccessToTemplate(template.id) && (
-                  <div className="absolute top-2 right-2 z-10 bg-green-500 rounded-full p-1">
+                  <div className="absolute top-2 right-2 z-10 bg-green-500 rounded-full p-1 shadow-md">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
                 )}
-                <img
-                  src={template.image_url}
-                  alt={template.name}
-                  className="h-full w-full object-contain"
-                />
               </div>
 
               <div className="p-3 flex flex-col gap-2 flex-grow">
