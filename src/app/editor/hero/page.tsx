@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import HeroSection from '@/sections/HeroSection'
@@ -14,7 +14,17 @@ interface Version {
   section_id: number
 }
 
-export default function HeroEditorPage() {
+// Loading fallback component
+function EditorLoading() {
+  return (
+    <div className="flex items-center justify-center h-screen bg-white">
+      <div className="animate-spin h-10 w-10 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+    </div>
+  );
+}
+
+// Main editor component wrapped with search params
+function HeroEditor() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const sectionId = searchParams.get('id')
@@ -289,5 +299,14 @@ export default function HeroEditorPage() {
       
       <HeroSectionWrapper />
     </>
+  );
+}
+
+// Export the page component with Suspense boundary
+export default function HeroEditorPage() {
+  return (
+    <Suspense fallback={<EditorLoading />}>
+      <HeroEditor />
+    </Suspense>
   );
 }
