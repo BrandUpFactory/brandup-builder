@@ -54,7 +54,9 @@ export default function EditorLayout({
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault()
-        handleSave()
+        if (onSave) {
+          onSave()
+        }
       }
     }
     

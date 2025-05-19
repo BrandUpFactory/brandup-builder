@@ -134,8 +134,8 @@ export default function MySectionsPage() {
   }, {} as Record<string, SectionEntry[]>);
 
   return (
-    <div className="p-6 md:p-10 h-screen overflow-auto bg-[#f9f9f9]">
-      <div className="bg-white shadow rounded-xl p-6 md:p-8 w-full max-w-5xl mx-auto">
+    <div className="p-6 md:p-10 h-screen bg-[#f9f9f9]" style={{ overflow: 'visible' }}>
+      <div className="bg-white shadow rounded-xl p-6 md:p-8 w-full max-w-5xl mx-auto" style={{ overflow: 'visible' }}>
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-[#1c2838] mb-1">Meine Sections</h1>
@@ -165,13 +165,13 @@ export default function MySectionsPage() {
               </Link>
             </div>
           ) : (
-            <div className="space-y-8">
+            <div className="space-y-8" style={{ overflow: 'visible' }}>
               {Object.entries(groupedSections).map(([templateId, templateSections]) => {
                 // Nehme das erste Section-Element, um Template-Informationen zu erhalten
                 const templateInfo = templateSections[0]?.template;
                 
                 return (
-                  <div key={templateId} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                  <div key={templateId} className="bg-gray-50 rounded-xl p-4 border border-gray-100" style={{ overflow: 'visible' }}>
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center overflow-hidden">
                         {templateInfo?.image_url ? (
@@ -189,11 +189,12 @@ export default function MySectionsPage() {
                       </h2>
                     </div>
                     
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" style={{ overflow: 'visible' }}>
                       {templateSections.map((section) => (
                         <div
                           key={section.id}
-                          className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition"
+                          className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition"
+                          style={{ overflow: 'visible' }}
                         >
                           <div className="p-4">
                             <div className="flex justify-between items-start mb-3">
@@ -217,7 +218,7 @@ export default function MySectionsPage() {
                               >
                                 Bearbeiten
                               </Link>
-                              <div className="relative group" tabIndex={0}>
+                              <div className="relative group" tabIndex={0} style={{ position: 'relative', overflow: 'visible' }}>
                                 <button 
                                   className="bg-[#1c2838] text-white px-3 py-2 text-xs rounded-lg hover:opacity-90 transition shadow-sm"
                                 >
@@ -225,7 +226,7 @@ export default function MySectionsPage() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                                   </svg>
                                 </button>
-                                <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-[100] hidden group-hover:block transition-opacity duration-300 group-focus-within:block">
+                                <div className="absolute top-full right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-[100] hidden group-hover:block transition-opacity duration-300 group-focus-within:block">
                                   <div className="py-1">
                                     <button 
                                       className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 rounded-t-lg text-gray-700 transition flex items-center"
