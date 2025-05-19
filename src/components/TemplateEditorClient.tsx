@@ -65,44 +65,55 @@ export default function TemplateEditorClient({
 
   // Handle data changes from section components
   const handleDataChange = (newData: any) => {
-    console.log("Data changed:", newData);
-    setCurrentSectionData(newData);
+    console.log("⚡ TemplateEditor: Data changed from section component:", JSON.stringify(newData, null, 2));
+    
+    // Ensure data is valid before updating state
+    if (newData && typeof newData === 'object') {
+      // Make deep copy to avoid reference issues
+      const dataCopy = JSON.parse(JSON.stringify(newData));
+      setCurrentSectionData(dataCopy);
+      console.log("⚡ TemplateEditor: Updated currentSectionData state");
+    } else {
+      console.error("⚡ TemplateEditor: Invalid data received from section component", newData);
+    }
   };
 
   // Save section data function as a regular function to avoid dependency issues
   const saveSection = async (newData: any) => {
     if (!section) {
-      console.error('No section available to save');
+      console.error('⚡ SaveSection: No section available to save');
       return false;
     }
     
     try {
       // Make sure newData is a valid object
       if (!newData || typeof newData !== 'object') {
-        console.error('Invalid data format for saving:', newData);
+        console.error('⚡ SaveSection: Invalid data format for saving:', newData);
         return false;
       }
       
+      // Force create a clean object with exactly the properties we need
+      const cleanData = {
+        title: newData.title || "Untitled Hero Section",
+        subtitle: newData.subtitle || "",
+        color: newData.color || "#f5f7fa",
+        buttonText: newData.buttonText || "Button",
+        buttonLink: newData.buttonLink || "#",
+        imageUrl: newData.imageUrl || "/BG_Card_55.jpg",
+        alignment: newData.alignment || "center",
+        textColor: newData.textColor || "#ffffff",
+        padding: newData.padding || "80px",
+        showButton: newData.showButton !== undefined ? newData.showButton : true
+      };
+      
       // Ensure we're storing stringified JSON data
-      const dataToSave = JSON.stringify(newData);
+      const dataToSave = JSON.stringify(cleanData);
       
-      console.log("Saving section with ID:", section.id);
-      console.log("Saving data:", dataToSave);
+      console.log("⚡ SaveSection: Saving section with ID:", section.id);
+      console.log("⚡ SaveSection: Clean data created:", cleanData);
+      console.log("⚡ SaveSection: Stringified data:", dataToSave);
       
-      // Log the actual data that will be saved to help with debugging
-      console.log("Data to be saved (parsed for readability):", {
-        title: newData.title,
-        subtitle: newData.subtitle,
-        color: newData.color,
-        buttonText: newData.buttonText,
-        buttonLink: newData.buttonLink,
-        imageUrl: newData.imageUrl,
-        alignment: newData.alignment,
-        textColor: newData.textColor,
-        padding: newData.padding,
-        showButton: newData.showButton
-      });
-      
+      // Direct raw SQL query as a fallback if the ORM method fails
       const { error } = await supabase
         .from('sections')
         .update({ 
@@ -112,17 +123,29 @@ export default function TemplateEditorClient({
         .eq('id', section.id);
       
       if (error) {
-        console.error('Error saving section:', error);
-        return false;
+        console.error('⚡ SaveSection: Error saving section with ORM:', error);
+        
+        // Fallback to raw SQL if needed
+        console.log('⚡ SaveSection: Attempting direct SQL update as fallback');
+        
+        const { error: sqlError } = await supabase.rpc('update_section_data', { 
+          section_id: section.id,
+          section_data: dataToSave
+        });
+        
+        if (sqlError) {
+          console.error('⚡ SaveSection: SQL fallback also failed:', sqlError);
+          return false;
+        }
       }
       
-      console.log("Section saved successfully!");
+      console.log("⚡ SaveSection: Section saved successfully!");
       
       // Update local state to ensure UI is consistent
-      setSectionData(newData);
+      setSectionData(cleanData);
       return true;
     } catch (err) {
-      console.error('Unexpected error while saving section:', err);
+      console.error('⚡ SaveSection: Unexpected error while saving section:', err);
       return false;
     }
   };
@@ -133,12 +156,26 @@ export default function TemplateEditorClient({
     setSaveMessage(null)
     
     try {
-      console.log("Saving section data...", currentSectionData);
-      const success = await saveSection(currentSectionData)
+      console.log("⚡ SaveAction: Attempting to save section data");
+      console.log("⚡ SaveAction: Current section data", JSON.stringify(currentSectionData, null, 2));
+      
+      // Check if the section exists
+      if (!section) {
+        console.error("⚡ SaveAction: No section object available");
+        alert("Fehler: Keine Sektion zum Speichern gefunden.");
+        return;
+      }
+      
+      // Log the section ID we're saving to
+      console.log("⚡ SaveAction: Saving to section with ID", section.id);
+      
+      const success = await saveSection(currentSectionData);
       
       if (success) {
+        console.log("⚡ SaveAction: Save successful!");
+        
         // Show success message in component state
-        setSaveMessage({ text: 'Änderungen gespeichert', type: 'success' })
+        setSaveMessage({ text: 'Änderungen gespeichert', type: 'success' });
         
         // Show save success notification
         const saveSuccessNotification = document.getElementById('saveSuccessNotification');
@@ -153,20 +190,21 @@ export default function TemplateEditorClient({
         // Also show as an alert for better visibility
         alert('Änderungen wurden erfolgreich gespeichert!');
       } else {
-        setSaveMessage({ text: 'Fehler beim Speichern', type: 'error' })
+        console.error("⚡ SaveAction: Save operation failed");
+        setSaveMessage({ text: 'Fehler beim Speichern', type: 'error' });
         alert('Fehler beim Speichern. Bitte versuchen Sie es erneut.');
       }
     } catch (error) {
-      console.error('Save error:', error)
-      setSaveMessage({ text: 'Ein unerwarteter Fehler ist aufgetreten', type: 'error' })
+      console.error('⚡ SaveAction: Exception during save:', error);
+      setSaveMessage({ text: 'Ein unerwarteter Fehler ist aufgetreten', type: 'error' });
       alert('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
       
       // Clear message after 3 seconds
       setTimeout(() => {
-        setSaveMessage(null)
-      }, 3000)
+        setSaveMessage(null);
+      }, 3000);
     }
   };
 

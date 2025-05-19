@@ -32,23 +32,21 @@ export default function MySectionsPage() {
   const [allTemplatesWithSections, setAllTemplatesWithSections] = useState<Record<string, {template: any, sections: SectionEntry[]}>>({})
   const [templates, setTemplates] = useState<any[]>([])
 
+  // Track active dropdown
+  const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
+  
   // Add event listener to close dropdowns when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const dropdowns = document.querySelectorAll('.dropdown-container.active');
-      dropdowns.forEach(dropdown => {
-        if (!dropdown.contains(event.target as Node)) {
-          dropdown.classList.remove('active');
-          const menu = dropdown.querySelector('.dropdown-menu');
-          if (menu) {
-            menu.classList.add('hidden');
-          }
-        }
-      });
+    const handleClick = () => {
+      setActiveDropdown(null);
     };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    
+    // Add the global click handler
+    window.addEventListener('click', handleClick);
+    
+    return () => {
+      window.removeEventListener('click', handleClick);
+    };
   }, []);
 
   useEffect(() => {
@@ -305,7 +303,7 @@ export default function MySectionsPage() {
               Hier findest du alle gespeicherten Varianten deiner bearbeiteten Templates.
             </p>
           </div>
-          <Link href="/templates" className="bg-[#1c2838] text-white px-4 py-2 text-sm rounded-lg hover:opacity-90 transition">
+          <Link href="/templates" className="bg-[#1c2838] text-white px-4 py-2 text-sm rounded-lg hover:opacity-90 transition cursor-pointer">
             Neue Section erstellen
           </Link>
         </div>
@@ -371,49 +369,32 @@ export default function MySectionsPage() {
                               <div className="flex justify-between mt-4">
                                 <Link
                                   href={`/editor/${section.template_id}?id=${section.id}`}
-                                  className="bg-[#1c2838] text-white px-3 py-2 text-xs rounded-lg hover:opacity-90 transition flex-grow text-center mr-2 shadow-sm"
+                                  className="bg-[#1c2838] text-white px-3 py-2 text-xs rounded-lg hover:opacity-90 transition flex-grow text-center mr-2 shadow-sm cursor-pointer"
                                 >
                                   Bearbeiten
                                 </Link>
-                                <div className="dropdown-container relative" style={{ overflow: 'visible' }}>
+                                <div className="relative" style={{ overflow: 'visible' }}>
                                   <button 
-                                    className="bg-[#1c2838] text-white px-3 py-2 text-xs rounded-lg hover:opacity-90 transition shadow-sm"
+                                    className="bg-[#1c2838] text-white px-3 py-2 text-xs rounded-lg hover:opacity-90 transition shadow-sm cursor-pointer"
                                     onClick={(e) => {
-                                      // Close any other open dropdowns first
-                                      document.querySelectorAll('.dropdown-container.active').forEach(dropdown => {
-                                        if (dropdown !== e.currentTarget.parentElement) {
-                                          dropdown.classList.remove('active');
-                                          const menu = dropdown.querySelector('.dropdown-menu');
-                                          if (menu) {
-                                            menu.classList.add('hidden');
-                                          }
-                                        }
-                                      });
-                                      
-                                      // Toggle the active state of this dropdown
-                                      const container = e.currentTarget.parentElement;
-                                      container?.classList.toggle('active');
-                                      
-                                      // Toggle the visibility of the dropdown menu
-                                      const menu = container?.querySelector('.dropdown-menu');
-                                      if (menu) {
-                                        menu.classList.toggle('hidden');
-                                      }
-                                      
                                       e.stopPropagation();
+                                      setActiveDropdown(activeDropdown === section.id ? null : section.id);
                                     }}
                                   >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                                     </svg>
                                   </button>
-                                  <div className="absolute top-full right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-[100] hidden dropdown-menu">
+                                  {activeDropdown === section.id && (
+                                    <div className="absolute top-full right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-[100]">
                                     <div className="py-1">
                                       <button 
-                                        className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 rounded-t-lg text-gray-700 transition flex items-center"
-                                        onClick={() => {
+                                        className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 rounded-t-lg text-gray-700 transition flex items-center cursor-pointer"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
                                           setSectionToRename(section);
                                           setRenameDialogOpen(true);
+                                          setActiveDropdown(null);
                                         }}
                                       >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -422,8 +403,9 @@ export default function MySectionsPage() {
                                         Umbenennen
                                       </button>
                                       <button 
-                                        className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 text-red-600 rounded-b-lg transition flex items-center"
-                                        onClick={() => {
+                                        className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 text-red-600 rounded-b-lg transition flex items-center cursor-pointer"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
                                           if (confirm('Möchtest du diese Version wirklich löschen?')) {
                                             // Implementiere das tatsächliche Löschen
                                             const deleteSection = async () => {

@@ -52,12 +52,12 @@ export default function HeroSection({ initialData, onDataChange }: HeroSectionPr
         padding,
         showButton
       };
-      console.log("Updating data in HeroSection:", data);
+      console.log("⚡ HeroSection: Updating data with:", JSON.stringify(data, null, 2));
       onDataChange(data);
     }
   }, [
     title, subtitle, color, buttonText, buttonLink,
-    imageUrl, alignment, textColor, padding, showButton
+    imageUrl, alignment, textColor, padding, showButton, onDataChange
   ])
 
   // Text alignment classes based on the alignment setting
