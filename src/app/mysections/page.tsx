@@ -146,12 +146,12 @@ export default function MySectionsPage() {
                   className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm flex flex-col md:flex-row"
                 >
                   {/* Template Vorschaubild */}
-                  <div className="md:w-24 h-24 relative bg-gray-50 flex-shrink-0">
+                  <div className="md:w-24 h-24 relative bg-gray-50 flex-shrink-0 flex items-center justify-center">
                     {section.template?.image_url ? (
                       <img 
                         src={section.template.image_url} 
                         alt={section.title || 'Section'}
-                        className="w-full h-full object-cover"
+                        className="max-w-full max-h-full object-contain"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 text-xl">

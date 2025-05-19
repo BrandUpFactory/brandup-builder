@@ -228,19 +228,55 @@ export default function TemplateEditorClient({
     return <ErrorDisplay message="Zugriff verweigert oder fehlende Daten" />
   }
 
-  // Get editor components based on template
-  let editorComponents;
-  try {
-    editorComponents = HeroSection({
-      initialData: currentSectionData,
-      onDataChange: handleDataChange
-    });
-  } catch (err) {
-    console.error("Error rendering editor components:", err);
-    return <ErrorDisplay message="Fehler beim Laden des Editors" />;
-  }
+  // Render the editor with a wrapper component to handle HeroSection properly
+  return (
+    <EditorWrapper 
+      section={section}
+      template={template}
+      sectionData={currentSectionData}
+      onDataChange={handleDataChange}
+      onSave={handleSave}
+      isSaving={isSaving}
+      saveMessage={saveMessage}
+      onBack={() => router.push('/mysections')}
+    />
+  );
+}
 
-  // Render the editor with all its components
+// Separate wrapper component to prevent React hooks errors
+function EditorWrapper({
+  section,
+  template,
+  sectionData,
+  onDataChange,
+  onSave,
+  isSaving,
+  saveMessage,
+  onBack
+}: {
+  section: any;
+  template: any;
+  sectionData: any;
+  onDataChange: (data: any) => void;
+  onSave: () => void;
+  isSaving: boolean;
+  saveMessage: {text: string, type: 'success' | 'error'} | null;
+  onBack: () => void;
+}) {
+  // Create the hero section component
+  const editorContent = () => {
+    // For now, we always use HeroSection
+    const { settings, preview, code } = HeroSection({
+      initialData: sectionData,
+      onDataChange: onDataChange
+    });
+    
+    return { settings, preview, code };
+  };
+  
+  // Get the content safely
+  const { settings, preview, code } = editorContent();
+  
   return (
     <div className="h-screen flex flex-col">
       {/* Header with save button */}
@@ -256,7 +292,7 @@ export default function TemplateEditorClient({
             </span>
           )}
           <button 
-            onClick={handleSave}
+            onClick={onSave}
             disabled={isSaving}
             className="bg-[#1c2838] text-white px-4 py-1.5 text-sm rounded-full hover:opacity-90 transition flex items-center gap-1"
           >
@@ -268,7 +304,7 @@ export default function TemplateEditorClient({
             ) : 'Speichern'}
           </button>
           <button 
-            onClick={() => router.push('/mysections')}
+            onClick={onBack}
             className="bg-gray-200 text-gray-800 px-4 py-1.5 text-sm rounded-full hover:bg-gray-300 transition"
           >
             Zurück
@@ -279,9 +315,9 @@ export default function TemplateEditorClient({
       {/* Editor Layout */}
       <div className="flex-grow overflow-auto">
         <EditorLayout
-          settings={editorComponents.settings}
-          preview={editorComponents.preview}
-          code={editorComponents.code}
+          settings={settings}
+          preview={preview}
+          code={code}
         />
       </div>
     </div>

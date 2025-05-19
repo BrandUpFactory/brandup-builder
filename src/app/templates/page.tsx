@@ -120,7 +120,7 @@ export default function TemplatesPage() {
               key={template.id}
               className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col hover:shadow-md transition"
             >
-              <div className="aspect-square w-full relative bg-gray-50">
+              <div className="h-48 w-full relative bg-gray-50 flex items-center justify-center">
                 <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
                   <img
                     src="/Schloss_Icon.png"
@@ -131,7 +131,7 @@ export default function TemplatesPage() {
                 <img
                   src={template.image_url}
                   alt={template.name}
-                  className="w-full h-full object-cover"
+                  className="max-h-full max-w-full object-contain"
                 />
               </div>
 
