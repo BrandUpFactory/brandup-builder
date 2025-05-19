@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { hasAccessToTemplate } from '@/features/template'
@@ -38,6 +38,7 @@ export default function TemplateEditorClient({
   const supabase = createClient()
   const router = useRouter()
   const urlSearchParams = useSearchParams()
+  
   // Use URL search params first, then fall back to server provided searchParams
   const sectionId = urlSearchParams.get('id') || (searchParams.id as string)
   
@@ -59,6 +60,64 @@ export default function TemplateEditorClient({
     }
   }, [sectionData]);
 
+  // Handle data changes from section components
+  const handleDataChange = useCallback((newData: any) => {
+    setCurrentSectionData(newData)
+  }, []);
+
+  // Save section data function
+  const saveSection = useCallback(async (newData: any) => {
+    if (!section) return false
+    
+    try {
+      const { error } = await supabase
+        .from('sections')
+        .update({ 
+          data: newData,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', section.id)
+      
+      if (error) {
+        console.error('Fehler beim Speichern:', error)
+        return false
+      }
+      
+      // Update local state
+      setSectionData(newData)
+      return true
+    } catch (err) {
+      console.error('Unerwarteter Fehler beim Speichern:', err)
+      return false
+    }
+  }, [section, supabase]);
+
+  // Handle save button click
+  const handleSave = useCallback(async () => {
+    setIsSaving(true)
+    setSaveMessage(null)
+    
+    try {
+      const success = await saveSection(currentSectionData)
+      if (success) {
+        setSaveMessage({ text: 'Änderungen gespeichert', type: 'success' })
+      } else {
+        setSaveMessage({ text: 'Fehler beim Speichern', type: 'error' })
+      }
+    } catch (error) {
+      setSaveMessage({ text: 'Ein unerwarteter Fehler ist aufgetreten', type: 'error' })
+      console.error('Save error:', error)
+    } finally {
+      setIsSaving(false)
+      
+      // Clear message after 3 seconds
+      setTimeout(() => {
+        setSaveMessage(null)
+      }, 3000)
+    }
+  }, [currentSectionData, saveSection]);
+
+  // Load editor data
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -152,133 +211,79 @@ export default function TemplateEditorClient({
     }
 
     loadData()
-  }, [templateId, sectionId, router, supabase])
+  }, [templateId, sectionId, router, supabase]);
 
-  // Save section data
-  const saveSection = async (newData: any) => {
-    if (!section) return false
-    
-    try {
-      const { error } = await supabase
-        .from('sections')
-        .update({ 
-          data: newData,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', section.id)
-      
-      if (error) {
-        console.error('Fehler beim Speichern:', error)
-        return false
-      }
-      
-      // Update local state
-      setSectionData(newData)
-      return true
-    } catch (err) {
-      console.error('Unerwarteter Fehler beim Speichern:', err)
-      return false
-    }
-  }
-
+  // Render loading state
   if (isLoading) {
     return <LoadingDisplay />
   }
 
+  // Render error state
   if (error) {
     return <ErrorDisplay message={error} />
   }
 
-
+  // Render missing access/data state
   if (!hasAccess || !template || !section) {
     return <ErrorDisplay message="Zugriff verweigert oder fehlende Daten" />
   }
 
-  // Handle data changes from section components
-  const handleDataChange = (newData: any) => {
-    setCurrentSectionData(newData)
+  // Get editor components based on template
+  let editorComponents;
+  try {
+    editorComponents = HeroSection({
+      initialData: currentSectionData,
+      onDataChange: handleDataChange
+    });
+  } catch (err) {
+    console.error("Error rendering editor components:", err);
+    return <ErrorDisplay message="Fehler beim Laden des Editors" />;
   }
 
-  // Handle save button click
-  const handleSave = async () => {
-    setIsSaving(true)
-    setSaveMessage(null)
-    
-    try {
-      const success = await saveSection(currentSectionData)
-      if (success) {
-        setSaveMessage({ text: 'Änderungen gespeichert', type: 'success' })
-      } else {
-        setSaveMessage({ text: 'Fehler beim Speichern', type: 'error' })
-      }
-    } catch (error) {
-      setSaveMessage({ text: 'Ein unerwarteter Fehler ist aufgetreten', type: 'error' })
-      console.error('Save error:', error)
-    } finally {
-      setIsSaving(false)
-      
-      // Clear message after 3 seconds
-      setTimeout(() => {
-        setSaveMessage(null)
-      }, 3000)
-    }
-  }
-  
-  // Render the appropriate component based on template type
-  const renderEditorComponent = () => {
-    // Here we would dynamically select the component based on template.id
-    // For now, we'll just use HeroSection as a placeholder
-    const { settings, preview, code } = HeroSection({
-      initialData: sectionData,
-      onDataChange: handleDataChange
-    })
-    
-    return (
-      <div className="h-screen flex flex-col">
-        {/* Header with save button */}
-        <div className="bg-white border-b px-6 py-3 flex justify-between items-center">
-          <div>
-            <h1 className="text-lg font-bold text-[#1c2838]">{section.title || template.name}</h1>
-            <p className="text-xs text-gray-500">Template: {template.name}</p>
-          </div>
-          <div className="flex gap-3 items-center">
-            {saveMessage && (
-              <span className={`text-sm ${saveMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
-                {saveMessage.text}
-              </span>
-            )}
-            <button 
-              onClick={handleSave}
-              disabled={isSaving}
-              className="bg-[#1c2838] text-white px-4 py-1.5 text-sm rounded-full hover:opacity-90 transition flex items-center gap-1"
-            >
-              {isSaving ? (
-                <>
-                  <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                  Speichern...
-                </>
-              ) : 'Speichern'}
-            </button>
-            <button 
-              onClick={() => router.push('/mysections')}
-              className="bg-gray-200 text-gray-800 px-4 py-1.5 text-sm rounded-full hover:bg-gray-300 transition"
-            >
-              Zurück
-            </button>
-          </div>
+  // Render the editor with all its components
+  return (
+    <div className="h-screen flex flex-col">
+      {/* Header with save button */}
+      <div className="bg-white border-b px-6 py-3 flex justify-between items-center">
+        <div>
+          <h1 className="text-lg font-bold text-[#1c2838]">{section.title || template.name}</h1>
+          <p className="text-xs text-gray-500">Template: {template.name}</p>
         </div>
-        
-        {/* Editor Layout */}
-        <div className="flex-grow overflow-auto">
-          <EditorLayout
-            settings={settings}
-            preview={preview}
-            code={code}
-          />
+        <div className="flex gap-3 items-center">
+          {saveMessage && (
+            <span className={`text-sm ${saveMessage.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+              {saveMessage.text}
+            </span>
+          )}
+          <button 
+            onClick={handleSave}
+            disabled={isSaving}
+            className="bg-[#1c2838] text-white px-4 py-1.5 text-sm rounded-full hover:opacity-90 transition flex items-center gap-1"
+          >
+            {isSaving ? (
+              <>
+                <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                Speichern...
+              </>
+            ) : 'Speichern'}
+          </button>
+          <button 
+            onClick={() => router.push('/mysections')}
+            className="bg-gray-200 text-gray-800 px-4 py-1.5 text-sm rounded-full hover:bg-gray-300 transition"
+          >
+            Zurück
+          </button>
         </div>
       </div>
-    )
-  }
-
-  return renderEditorComponent()
+      
+      {/* Editor Layout */}
+      <div className="flex-grow overflow-auto">
+        <EditorLayout
+          settings={editorComponents.settings}
+          preview={editorComponents.preview}
+          code={editorComponents.code}
+        />
+      </div>
+    </div>
+  );
 }
