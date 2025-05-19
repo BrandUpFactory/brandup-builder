@@ -357,27 +357,6 @@ export default function EditorLayout({
               </button>
             </div>
             
-            {hasVersionCreate && (
-              <button 
-                onClick={handleCreateVersion}
-                disabled={creatingVersion}
-                className={`${creatingVersion ? 'bg-blue-400' : 'bg-blue-600'} text-white px-4 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium shadow-sm flex items-center gap-1.5`}
-              >
-                {creatingVersion ? (
-                  <>
-                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-1"></div>
-                    Wird erstellt...
-                  </>
-                ) : (
-                  <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Neue Version
-                  </>
-                )}
-              </button>
-            )}
             
             <button 
               onClick={handleSave}

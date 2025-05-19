@@ -39,6 +39,10 @@ export default function MySectionsPage() {
       dropdowns.forEach(dropdown => {
         if (!dropdown.contains(event.target as Node)) {
           dropdown.classList.remove('active');
+          const menu = dropdown.querySelector('.dropdown-menu');
+          if (menu) {
+            menu.classList.add('hidden');
+          }
         }
       });
     };
@@ -211,6 +215,77 @@ export default function MySectionsPage() {
     }
   };
 
+  // Create a new section directly
+  const createNewSection = async (templateId: string) => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Default section data
+      const defaultData = {
+        title: "Hero Section",
+        subtitle: "Erstelle professionelle Shopify-Sektionen mit unserem intuitiven Builder.",
+        color: "#f5f7fa",
+        buttonText: "Jetzt entdecken",
+        buttonLink: "#",
+        imageUrl: "/BG_Card_55.jpg",
+        alignment: "center",
+        textColor: "#ffffff",
+        padding: "80px",
+        showButton: true
+      };
+
+      // Get the template info
+      const template = allTemplatesWithSections[templateId]?.template;
+      const existingSections = allTemplatesWithSections[templateId]?.sections || [];
+
+      // Check if max limit reached (5 versions)
+      if (existingSections.length >= 5) {
+        alert('Sie haben das Maximum von 5 Versionen für dieses Template erreicht. Bitte löschen Sie eine vorhandene Version, um eine neue zu erstellen.');
+        setLoading(false);
+        return;
+      }
+
+      // Create version name
+      const versionNumber = existingSections.length + 1;
+      const versionTitle = `${template.name} ${versionNumber}`;
+      
+      // Insert the new section
+      const { data: newSection, error: insertError } = await supabase
+        .from('sections')
+        .insert({
+          user_id: user.id,
+          template_id: templateId,
+          title: versionTitle,
+          data: JSON.stringify(defaultData),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select();
+
+      if (insertError || !newSection || newSection.length === 0) {
+        console.error('Error creating new section:', insertError);
+        alert('Fehler beim Erstellen einer neuen Version. Bitte versuchen Sie es später erneut.');
+        setLoading(false);
+        return;
+      }
+
+      console.log('New section created with ID:', newSection[0].id);
+      
+      // Redirect to editor with the new section
+      router.push(`/editor/${templateId}?id=${newSection[0].id}`);
+
+    } catch (error) {
+      console.error('Error creating section:', error);
+      alert('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="p-6 md:p-10 h-screen bg-[#f9f9f9]" style={{ overflow: 'visible' }}>
       {/* Rename Dialog */}
@@ -304,7 +379,27 @@ export default function MySectionsPage() {
                                   <button 
                                     className="bg-[#1c2838] text-white px-3 py-2 text-xs rounded-lg hover:opacity-90 transition shadow-sm"
                                     onClick={(e) => {
-                                      e.currentTarget.parentElement?.classList.toggle('active');
+                                      // Close any other open dropdowns first
+                                      document.querySelectorAll('.dropdown-container.active').forEach(dropdown => {
+                                        if (dropdown !== e.currentTarget.parentElement) {
+                                          dropdown.classList.remove('active');
+                                          const menu = dropdown.querySelector('.dropdown-menu');
+                                          if (menu) {
+                                            menu.classList.add('hidden');
+                                          }
+                                        }
+                                      });
+                                      
+                                      // Toggle the active state of this dropdown
+                                      const container = e.currentTarget.parentElement;
+                                      container?.classList.toggle('active');
+                                      
+                                      // Toggle the visibility of the dropdown menu
+                                      const menu = container?.querySelector('.dropdown-menu');
+                                      if (menu) {
+                                        menu.classList.toggle('hidden');
+                                      }
+                                      
                                       e.stopPropagation();
                                     }}
                                   >
@@ -386,7 +481,7 @@ export default function MySectionsPage() {
                     {sections.length < 5 && (
                       <div
                         className="bg-white rounded-lg border border-dashed border-gray-300 p-4 flex flex-col items-center justify-center h-40 hover:bg-gray-50 cursor-pointer transition group shadow-sm hover:shadow-md"
-                        onClick={() => router.push(`/editor/${templateId}`)}
+                        onClick={() => createNewSection(templateId)}
                       >
                         <div className="bg-[#1c2838] rounded-full p-3 mb-3 group-hover:scale-110 transition-transform">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -71,14 +71,37 @@ export default function TemplateEditorClient({
 
   // Save section data function as a regular function to avoid dependency issues
   const saveSection = async (newData: any) => {
-    if (!section) return false
+    if (!section) {
+      console.error('No section available to save');
+      return false;
+    }
     
     try {
-      // Ensure we're storing stringified JSON data
-      const dataToSave = typeof newData === 'string' ? newData : JSON.stringify(newData);
+      // Make sure newData is a valid object
+      if (!newData || typeof newData !== 'object') {
+        console.error('Invalid data format for saving:', newData);
+        return false;
+      }
       
+      // Ensure we're storing stringified JSON data
+      const dataToSave = JSON.stringify(newData);
+      
+      console.log("Saving section with ID:", section.id);
       console.log("Saving data:", dataToSave);
-      console.log("Current section data:", currentSectionData);
+      
+      // Log the actual data that will be saved to help with debugging
+      console.log("Data to be saved (parsed for readability):", {
+        title: newData.title,
+        subtitle: newData.subtitle,
+        color: newData.color,
+        buttonText: newData.buttonText,
+        buttonLink: newData.buttonLink,
+        imageUrl: newData.imageUrl,
+        alignment: newData.alignment,
+        textColor: newData.textColor,
+        padding: newData.padding,
+        showButton: newData.showButton
+      });
       
       const { error } = await supabase
         .from('sections')
@@ -86,19 +109,21 @@ export default function TemplateEditorClient({
           data: dataToSave,
           updated_at: new Date().toISOString()
         })
-        .eq('id', section.id)
+        .eq('id', section.id);
       
       if (error) {
-        console.error('Fehler beim Speichern:', error)
-        return false
+        console.error('Error saving section:', error);
+        return false;
       }
       
-      // Update local state
-      setSectionData(newData)
-      return true
+      console.log("Section saved successfully!");
+      
+      // Update local state to ensure UI is consistent
+      setSectionData(newData);
+      return true;
     } catch (err) {
-      console.error('Unerwarteter Fehler beim Speichern:', err)
-      return false
+      console.error('Unexpected error while saving section:', err);
+      return false;
     }
   };
 
@@ -108,24 +133,33 @@ export default function TemplateEditorClient({
     setSaveMessage(null)
     
     try {
+      console.log("Saving section data...", currentSectionData);
       const success = await saveSection(currentSectionData)
+      
       if (success) {
+        // Show success message in component state
         setSaveMessage({ text: 'Änderungen gespeichert', type: 'success' })
         
         // Show save success notification
         const saveSuccessNotification = document.getElementById('saveSuccessNotification');
         if (saveSuccessNotification) {
+          saveSuccessNotification.textContent = 'Änderungen erfolgreich gespeichert!';
           saveSuccessNotification.classList.remove('hidden');
           setTimeout(() => {
             saveSuccessNotification.classList.add('hidden');
-          }, 2000);
+          }, 3000);
         }
+        
+        // Also show as an alert for better visibility
+        alert('Änderungen wurden erfolgreich gespeichert!');
       } else {
         setSaveMessage({ text: 'Fehler beim Speichern', type: 'error' })
+        alert('Fehler beim Speichern. Bitte versuchen Sie es erneut.');
       }
     } catch (error) {
-      setSaveMessage({ text: 'Ein unerwarteter Fehler ist aufgetreten', type: 'error' })
       console.error('Save error:', error)
+      setSaveMessage({ text: 'Ein unerwarteter Fehler ist aufgetreten', type: 'error' })
+      alert('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
     } finally {
       setIsSaving(false)
       
