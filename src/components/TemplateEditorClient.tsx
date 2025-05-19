@@ -178,14 +178,19 @@ export default function TemplateEditorClient({
     return <ErrorDisplay message={error} />
   }
 
+  // State for tracking current section data - initialize at the top level
+  const [currentSectionData, setCurrentSectionData] = useState<any>({})
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveMessage, setSaveMessage] = useState<{text: string, type: 'success' | 'error'} | null>(null)
+  
+  // Update currentSectionData when sectionData changes
+  useEffect(() => {
+    setCurrentSectionData(sectionData);
+  }, [sectionData]);
+
   if (!hasAccess || !template || !section) {
     return <ErrorDisplay message="Zugriff verweigert oder fehlende Daten" />
   }
-
-  // State for tracking current section data
-  const [currentSectionData, setCurrentSectionData] = useState<any>(sectionData)
-  const [isSaving, setIsSaving] = useState(false)
-  const [saveMessage, setSaveMessage] = useState<{text: string, type: 'success' | 'error'} | null>(null)
 
   // Handle data changes from section components
   const handleDataChange = (newData: any) => {

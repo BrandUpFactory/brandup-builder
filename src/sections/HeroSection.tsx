@@ -10,9 +10,11 @@ interface HeroSectionProps {
   onDataChange?: (data: any) => void;
 }
 
-export default function HeroSection({ initialData = {}, onDataChange }: HeroSectionProps = {}) {
-  const [title, setTitle] = useState(initialData.title || 'BrandUp Builder')
-  const [color, setColor] = useState(initialData.color || '#f3f4f6')
+export default function HeroSection({ initialData, onDataChange }: HeroSectionProps) {
+  // Ensure initialData is an object
+  const safeInitialData = initialData || {};
+  const [title, setTitle] = useState(safeInitialData.title || 'BrandUp Builder')
+  const [color, setColor] = useState(safeInitialData.color || '#f3f4f6')
   
   // Update parent component when data changes
   useEffect(() => {
