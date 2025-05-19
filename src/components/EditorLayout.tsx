@@ -202,7 +202,7 @@ export default function EditorLayout({
         <div>
           <h1 className="text-xl font-bold text-[#1c2838]">
             {title}
-            <span className="ml-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs px-2 py-0.5 rounded-full">
+            <span className="ml-2 bg-gradient-to-r from-[#1c2838] to-[#354153] text-white text-xs px-2 py-0.5 rounded-full">
               Editor
             </span>
           </h1>

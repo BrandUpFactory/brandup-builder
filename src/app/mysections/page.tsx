@@ -225,7 +225,7 @@ export default function MySectionsPage() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                                   </svg>
                                 </button>
-                                <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10 hidden group-hover:block transition-opacity duration-300 group-focus-within:block">
+                                <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-50 hidden group-hover:block transition-opacity duration-300 group-focus-within:block">
                                   <div className="py-1">
                                     <button 
                                       className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 rounded-t-lg text-gray-700 transition flex items-center"
@@ -314,8 +314,8 @@ export default function MySectionsPage() {
                           className="bg-white rounded-lg border border-dashed border-gray-300 p-4 flex flex-col items-center justify-center h-40 hover:bg-gray-50 cursor-pointer transition group shadow-sm hover:shadow-md"
                           onClick={() => router.push(`/editor/${templateId}`)}
                         >
-                          <div className="bg-[#1c2838] bg-opacity-10 rounded-full p-3 mb-3 group-hover:scale-110 transition-transform">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#1c2838]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <div className="bg-[#1c2838] rounded-full p-3 mb-3 group-hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
                           </div>
