@@ -123,64 +123,132 @@ export default function MySectionsPage() {
     )
   }
 
+  // Gruppierte Sections nach Template
+  const groupedSections = sections.reduce((acc, section) => {
+    const templateId = section.template_id;
+    if (!acc[templateId]) {
+      acc[templateId] = [];
+    }
+    acc[templateId].push(section);
+    return acc;
+  }, {} as Record<string, SectionEntry[]>);
+
   return (
     <div className="p-6 md:p-10 h-screen overflow-auto bg-[#f9f9f9]">
-      <div className="bg-white shadow rounded-lg p-6 md:p-8 w-full max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-[#1c2838] mb-3">Meine Sections</h1>
-        <p className="text-sm text-gray-600">
-          Hier findest du alle gespeicherten Varianten deiner bearbeiteten Templates.
-        </p>
+      <div className="bg-white shadow rounded-xl p-6 md:p-8 w-full max-w-5xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-[#1c2838] mb-1">Meine Sections</h1>
+            <p className="text-sm text-gray-600">
+              Hier findest du alle gespeicherten Varianten deiner bearbeiteten Templates.
+            </p>
+          </div>
+          <Link href="/templates" className="bg-blue-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-700 transition">
+            Neue Section erstellen
+          </Link>
+        </div>
 
         <div className="mt-6">
           {loading ? (
-            <p className="text-center text-gray-400 text-sm">⏳ Lade deine Sections...</p>
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+            </div>
           ) : sections.length === 0 ? (
-            <div className="text-center text-gray-400 text-sm">
-              💾 Noch keine Sections gespeichert. Beginne jetzt mit dem Builder!
+            <div className="text-center py-16 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="text-5xl mb-4">💾</div>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">Noch keine Sections gespeichert</h3>
+              <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                Beginne mit dem Erstellen deiner ersten Section, um sie hier zu sehen.
+              </p>
+              <Link href="/templates" className="bg-[#1c2838] text-white px-6 py-2 rounded-lg hover:opacity-90 transition">
+                Mit dem Builder starten
+              </Link>
             </div>
           ) : (
-            <ul className="space-y-4">
-              {sections.map((section) => (
-                <li
-                  key={section.id}
-                  className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm flex flex-col md:flex-row"
-                >
-                  {/* Template Vorschaubild */}
-                  <div className="md:w-24 h-24 relative bg-gray-50 flex-shrink-0 flex items-center justify-center">
-                    {section.template?.image_url ? (
-                      <img 
-                        src={section.template.image_url} 
-                        alt={section.title || 'Section'}
-                        className="max-w-full max-h-full object-contain"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 text-xl">
-                        📄
+            <div className="space-y-8">
+              {Object.entries(groupedSections).map(([templateId, templateSections]) => {
+                // Nehme das erste Section-Element, um Template-Informationen zu erhalten
+                const templateInfo = templateSections[0]?.template;
+                
+                return (
+                  <div key={templateId} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center overflow-hidden">
+                        {templateInfo?.image_url ? (
+                          <img 
+                            src={templateInfo.image_url} 
+                            alt={templateInfo.name} 
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <span className="text-gray-400 text-lg">📄</span>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  
-                  {/* Informationen */}
-                  <div className="p-4 flex-grow flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                      <h2 className="font-medium text-[#1c2838] text-sm mb-1">
-                        {section.title || 'Unbenannte Section'}
+                      <h2 className="font-medium text-[#1c2838]">
+                        {templateInfo?.name || `Template ${templateId}`}
                       </h2>
-                      <p className="text-xs text-gray-500">
-                        {section.template?.name || `Template ${section.template_id}`} •{' '}
-                        {new Date(section.created_at).toLocaleDateString('de-DE')}
-                      </p>
                     </div>
-                    <Link
-                      href={`/editor/${section.template_id}?id=${section.id}`}
-                      className="bg-[#1c2838] text-white px-4 py-1.5 text-xs rounded-full hover:opacity-90 transition whitespace-nowrap"
-                    >
-                      Bearbeiten
-                    </Link>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {templateSections.map((section) => (
+                        <div
+                          key={section.id}
+                          className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition"
+                        >
+                          <div className="p-4">
+                            <div className="flex justify-between items-start mb-3">
+                              <div>
+                                <h3 className="font-medium text-[#1c2838] mb-1">
+                                  {section.title || 'Version ' + (templateSections.indexOf(section) + 1)}
+                                </h3>
+                                <p className="text-xs text-gray-500">
+                                  Bearbeitet: {new Date(section.created_at).toLocaleDateString('de-DE')}
+                                </p>
+                              </div>
+                              <div className="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-medium">
+                                Version {templateSections.indexOf(section) + 1}
+                              </div>
+                            </div>
+                            
+                            <div className="flex justify-between mt-4">
+                              <Link
+                                href={`/editor/${section.template_id}?id=${section.id}`}
+                                className="bg-[#1c2838] text-white px-3 py-1.5 text-xs rounded-lg hover:opacity-90 transition flex-grow text-center mr-2"
+                              >
+                                Bearbeiten
+                              </Link>
+                              <button 
+                                className="bg-gray-100 text-gray-700 px-3 py-1.5 text-xs rounded-lg hover:bg-gray-200 transition"
+                                onClick={() => alert('Diese Funktion wird bald verfügbar sein')}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {/* Neue Version erstellen, wenn weniger als 5 Versionen */}
+                      {templateSections.length < 5 && (
+                        <div
+                          className="bg-white rounded-lg border border-dashed border-gray-300 p-4 flex flex-col items-center justify-center h-40 hover:bg-gray-50 cursor-pointer transition"
+                          onClick={() => router.push(`/editor/${templateId}`)}
+                        >
+                          <div className="bg-gray-100 rounded-full p-2 mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                          </div>
+                          <span className="text-sm text-gray-700">Neue Version erstellen</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </li>
-              ))}
-            </ul>
+                );
+              })}
+            </div>
           )}
         </div>
       </div>

@@ -222,11 +222,11 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {templates.map((template) => (
                 <div key={template.id} className="rounded-xl overflow-hidden bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow group">
-                  <div className="h-48 bg-gray-100 relative overflow-hidden flex items-center justify-center">
+                  <div className="h-48 bg-gray-100 relative overflow-hidden flex items-center justify-center p-0">
                     <img 
                       src={template.image_url} 
                       alt={template.name} 
-                      className="max-h-full max-w-full object-contain transition-transform duration-500 group-hover:scale-105" 
+                      className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105" 
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
                       <div className="p-4 w-full">

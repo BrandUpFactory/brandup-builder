@@ -28,6 +28,12 @@ export default function TemplatesPage() {
   const [user, setUser] = useState<User | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null)
+  const [unlockedTemplates, setUnlockedTemplates] = useState<string[]>([])
+
+  // Funktion, um zu prüfen, ob ein Template freigeschaltet ist
+  const hasAccessToTemplate = (templateId: string) => {
+    return unlockedTemplates.includes(templateId);
+  }
 
   // Benutzer prüfen
   useEffect(() => {
@@ -35,6 +41,18 @@ export default function TemplatesPage() {
       const { data, error } = await supabase.auth.getUser()
       if (!error && data.user) {
         setUser(data.user)
+        
+        // Wenn Benutzer angemeldet ist, lade freigeschaltete Templates
+        const { data: licenses } = await supabase
+          .from('licenses')
+          .select('template_id')
+          .eq('user_id', data.user.id)
+          .eq('used', true)
+        
+        if (licenses && licenses.length > 0) {
+          const templateIds = licenses.map(license => license.template_id);
+          setUnlockedTemplates(templateIds);
+        }
       }
     }
 
@@ -44,6 +62,13 @@ export default function TemplatesPage() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
+      
+      // Bei Auth-Änderungen neu laden
+      if (session?.user) {
+        fetchUser();
+      } else {
+        setUnlockedTemplates([]);
+      }
     })
 
     return () => subscription.unsubscribe()
@@ -120,18 +145,27 @@ export default function TemplatesPage() {
               key={template.id}
               className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col hover:shadow-md transition"
             >
-              <div className="h-48 w-full relative bg-gray-50 flex items-center justify-center">
-                <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                  <img
-                    src="/Schloss_Icon.png"
-                    alt="Locked"
-                    className="w-10 h-10 object-contain opacity-90"
-                  />
-                </div>
+              <div className="h-48 w-full relative bg-gray-50 flex items-center justify-center p-0">
+                {!hasAccessToTemplate(template.id) && (
+                  <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                    <img
+                      src="/Schloss_Icon.png"
+                      alt="Locked"
+                      className="w-10 h-10 object-contain opacity-90"
+                    />
+                  </div>
+                )}
+                {hasAccessToTemplate(template.id) && (
+                  <div className="absolute top-2 right-2 z-10 bg-green-500 rounded-full p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
                 <img
                   src={template.image_url}
                   alt={template.name}
-                  className="max-h-full max-w-full object-contain"
+                  className="h-full w-full object-contain"
                 />
               </div>
 
@@ -140,20 +174,31 @@ export default function TemplatesPage() {
                 <p className="text-xs text-gray-500 line-clamp-2">{template.description}</p>
 
                 <div className="mt-auto flex flex-col gap-2">
-                  <button 
-                    onClick={() => handleUnlockClick(template)}
-                    className="bg-[#676058] hover:opacity-90 text-white text-xs px-4 py-1.5 rounded-full w-full transition"
-                  >
-                    Freischalten
-                  </button>
+                  {hasAccessToTemplate(template.id) ? (
+                    <Link
+                      href={`/editor/${template.id}`}
+                      className="bg-[#1c2838] hover:opacity-90 text-white text-xs px-4 py-1.5 rounded-full w-full text-center transition"
+                    >
+                      Bearbeiten
+                    </Link>
+                  ) : (
+                    <>
+                      <button 
+                        onClick={() => handleUnlockClick(template)}
+                        className="bg-[#676058] hover:opacity-90 text-white text-xs px-4 py-1.5 rounded-full w-full transition"
+                      >
+                        Freischalten
+                      </button>
 
-                  <Link
-                    href={template.buy_url || '#'}
-                    target="_blank"
-                    className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full text-center w-full"
-                  >
-                    Kaufen
-                  </Link>
+                      <Link
+                        href={template.buy_url || '#'}
+                        target="_blank"
+                        className="bg-[#1c2838] text-white text-xs px-4 py-1.5 rounded-full text-center w-full"
+                      >
+                        Kaufen
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
