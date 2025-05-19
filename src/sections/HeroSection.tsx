@@ -1,10 +1,35 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-export default function HeroSection() {
-  const [title, setTitle] = useState('BrandUp Builder')
-  const [color, setColor] = useState('#f3f4f6')
+interface HeroSectionProps {
+  initialData?: {
+    title?: string;
+    color?: string;
+  };
+  onDataChange?: (data: any) => void;
+}
+
+export default function HeroSection({ initialData = {}, onDataChange }: HeroSectionProps = {}) {
+  const [title, setTitle] = useState(initialData.title || 'BrandUp Builder')
+  const [color, setColor] = useState(initialData.color || '#f3f4f6')
+  
+  // Update parent component when data changes
+  useEffect(() => {
+    if (onDataChange) {
+      onDataChange({ title, color })
+    }
+  }, [title, color, onDataChange])
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value
+    setTitle(newTitle)
+  }
+
+  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newColor = e.target.value
+    setColor(newColor)
+  }
 
   const settings = (
     <div className="space-y-4">
@@ -13,7 +38,7 @@ export default function HeroSection() {
         <input
           type="text"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={handleTitleChange}
           className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm"
         />
       </label>
@@ -22,7 +47,7 @@ export default function HeroSection() {
         <input
           type="color"
           value={color}
-          onChange={(e) => setColor(e.target.value)}
+          onChange={handleColorChange}
           className="mt-1 w-10 h-6 border rounded"
         />
       </label>
@@ -35,7 +60,7 @@ export default function HeroSection() {
     </div>
   )
 
-  const code = `<section style=\"background-color: ${color};\">\n  <h1>${title}</h1>\n</section>`
+  const code = `<section style="background-color: ${color};">\n  <h1>${title}</h1>\n</section>`
 
   return { settings, preview, code }
 }
