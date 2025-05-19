@@ -75,7 +75,6 @@ export default function TemplateEditorClient({
         .from('sections')
         .update({ 
           data: newData,
-          title: sectionTitle,
           updated_at: new Date().toISOString()
         })
         .eq('id', section.id)
@@ -92,7 +91,7 @@ export default function TemplateEditorClient({
       console.error('Unerwarteter Fehler beim Speichern:', err)
       return false
     }
-  }, [section, supabase, sectionTitle]);
+  }, [section, supabase]);
 
   // Handle save button click
   const handleSave = useCallback(async () => {
@@ -232,6 +231,28 @@ export default function TemplateEditorClient({
     return <ErrorDisplay message="Zugriff verweigert oder fehlende Daten" />
   }
 
+  // Handle version name change
+  const handleVersionNameChange = useCallback(async (newName: string) => {
+    if (!section) return
+    
+    try {
+      const { error } = await supabase
+        .from('sections')
+        .update({ 
+          title: newName,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', section.id)
+      
+      if (error) {
+        console.error('Fehler beim Speichern des Versionsnamens:', error)
+      }
+      
+    } catch (err) {
+      console.error('Unerwarteter Fehler beim Speichern des Versionsnamens:', err)
+    }
+  }, [section, supabase]);
+
   // Render the editor with a wrapper component to handle HeroSection properly
   return (
     <EditorWrapper 
@@ -243,6 +264,8 @@ export default function TemplateEditorClient({
       isSaving={isSaving}
       saveMessage={saveMessage}
       onBack={() => router.push('/mysections')}
+      versionName={section?.title}
+      onVersionNameChange={handleVersionNameChange}
     />
   );
 }
@@ -256,7 +279,9 @@ function EditorWrapper({
   onSave,
   isSaving,
   saveMessage,
-  onBack
+  onBack,
+  versionName,
+  onVersionNameChange
 }: {
   section: any;
   template: any;
@@ -266,6 +291,8 @@ function EditorWrapper({
   isSaving: boolean;
   saveMessage: {text: string, type: 'success' | 'error'} | null;
   onBack: () => void;
+  versionName?: string;
+  onVersionNameChange?: (name: string) => void;
 }) {
   // Create the hero section component
   const editorContent = () => {
@@ -297,13 +324,11 @@ function EditorWrapper({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <input 
-                type="text"
-                value={sectionTitle}
-                className="text-lg font-bold text-[#1c2838] bg-transparent border-b border-transparent hover:border-gray-200 focus:border-blue-500 outline-none transition-colors px-0 py-0.5 max-w-[250px]"
-                placeholder="Versionstitel eingeben"
-                onChange={(e) => setSectionTitle(e.target.value)}
-              />
+              <span
+                className="text-lg font-bold text-[#1c2838] max-w-[250px]"
+              >
+                Hero Section
+              </span>
             </div>
             <p className="text-xs text-gray-500">Template: {template.name}</p>
           </div>
@@ -340,6 +365,8 @@ function EditorWrapper({
           settings={settings}
           preview={preview}
           code={code}
+          versionName={versionName}
+          onVersionNameChange={onVersionNameChange}
         />
       </div>
     </div>
