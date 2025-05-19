@@ -143,7 +143,7 @@ export default function MySectionsPage() {
               Hier findest du alle gespeicherten Varianten deiner bearbeiteten Templates.
             </p>
           </div>
-          <Link href="/templates" className="bg-blue-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-700 transition">
+          <Link href="/templates" className="bg-[#1c2838] text-white px-4 py-2 text-sm rounded-lg hover:opacity-90 transition">
             Neue Section erstellen
           </Link>
         </div>
@@ -213,46 +213,94 @@ export default function MySectionsPage() {
                             <div className="flex justify-between mt-4">
                               <Link
                                 href={`/editor/${section.template_id}?id=${section.id}`}
-                                className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-2 text-xs rounded-lg hover:opacity-95 transition flex-grow text-center mr-2 shadow-sm"
+                                className="bg-[#1c2838] text-white px-3 py-2 text-xs rounded-lg hover:opacity-90 transition flex-grow text-center mr-2 shadow-sm"
                               >
                                 Bearbeiten
                               </Link>
-                              <div className="relative group">
+                              <div className="relative group" tabIndex={0}>
                                 <button 
-                                  className="bg-gray-100 text-gray-700 px-3 py-2 text-xs rounded-lg hover:bg-gray-200 transition shadow-sm"
+                                  className="bg-[#1c2838] text-white px-3 py-2 text-xs rounded-lg hover:opacity-90 transition shadow-sm"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                                   </svg>
                                 </button>
-                                <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10 hidden group-hover:block">
-                                  <button 
-                                    className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 rounded-t-lg text-gray-700 transition flex items-center"
-                                    onClick={() => {
-                                      const newName = prompt('Neuer Name für die Version:', section.title || `Version ${templateSections.indexOf(section) + 1}`);
-                                      if (newName && newName.trim()) {
-                                        alert(`Umbenennen in "${newName}" - Funktion wird bald verfügbar sein`);
-                                      }
-                                    }}
-                                  >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    Umbenennen
-                                  </button>
-                                  <button 
-                                    className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 text-red-600 rounded-b-lg transition flex items-center"
-                                    onClick={() => {
-                                      if (confirm('Möchtest du diese Version wirklich löschen?')) {
-                                        alert('Löschen - Funktion wird bald verfügbar sein');
-                                      }
-                                    }}
-                                  >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                    Löschen
-                                  </button>
+                                <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10 hidden group-hover:block transition-opacity duration-300 group-focus-within:block">
+                                  <div className="py-1">
+                                    <button 
+                                      className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 rounded-t-lg text-gray-700 transition flex items-center"
+                                      onClick={() => {
+                                        const newName = prompt('Neuer Name für die Version:', section.title || `Version ${templateSections.indexOf(section) + 1}`);
+                                        if (newName && newName.trim()) {
+                                          // Implementiere das tatsächliche Umbenennen
+                                          const updateSectionName = async () => {
+                                            try {
+                                              const { error } = await supabase
+                                                .from('sections')
+                                                .update({ title: newName })
+                                                .eq('id', section.id);
+                                              
+                                              if (error) {
+                                                throw error;
+                                              }
+                                              
+                                              // Aktualisiere die lokale Ansicht ohne Neuladen
+                                              const updatedSections = [...sections];
+                                              const sectionIndex = updatedSections.findIndex(s => s.id === section.id);
+                                              if (sectionIndex !== -1) {
+                                                updatedSections[sectionIndex].title = newName;
+                                                setSections(updatedSections);
+                                              }
+                                              
+                                              alert(`Version wurde in "${newName}" umbenannt!`);
+                                            } catch (error) {
+                                              console.error('Fehler beim Umbenennen:', error);
+                                              alert('Fehler beim Umbenennen. Bitte versuche es erneut.');
+                                            }
+                                          };
+                                          updateSectionName();
+                                        }
+                                      }}
+                                    >
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                      </svg>
+                                      Umbenennen
+                                    </button>
+                                    <button 
+                                      className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 text-red-600 rounded-b-lg transition flex items-center"
+                                      onClick={() => {
+                                        if (confirm('Möchtest du diese Version wirklich löschen?')) {
+                                          // Implementiere das tatsächliche Löschen
+                                          const deleteSection = async () => {
+                                            try {
+                                              const { error } = await supabase
+                                                .from('sections')
+                                                .delete()
+                                                .eq('id', section.id);
+                                              
+                                              if (error) {
+                                                throw error;
+                                              }
+                                              
+                                              // Aktualisiere die lokale Ansicht ohne Neuladen
+                                              setSections(sections.filter(s => s.id !== section.id));
+                                              alert('Version wurde erfolgreich gelöscht!');
+                                            } catch (error) {
+                                              console.error('Fehler beim Löschen:', error);
+                                              alert('Fehler beim Löschen. Bitte versuche es erneut.');
+                                            }
+                                          };
+                                          deleteSection();
+                                        }
+                                      }}
+                                    >
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                      </svg>
+                                      Löschen
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -266,8 +314,8 @@ export default function MySectionsPage() {
                           className="bg-white rounded-lg border border-dashed border-gray-300 p-4 flex flex-col items-center justify-center h-40 hover:bg-gray-50 cursor-pointer transition group shadow-sm hover:shadow-md"
                           onClick={() => router.push(`/editor/${templateId}`)}
                         >
-                          <div className="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full p-3 mb-3 group-hover:scale-110 transition-transform">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <div className="bg-[#1c2838] bg-opacity-10 rounded-full p-3 mb-3 group-hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#1c2838]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
                           </div>

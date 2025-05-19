@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import DevicePreview from './DevicePreview'
 import VersionHistory from './VersionHistory'
 import ExportImportPanel from './ExportImportPanel'
@@ -42,10 +42,16 @@ export default function EditorLayout({
   const [editing, setEditing] = useState(false)
   const [editingName, setEditingName] = useState(versionName || 'Unbenannte Version')
   const [showSettings, setShowSettings] = useState(true)
+  const [copySuccess, setCopySuccess] = useState(false)
+  
+  // Update editingName when versionName changes
+  useEffect(() => {
+    setEditingName(versionName || 'Unbenannte Version')
+  }, [versionName])
   
   const handleNameSave = () => {
     setEditing(false)
-    if (onVersionNameChange) {
+    if (onVersionNameChange && editingName.trim() !== '') {
       onVersionNameChange(editingName)
     }
   }
@@ -78,14 +84,6 @@ export default function EditorLayout({
         >
           Code
         </button>
-        {sectionId && (
-          <button 
-            onClick={() => setActiveTab('history')}
-            className={`px-4 py-2 text-sm whitespace-nowrap ${activeTab === 'history' ? 'border-b-2 border-[#1c2838] font-medium' : 'text-gray-600'}`}
-          >
-            Versionen
-          </button>
-        )}
       </div>
       
       {activeTab === 'settings' && (
@@ -109,18 +107,6 @@ export default function EditorLayout({
           <div className="text-sm whitespace-pre-wrap">
             {code}
           </div>
-        </div>
-      )}
-      
-      {activeTab === 'history' && sectionId && (
-        <div className="mb-4">
-          <VersionHistory
-            sectionId={sectionId}
-            currentVersionId={currentVersionId || null}
-            onVersionSelect={onVersionSelect || (() => {})}
-            onVersionCreate={onVersionCreate || (() => {})}
-            onVersionDelete={onVersionDelete || (() => {})}
-          />
         </div>
       )}
     </div>
@@ -156,7 +142,7 @@ export default function EditorLayout({
                 <div className="h-full flex flex-col items-center justify-center">
                   <button
                     onClick={() => setShowSettings(true)}
-                    className="transform -rotate-90 whitespace-nowrap text-sm text-gray-500 hover:text-blue-600 transition"
+                    className="transform -rotate-90 whitespace-nowrap text-sm text-gray-500 hover:text-[#1c2838] transition"
                   >
                     Einstellungen anzeigen
                   </button>
@@ -167,16 +153,6 @@ export default function EditorLayout({
             {/* Version History and Import/Export at bottom of sidebar */}
             {showSettings && (
               <div className="p-3 border-t bg-gray-50 space-y-3">
-                {sectionId && (
-                  <VersionHistory
-                    sectionId={sectionId}
-                    currentVersionId={currentVersionId || null}
-                    onVersionSelect={onVersionSelect || (() => {})}
-                    onVersionCreate={onVersionCreate || (() => {})}
-                    onVersionDelete={onVersionDelete || (() => {})}
-                  />
-                )}
-                
                 {onImportData && (
                   <ExportImportPanel
                     data={exportData}
@@ -214,6 +190,13 @@ export default function EditorLayout({
 
   return (
     <div className="p-4 md:p-6 bg-white text-[#1c2838]">
+      {/* Notification for copy success */}
+      {copySuccess && (
+        <div className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50">
+          Code wurde in die Zwischenablage kopiert!
+        </div>
+      )}
+      
       {/* Editor Header with Title and Version Control */}
       <div className="mb-6 flex flex-col md:flex-row justify-between gap-3">
         <div>
@@ -237,7 +220,7 @@ export default function EditorLayout({
                 />
                 <button 
                   onClick={handleNameSave}
-                  className="ml-1 text-blue-600 hover:text-blue-800"
+                  className="ml-1 text-[#1c2838] hover:text-blue-800"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -250,7 +233,7 @@ export default function EditorLayout({
                 <span className="text-sm font-medium">{versionName || 'Unbenannte Version'}</span>
                 <button 
                   onClick={() => setEditing(true)}
-                  className="ml-1.5 text-gray-400 hover:text-blue-600 transition"
+                  className="ml-1.5 text-gray-400 hover:text-[#1c2838] transition"
                   title="Version umbenennen"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -267,31 +250,8 @@ export default function EditorLayout({
             <button 
               onClick={() => {
                 navigator.clipboard.writeText(code?.toString() || '');
-                // Show toast notification
-                const toast = document.createElement('div');
-                toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in-out';
-                toast.style.animation = 'fadeInOut 2s ease-in-out forwards';
-                toast.innerText = 'Code wurde in die Zwischenablage kopiert!';
-                
-                // Add animation keyframes
-                const style = document.createElement('style');
-                style.innerHTML = `
-                  @keyframes fadeInOut {
-                    0% { opacity: 0; transform: translateY(-20px); }
-                    10% { opacity: 1; transform: translateY(0); }
-                    80% { opacity: 1; transform: translateY(0); }
-                    100% { opacity: 0; transform: translateY(-20px); }
-                  }
-                `;
-                document.head.appendChild(style);
-                
-                document.body.appendChild(toast);
-                
-                // Remove toast after animation
-                setTimeout(() => {
-                  document.body.removeChild(toast);
-                  document.head.removeChild(style);
-                }, 2000);
+                setCopySuccess(true);
+                setTimeout(() => setCopySuccess(false), 2000);
               }}
               className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-1.5 transition font-medium"
             >
@@ -313,7 +273,7 @@ export default function EditorLayout({
           
           <button 
             onClick={handleSave}
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium shadow-sm flex items-center gap-1.5"
+            className="bg-[#1c2838] text-white px-4 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium shadow-sm flex items-center gap-1.5"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />

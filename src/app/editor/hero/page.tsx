@@ -291,10 +291,7 @@ function HeroEditor() {
         onVersionNameChange={handleVersionNameChange}
         sectionId={sectionId ? Number(sectionId) : undefined}
         onSave={handleSave}
-        onVersionSelect={handleVersionSelect}
-        onVersionCreate={handleCreateVersion}
-        onVersionDelete={handleVersionDelete}
-        currentVersionId={currentVersionId}
+        // Removed version controls to simplify
         exportData={sectionData}
         onImportData={handleImportData}
       />
