@@ -132,7 +132,7 @@ export default function EditorLayout({
       <div className="grid grid-cols-12 gap-4">
         {/* Settings Sidebar */}
         <div className={`${showSettings ? 'col-span-3' : 'col-span-1'} transition-all duration-300`}>
-          <div className="border rounded-xl overflow-hidden bg-white h-full flex flex-col">
+          <div className="border rounded-xl overflow-hidden bg-white h-[calc(100vh-200px)] flex flex-col">
             <div className="p-2 bg-gray-50 border-b flex items-center justify-between">
               <h2 className={`text-sm font-semibold text-gray-700 ${!showSettings && 'hidden'}`}>Einstellungen</h2>
               <button 
@@ -189,20 +189,22 @@ export default function EditorLayout({
           </div>
         </div>
 
-        {/* Content Area */}
-        <div className={`${showSettings ? 'col-span-9' : 'col-span-11'} grid grid-rows-2 gap-4 h-[calc(100vh-200px)]`}>
-          {/* Preview */}
-          <div className="border rounded-xl overflow-hidden bg-white">
-            <DevicePreview>
-              {preview}
-            </DevicePreview>
-          </div>
+        {/* Content Area - Changed to have preview and code side by side */}
+        <div className={`${showSettings ? 'col-span-9' : 'col-span-11'} flex flex-col h-[calc(100vh-200px)]`}>
+          <div className="grid grid-cols-2 gap-4 h-full">
+            {/* Preview */}
+            <div className="border rounded-xl overflow-hidden bg-white">
+              <DevicePreview>
+                {preview}
+              </DevicePreview>
+            </div>
 
-          {/* Code Output */}
-          <div className="border rounded-xl p-4 overflow-auto bg-[#f9f9f9]">
-            <h2 className="text-lg font-semibold mb-2">Liquid Code</h2>
-            <div className="text-sm whitespace-pre-wrap">
-              {code}
+            {/* Code Output */}
+            <div className="border rounded-xl p-4 overflow-auto bg-[#f9f9f9]">
+              <h2 className="text-lg font-semibold mb-2">Liquid Code</h2>
+              <div className="text-sm whitespace-pre-wrap">
+                {code}
+              </div>
             </div>
           </div>
         </div>
@@ -215,7 +217,7 @@ export default function EditorLayout({
       {/* Editor Header with Title and Version Control */}
       <div className="mb-6 flex flex-col md:flex-row justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-[#1c2838] flex items-center">
+          <h1 className="text-xl font-bold text-[#1c2838]">
             {title}
             <span className="ml-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs px-2 py-0.5 rounded-full">
               Editor
@@ -263,7 +265,34 @@ export default function EditorLayout({
         <div className="flex items-center gap-2">
           <div className="bg-gray-50 rounded-lg flex overflow-hidden shadow-sm">
             <button 
-              onClick={() => navigator.clipboard.writeText(code?.toString() || '')}
+              onClick={() => {
+                navigator.clipboard.writeText(code?.toString() || '');
+                // Show toast notification
+                const toast = document.createElement('div');
+                toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in-out';
+                toast.style.animation = 'fadeInOut 2s ease-in-out forwards';
+                toast.innerText = 'Code wurde in die Zwischenablage kopiert!';
+                
+                // Add animation keyframes
+                const style = document.createElement('style');
+                style.innerHTML = `
+                  @keyframes fadeInOut {
+                    0% { opacity: 0; transform: translateY(-20px); }
+                    10% { opacity: 1; transform: translateY(0); }
+                    80% { opacity: 1; transform: translateY(0); }
+                    100% { opacity: 0; transform: translateY(-20px); }
+                  }
+                `;
+                document.head.appendChild(style);
+                
+                document.body.appendChild(toast);
+                
+                // Remove toast after animation
+                setTimeout(() => {
+                  document.body.removeChild(toast);
+                  document.head.removeChild(style);
+                }, 2000);
+              }}
               className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-1.5 transition font-medium"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -272,7 +301,7 @@ export default function EditorLayout({
               Code kopieren
             </button>
             <button 
-              onClick={() => window.open('https://shopify.dev/themes/architecture/sections', '_blank')}
+              onClick={() => window.open('https://www.brandupfactory.com/help-center', '_blank')}
               className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-1.5 transition font-medium border-l border-gray-200"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

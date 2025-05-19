@@ -93,18 +93,26 @@ function HeroEditor() {
   
   // Handle version name change
   const handleVersionNameChange = async (name: string) => {
-    setVersionName(name)
-    
-    // If we have a section ID, update the name in the database
-    if (sectionId) {
-      const { error } = await supabase
-        .from('sections')
-        .update({ title: name })
-        .eq('id', sectionId)
+    try {
+      // Set the name in the UI immediately
+      setVersionName(name)
       
-      if (error) {
-        console.error('Error updating section name:', error)
+      // If we have a section ID, update the name in the database
+      if (sectionId) {
+        const { error } = await supabase
+          .from('sections')
+          .update({ title: name })
+          .eq('id', Number(sectionId))
+        
+        if (error) {
+          throw error
+        }
+        
+        console.log('Version name updated successfully')
       }
+    } catch (error) {
+      console.error('Error updating section name:', error)
+      alert('Fehler beim Umbenennen der Version. Bitte versuche es erneut.')
     }
   }
   
@@ -137,17 +145,23 @@ function HeroEditor() {
         
       if (sectionError) throw sectionError
       
-      // Create a new version snapshot
-      await handleCreateVersion()
+      console.log('Section data saved successfully')
+      
+      // Create a new version snapshot - comment this out to avoid duplicate versions
+      // Instead we'll just save the section without creating a new version
+      // await handleCreateVersion()
       
       // Wait a moment to show the saving state
       setTimeout(() => {
         setIsSaving(false)
+        // Show success message
+        alert('Änderungen erfolgreich gespeichert!')
       }, 500)
       
     } catch (error) {
       console.error('Error saving section:', error)
       setIsSaving(false)
+      alert('Fehler beim Speichern. Bitte versuche es erneut.')
     }
   }
   
@@ -168,14 +182,19 @@ function HeroEditor() {
       
       if (versionError) throw versionError
       
+      console.log('New version created:', newVersion)
+      
       // Set the new version as current
       if (newVersion && newVersion.length > 0) {
         setCurrentVersionId(newVersion[0].id)
+        // Show success message
+        alert('Version erfolgreich gespeichert!')
       }
       
       return newVersion
     } catch (error) {
       console.error('Error creating version:', error)
+      alert('Fehler beim Erstellen der Version. Bitte versuche es erneut.')
     }
   }
   

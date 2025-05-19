@@ -145,7 +145,7 @@ export default function TemplatesPage() {
               key={template.id}
               className="border rounded-xl overflow-hidden shadow-sm bg-white flex flex-col hover:shadow-md transition"
             >
-              <div className="relative bg-gray-50 h-48 w-full overflow-hidden">
+              <div className="relative bg-gray-50 aspect-square w-full overflow-hidden">
                 <div className="h-full w-full flex items-center justify-center">
                   <img
                     src={template.image_url}
