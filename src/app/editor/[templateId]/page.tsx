@@ -28,14 +28,25 @@ const LoadingDisplay = () => (
   </div>
 )
 
-interface TemplateEditorPageProps {
-  params: {
-    templateId: string;
-  };
+// Separate Server Component for handling the dynamic route parameters
+export default function TemplateEditorPage({
+  params,
+  searchParams,
+}: {
+  params: { templateId: string };
   searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  return <TemplateEditorClient templateId={params.templateId} searchParams={searchParams} />;
 }
 
-export default function TemplateEditorPage({ params, searchParams }: TemplateEditorPageProps) {
+// Client Component that handles the actual editor functionality
+function TemplateEditorClient({ 
+  templateId, 
+  searchParams 
+}: { 
+  templateId: string;
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const supabase = createClient()
   const router = useRouter()
   const urlSearchParams = useSearchParams()
@@ -48,9 +59,6 @@ export default function TemplateEditorPage({ params, searchParams }: TemplateEdi
   const [section, setSection] = useState<any>(null)
   const [sectionData, setSectionData] = useState<any>({})
   const [hasAccess, setHasAccess] = useState(false)
-
-  // Get template ID from route params
-  const { templateId } = params
 
   useEffect(() => {
     const loadData = async () => {
