@@ -281,15 +281,9 @@ export default function EditorLayout({
         </div>
       )}
       
-      {/* Editor Header with Title and Version Control */}
+      {/* Editor Header with Version Control only */}
       <div className="mb-6 flex flex-col md:flex-row justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-[#1c2838]">
-            {title}
-            <span className="ml-2 bg-gradient-to-r from-[#1c2838] to-[#354153] text-white text-xs px-2 py-0.5 rounded-full">
-              Editor
-            </span>
-          </h1>
           <div className="flex items-center mt-1">
             {editing ? (
               <div className="flex items-center">
