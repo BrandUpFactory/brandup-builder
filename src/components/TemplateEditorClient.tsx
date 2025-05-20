@@ -230,8 +230,25 @@ export default function TemplateEditorClient({
 
   // Handle save button click as a regular function to avoid dependency issues
   const handleSave = async () => {
-    setIsSaving(true)
-    setSaveMessage(null)
+    console.log("⚡ SaveAction: Save button clicked");
+    
+    // Disable all save buttons to prevent multiple clicks
+    const saveButton = document.getElementById('saveButton');
+    const headerSaveButton = document.getElementById('headerSaveButton');
+    
+    if (saveButton) {
+      saveButton.setAttribute('disabled', 'true');
+      saveButton.classList.add('opacity-50');
+    }
+    
+    if (headerSaveButton) {
+      headerSaveButton.setAttribute('disabled', 'true');
+      headerSaveButton.classList.add('opacity-50');
+    }
+    
+    // Set saving state and clear any previous messages
+    setIsSaving(true);
+    setSaveMessage(null);
     
     try {
       console.log("⚡ SaveAction: Attempting to save section data");
@@ -247,6 +264,7 @@ export default function TemplateEditorClient({
       // Log the section ID we're saving to
       console.log("⚡ SaveAction: Saving to section with ID", section.id);
       
+      // Call the save function with the current data
       const success = await saveSection(currentSectionData);
       
       if (success) {
@@ -255,43 +273,41 @@ export default function TemplateEditorClient({
         // Show success message in component state
         setSaveMessage({ text: 'Änderungen gespeichert', type: 'success' });
         
-        // Show save success notification
-        const saveSuccessNotification = document.getElementById('saveSuccessNotification');
-        if (saveSuccessNotification) {
-          saveSuccessNotification.textContent = 'Änderungen erfolgreich gespeichert!';
-          saveSuccessNotification.classList.remove('hidden');
-          setTimeout(() => {
-            saveSuccessNotification.classList.add('hidden');
-          }, 3000);
-        }
-        
         // Mark that there are no unsaved changes
         setHasUnsavedChanges(false);
         
-        // Custom notification instead of alert
+        // Create and show success notification
         const notification = document.createElement('div');
         notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn';
         notification.textContent = 'Änderungen wurden erfolgreich gespeichert!';
         document.body.appendChild(notification);
+        
+        // Remove notification after delay with fade animation
         setTimeout(() => {
           notification.classList.add('animate-fadeOut');
           setTimeout(() => {
-            document.body.removeChild(notification);
+            if (document.body.contains(notification)) {
+              document.body.removeChild(notification);
+            }
           }, 500);
         }, 3000);
       } else {
         console.error("⚡ SaveAction: Save operation failed");
         setSaveMessage({ text: 'Fehler beim Speichern', type: 'error' });
         
-        // Custom error notification instead of alert
+        // Create and show error notification
         const notification = document.createElement('div');
         notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn';
         notification.textContent = 'Fehler beim Speichern. Bitte versuchen Sie es erneut.';
         document.body.appendChild(notification);
+        
+        // Remove notification after delay with fade animation
         setTimeout(() => {
           notification.classList.add('animate-fadeOut');
           setTimeout(() => {
-            document.body.removeChild(notification);
+            if (document.body.contains(notification)) {
+              document.body.removeChild(notification);
+            }
           }, 500);
         }, 3000);
       }
@@ -299,19 +315,35 @@ export default function TemplateEditorClient({
       console.error('⚡ SaveAction: Exception during save:', error);
       setSaveMessage({ text: 'Ein unerwarteter Fehler ist aufgetreten', type: 'error' });
       
-      // Custom error notification instead of alert
+      // Create and show error notification
       const notification = document.createElement('div');
       notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn';
       notification.textContent = 'Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.';
       document.body.appendChild(notification);
+      
+      // Remove notification after delay with fade animation
       setTimeout(() => {
         notification.classList.add('animate-fadeOut');
         setTimeout(() => {
-          document.body.removeChild(notification);
+          if (document.body.contains(notification)) {
+            document.body.removeChild(notification);
+          }
         }, 500);
       }, 3000);
     } finally {
+      // Reset the saving state
       setIsSaving(false);
+      
+      // Re-enable all save buttons
+      if (saveButton) {
+        saveButton.removeAttribute('disabled');
+        saveButton.classList.remove('opacity-50');
+      }
+      
+      if (headerSaveButton) {
+        headerSaveButton.removeAttribute('disabled');
+        headerSaveButton.classList.remove('opacity-50');
+      }
       
       // Clear message after 3 seconds
       setTimeout(() => {
@@ -640,9 +672,9 @@ export default function TemplateEditorClient({
   // Handle back navigation with unsaved changes check
   const handleBack = () => {
     if (hasUnsavedChanges) {
-      // Create a modern confirmation dialog
+      // Create a modern confirmation dialog with a blurred background
       const overlay = document.createElement('div');
-      overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000] animate-fadeIn';
+      overlay.className = 'fixed inset-0 backdrop-blur-sm bg-white bg-opacity-30 flex items-center justify-center z-[1000] animate-fadeIn';
       
       const dialog = document.createElement('div');
       dialog.className = 'bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4 animate-slideUp';
@@ -667,7 +699,7 @@ export default function TemplateEditorClient({
       
       const confirmButton = document.createElement('button');
       confirmButton.className = 'px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition';
-      confirmButton.textContent = 'Zurückgehen';
+      confirmButton.textContent = 'Ohne Speichern verlassen';
       confirmButton.onclick = () => {
         document.body.removeChild(overlay);
         router.push('/mysections');
@@ -795,6 +827,17 @@ function EditorWrapper({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
               Zurück
+            </button>
+            
+            <button 
+              onClick={onSave}
+              className={`${hasUnsavedChanges ? 'bg-red-600 animate-pulse' : 'bg-[#1c2838]'} text-white px-4 py-2 text-sm rounded-lg hover:opacity-90 transition shadow-sm flex items-center gap-1.5`}
+              id="headerSaveButton"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+              </svg>
+              {hasUnsavedChanges ? 'Speichern!' : 'Speichern'}
             </button>
           </div>
         </div>

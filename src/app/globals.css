@@ -93,6 +93,11 @@ body {
   z-index: 90;
 }
 
+/* Add backdrop blur utility if not already provided by Tailwind */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
 /* Keep dropdown visible for a brief period after leaving */
 .dropdown-menu {
   transition: opacity 0.3s ease;

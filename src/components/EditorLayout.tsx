@@ -84,16 +84,24 @@ export default function EditorLayout({
 
   // Save function that will be called by a keyboard shortcut or from other components
   const handleSave = () => {
+    console.log("EditorLayout: handleSave called");
+    
     if (onSave) {
+      console.log("EditorLayout: Calling parent onSave function");
+      // Call the parent's onSave function
       onSave();
-      // Show save success notification
-      const saveSuccessNotification = document.getElementById('saveSuccessNotification');
-      if (saveSuccessNotification) {
-        saveSuccessNotification.classList.remove('hidden');
+      
+      // Show visual feedback that the save action was triggered
+      const saveButton = document.getElementById('saveButton');
+      if (saveButton) {
+        // Add a quick flash effect
+        saveButton.classList.add('bg-opacity-70');
         setTimeout(() => {
-          saveSuccessNotification.classList.add('hidden');
-        }, 2000);
+          saveButton.classList.remove('bg-opacity-70');
+        }, 200);
       }
+    } else {
+      console.error("EditorLayout: onSave function is not defined");
     }
   }
   
@@ -370,6 +378,7 @@ export default function EditorLayout({
             <button 
               onClick={handleSave}
               className={`${hasUnsavedChanges ? 'bg-red-600 animate-pulse' : 'bg-[#1c2838]'} text-white px-4 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium shadow-sm flex items-center gap-1.5 cursor-pointer`}
+              id="saveButton"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
