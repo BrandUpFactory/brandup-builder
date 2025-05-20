@@ -665,9 +665,11 @@ export default function TemplateEditorClient({
 
   // Create exit confirmation dialog
   const createExitConfirmation = (onConfirm) => {
+    console.log("⚡ Creating exit confirmation dialog");
+    
     // Create a modern confirmation dialog with a blurred background
     const overlay = document.createElement('div');
-    overlay.className = 'fixed inset-0 backdrop-blur-sm bg-black bg-opacity-10 flex items-center justify-center z-[1000] animate-fadeIn';
+    overlay.className = 'fixed inset-0 backdrop-blur-sm flex items-center justify-center z-[1000] animate-fadeIn';
     
     const dialog = document.createElement('div');
     dialog.className = 'bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4 animate-slideUp';
@@ -687,6 +689,7 @@ export default function TemplateEditorClient({
     cancelButton.className = 'px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition';
     cancelButton.textContent = 'Abbrechen';
     cancelButton.onclick = () => {
+      console.log("⚡ Cancel button clicked");
       document.body.removeChild(overlay);
     };
     
@@ -694,8 +697,13 @@ export default function TemplateEditorClient({
     confirmButton.className = 'px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition';
     confirmButton.textContent = 'Ohne Speichern verlassen';
     confirmButton.onclick = () => {
+      console.log("⚡ Ohne Speichern verlassen clicked, executing onConfirm");
       document.body.removeChild(overlay);
-      onConfirm();
+      if (typeof onConfirm === 'function') {
+        onConfirm();
+      } else {
+        console.error("⚡ onConfirm is not a function:", onConfirm);
+      }
     };
     
     buttonContainer.appendChild(cancelButton);

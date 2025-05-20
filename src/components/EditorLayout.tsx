@@ -82,24 +82,14 @@ export default function EditorLayout({
     }
   }
 
-  // Save function that will be called by a keyboard shortcut or from other components
+  // Save function that will be called by a keyboard shortcut
   const handleSave = () => {
     console.log("EditorLayout: handleSave called");
     
     if (onSave) {
-      console.log("EditorLayout: Calling parent onSave function");
+      console.log("EditorLayout: Calling parent onSave function from keyboard shortcut");
       // Call the parent's onSave function
       onSave();
-      
-      // Show visual feedback that the save action was triggered
-      const saveButton = document.getElementById('saveButton');
-      if (saveButton) {
-        // Add a quick flash effect
-        saveButton.classList.add('bg-opacity-70');
-        setTimeout(() => {
-          saveButton.classList.remove('bg-opacity-70');
-        }, 200);
-      }
     } else {
       console.error("EditorLayout: onSave function is not defined");
     }
@@ -376,7 +366,7 @@ export default function EditorLayout({
             
             
             <button 
-              onClick={handleSave}
+              onClick={() => onSave ? onSave() : console.error('onSave function is not defined')}
               className={`${hasUnsavedChanges ? 'animate-pulse' : ''} bg-[#1c2838] text-white px-4 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium shadow-sm flex items-center gap-1.5 cursor-pointer`}
               id="saveButton"
             >

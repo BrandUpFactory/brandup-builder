@@ -11,6 +11,7 @@ let hasUnsavedChangesGlobal = false;
 let createExitConfirmationGlobal: CreateExitConfirmationFn | null = null;
 let originalPushState: typeof history.pushState | null = null;
 let originalReplaceState: typeof history.replaceState | null = null;
+let lastAttemptedNavigation: string | null = null; // Store the last attempted navigation URL
 
 export const registerNavigationManager = (
   hasUnsavedChanges: boolean,
@@ -42,6 +43,9 @@ export default function NavigationManager() {
     // Skip if the link has a target attribute
     if (anchor.hasAttribute('target')) return;
     
+    // Save the navigation target
+    lastAttemptedNavigation = href;
+    
     // Prevent the default navigation
     event.preventDefault();
     event.stopPropagation();
@@ -49,7 +53,10 @@ export default function NavigationManager() {
     // Show confirmation dialog
     createExitConfirmationGlobal(() => {
       // Navigate to the href if user confirms
-      router.push(href);
+      console.log("NavigationManager: Navigating to saved URL:", lastAttemptedNavigation);
+      if (lastAttemptedNavigation) {
+        router.push(lastAttemptedNavigation);
+      }
     });
   }, [router]);
 
@@ -61,8 +68,14 @@ export default function NavigationManager() {
 
       // Override pushState
       history.pushState = function(...args) {
+        // Store the URL for later use
+        if (args[2]) {
+          lastAttemptedNavigation = args[2] as string;
+        }
+        
         if (hasUnsavedChangesGlobal && createExitConfirmationGlobal) {
           createExitConfirmationGlobal(() => {
+            console.log("NavigationManager: Executing saved pushState:", lastAttemptedNavigation);
             if (originalPushState) originalPushState.apply(this, args);
           });
           return;
@@ -72,8 +85,14 @@ export default function NavigationManager() {
 
       // Override replaceState
       history.replaceState = function(...args) {
+        // Store the URL for later use
+        if (args[2]) {
+          lastAttemptedNavigation = args[2] as string;
+        }
+        
         if (hasUnsavedChangesGlobal && createExitConfirmationGlobal) {
           createExitConfirmationGlobal(() => {
+            console.log("NavigationManager: Executing saved replaceState:", lastAttemptedNavigation);
             if (originalReplaceState) originalReplaceState.apply(this, args);
           });
           return;
