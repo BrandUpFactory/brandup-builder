@@ -7,11 +7,13 @@ interface SocialProofSectionProps {
   initialData?: {
     firstName1?: string;
     firstName2?: string;
+    firstName3?: string;
     userCount?: string;
     brandName?: string;
     backgroundColor?: string;
     avatarImage1?: string;
     avatarImage2?: string;
+    avatarImage3?: string;
     verifiedImage?: string;
     avatarBorderColor?: string;
     textColor?: string;
@@ -19,6 +21,7 @@ interface SocialProofSectionProps {
     avatarSize?: string;
     borderRadius?: string;
     padding?: string;
+    avatarCount?: number;
   };
   onDataChange?: (data: any) => void;
 }
@@ -30,20 +33,23 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   // Section content
   const [firstName1, setFirstName1] = useState(safeInitialData.firstName1 || 'Steffi')
   const [firstName2, setFirstName2] = useState(safeInitialData.firstName2 || 'Daniela')
+  const [firstName3, setFirstName3] = useState(safeInitialData.firstName3 || 'Maria')
   const [userCount, setUserCount] = useState(safeInitialData.userCount || '12.752')
   const [brandName, setBrandName] = useState(safeInitialData.brandName || 'Regenliebe')
   const [avatarImage1, setAvatarImage1] = useState(safeInitialData.avatarImage1 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619')
   const [avatarImage2, setAvatarImage2] = useState(safeInitialData.avatarImage2 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098')
+  const [avatarImage3, setAvatarImage3] = useState(safeInitialData.avatarImage3 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-1.jpg?v=1738073619')
   const [verifiedImage, setVerifiedImage] = useState(safeInitialData.verifiedImage || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/insta-blue.png?v=1738073828')
+  const [avatarCount, setAvatarCount] = useState(safeInitialData.avatarCount || 2)
 
   // Section styling
   const [backgroundColor, setBackgroundColor] = useState(safeInitialData.backgroundColor || '#f7f7f7')
   const [avatarBorderColor, setAvatarBorderColor] = useState(safeInitialData.avatarBorderColor || '#ffffff')
-  const [textColor, setTextColor] = useState(safeInitialData.textColor || '#000000')
+  const [textColor, setTextColor] = useState(safeInitialData.textColor || '#1c2838')
   const [showBreakOnLarge, setShowBreakOnLarge] = useState(safeInitialData.showBreakOnLarge !== undefined ? safeInitialData.showBreakOnLarge : true)
   const [avatarSize, setAvatarSize] = useState(safeInitialData.avatarSize || '32px')
   const [borderRadius, setBorderRadius] = useState(safeInitialData.borderRadius || '12px')
-  const [padding, setPadding] = useState(safeInitialData.padding || '8px 12px')
+  const [padding, setPadding] = useState(safeInitialData.padding || '15px')
   
   // Update parent component when data changes
   useEffect(() => {
@@ -51,32 +57,83 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       const data = {
         firstName1,
         firstName2,
+        firstName3,
         userCount,
         brandName,
         backgroundColor,
         avatarImage1,
         avatarImage2,
+        avatarImage3,
         verifiedImage,
         avatarBorderColor,
         textColor,
         showBreakOnLarge,
         avatarSize,
         borderRadius,
-        padding
+        padding,
+        avatarCount
       };
       
       // Always notify parent to handle the data
       onDataChange(data);
     }
   }, [
-    firstName1, firstName2, userCount, brandName, 
-    backgroundColor, avatarImage1, avatarImage2, verifiedImage,
+    firstName1, firstName2, firstName3, userCount, brandName, 
+    backgroundColor, avatarImage1, avatarImage2, avatarImage3, verifiedImage,
     avatarBorderColor, textColor, showBreakOnLarge, 
-    avatarSize, borderRadius, padding, onDataChange
+    avatarSize, borderRadius, padding, avatarCount, onDataChange
   ])
+
+  // Handle avatar display names based on avatar count
+  const getDisplayNames = () => {
+    switch(avatarCount) {
+      case 1:
+        return firstName1;
+      case 2:
+        return `${firstName1}, ${firstName2}`;
+      case 3:
+        return `${firstName1}, ${firstName2}, ${firstName3}`;
+      default:
+        return `${firstName1}, ${firstName2}`;
+    }
+  };
 
   const settings = (
     <div className="space-y-6">
+      {/* Avatar Count Selection */}
+      <div className="border-b pb-4">
+        <h3 className="text-sm font-semibold mb-3 text-[#1c2838]">Avatar-Anzahl</h3>
+        <div className="space-y-2">
+          <div className="flex gap-2 mt-1">
+            <button
+              onClick={() => setAvatarCount(1)}
+              className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 1 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'}`}
+            >
+              1 Avatar
+            </button>
+            <button
+              onClick={() => setAvatarCount(2)}
+              className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 2 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'}`}
+            >
+              2 Avatare
+            </button>
+            <button
+              onClick={() => setAvatarCount(3)}
+              className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 3 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'}`}
+            >
+              3 Avatare
+            </button>
+            <button
+              onClick={() => setAvatarCount(0)}
+              className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 0 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'}`}
+            >
+              Keine
+            </button>
+          </div>
+          <p className="text-xs text-gray-500">Wähle, wie viele Avatare angezeigt werden sollen.</p>
+        </div>
+      </div>
+      
       {/* User Information */}
       <div className="border-b pb-4">
         <h3 className="text-sm font-semibold mb-3 text-[#1c2838]">Benutzerinformationen</h3>
@@ -89,6 +146,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 value={firstName1}
                 onChange={(e) => setFirstName1(e.target.value)}
                 className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm"
+                disabled={avatarCount === 0}
               />
             </label>
             
@@ -99,9 +157,24 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 value={firstName2}
                 onChange={(e) => setFirstName2(e.target.value)}
                 className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm"
+                disabled={avatarCount < 2}
               />
             </label>
           </div>
+          
+          {avatarCount > 2 && (
+            <div className="grid grid-cols-1 gap-3">
+              <label className="block text-sm text-[#1c2838]">
+                Name 3:
+                <input
+                  type="text"
+                  value={firstName3}
+                  onChange={(e) => setFirstName3(e.target.value)}
+                  className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm"
+                />
+              </label>
+            </div>
+          )}
           
           <div className="grid grid-cols-2 gap-3">
             <label className="block text-sm text-[#1c2838]">
@@ -131,63 +204,98 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       <div className="border-b pb-4">
         <h3 className="text-sm font-semibold mb-3 text-[#1c2838]">Bilder</h3>
         <div className="space-y-4">
-          <label className="block text-sm text-[#1c2838]">
-            Avatar 1:
-            <div className="mt-1 flex items-center space-x-2">
-              {avatarImage1 && (
-                <div className="w-10 h-10 border rounded-full overflow-hidden bg-white">
-                  <img
-                    src={avatarImage1}
-                    alt="Avatar 1"
-                    className="w-full h-full object-cover"
+          {avatarCount >= 1 && (
+            <label className="block text-sm text-[#1c2838]">
+              Avatar 1:
+              <div className="mt-1 flex items-center space-x-2">
+                {avatarImage1 && (
+                  <div className="w-10 h-10 border rounded-full overflow-hidden bg-white">
+                    <img
+                      src={avatarImage1}
+                      alt="Avatar 1"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    value={avatarImage1}
+                    onChange={(e) => setAvatarImage1(e.target.value)}
+                    className="w-full border px-3 py-1.5 rounded-md text-sm"
+                    placeholder="URL des Avatarbildes 1"
                   />
                 </div>
-              )}
-              <div className="flex-1">
-                <input
-                  type="text"
-                  value={avatarImage1}
-                  onChange={(e) => setAvatarImage1(e.target.value)}
-                  className="w-full border px-3 py-1.5 rounded-md text-sm"
-                  placeholder="URL des Avatarbildes 1"
+                <ImageManager
+                  onSelect={setAvatarImage1}
+                  currentImage={avatarImage1}
+                  buttonText="Bild wählen"
                 />
               </div>
-              <ImageManager
-                onSelect={setAvatarImage1}
-                currentImage={avatarImage1}
-                buttonText="Bild wählen"
-              />
-            </div>
-          </label>
+            </label>
+          )}
           
-          <label className="block text-sm text-[#1c2838]">
-            Avatar 2:
-            <div className="mt-1 flex items-center space-x-2">
-              {avatarImage2 && (
-                <div className="w-10 h-10 border rounded-full overflow-hidden bg-white">
-                  <img
-                    src={avatarImage2}
-                    alt="Avatar 2"
-                    className="w-full h-full object-cover"
+          {avatarCount >= 2 && (
+            <label className="block text-sm text-[#1c2838]">
+              Avatar 2:
+              <div className="mt-1 flex items-center space-x-2">
+                {avatarImage2 && (
+                  <div className="w-10 h-10 border rounded-full overflow-hidden bg-white">
+                    <img
+                      src={avatarImage2}
+                      alt="Avatar 2"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    value={avatarImage2}
+                    onChange={(e) => setAvatarImage2(e.target.value)}
+                    className="w-full border px-3 py-1.5 rounded-md text-sm"
+                    placeholder="URL des Avatarbildes 2"
                   />
                 </div>
-              )}
-              <div className="flex-1">
-                <input
-                  type="text"
-                  value={avatarImage2}
-                  onChange={(e) => setAvatarImage2(e.target.value)}
-                  className="w-full border px-3 py-1.5 rounded-md text-sm"
-                  placeholder="URL des Avatarbildes 2"
+                <ImageManager
+                  onSelect={setAvatarImage2}
+                  currentImage={avatarImage2}
+                  buttonText="Bild wählen"
                 />
               </div>
-              <ImageManager
-                onSelect={setAvatarImage2}
-                currentImage={avatarImage2}
-                buttonText="Bild wählen"
-              />
-            </div>
-          </label>
+            </label>
+          )}
+          
+          {avatarCount >= 3 && (
+            <label className="block text-sm text-[#1c2838]">
+              Avatar 3:
+              <div className="mt-1 flex items-center space-x-2">
+                {avatarImage3 && (
+                  <div className="w-10 h-10 border rounded-full overflow-hidden bg-white">
+                    <img
+                      src={avatarImage3}
+                      alt="Avatar 3"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    value={avatarImage3}
+                    onChange={(e) => setAvatarImage3(e.target.value)}
+                    className="w-full border px-3 py-1.5 rounded-md text-sm"
+                    placeholder="URL des Avatarbildes 3"
+                  />
+                </div>
+                <ImageManager
+                  onSelect={setAvatarImage3}
+                  currentImage={avatarImage3}
+                  buttonText="Bild wählen"
+                />
+              </div>
+            </label>
+          )}
           
           <label className="block text-sm text-[#1c2838]">
             Verifizierungsbadge:
@@ -323,9 +431,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               value={padding}
               onChange={(e) => setPadding(e.target.value)}
               className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm"
-              placeholder="z.B. 8px 12px"
+              placeholder="z.B. 15px oder 15px 20px"
             />
-            <p className="text-xs text-gray-500 mt-1">Format: vertical horizontal (z.B. 8px 12px)</p>
+            <p className="text-xs text-gray-500 mt-1">Format: 15px für alle Seiten oder 15px 20px für oben/unten links/rechts</p>
           </label>
         </div>
       </div>
@@ -347,68 +455,99 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
           marginBottom: '12px',
           color: textColor,
-          maxWidth: '100%'
+          maxWidth: '100%',
+          fontWeight: '500'
         }}
       >
-        <div 
-          className="user-avatars-proof" 
-          style={{
-            display: 'flex',
-            alignItems: 'center'
-          }}
-        >
-          <img 
-            src={avatarImage1}
-            alt="User 1" 
-            className="avatar-proof" 
+        {avatarCount > 0 && (
+          <div 
+            className="user-avatars-proof" 
             style={{
-              width: avatarSize,
-              height: avatarSize,
-              borderRadius: '50%',
-              marginRight: '-8px',
-              border: `2px solid ${avatarBorderColor}`,
-              objectFit: 'cover'
+              display: 'flex',
+              alignItems: 'center'
             }}
-          />
-          <img 
-            src={avatarImage2}
-            alt="User 2" 
-            className="avatar-proof" 
-            style={{
-              width: avatarSize,
-              height: avatarSize,
-              borderRadius: '50%',
-              marginRight: '-8px',
-              border: `2px solid ${avatarBorderColor}`,
-              objectFit: 'cover'
-            }}
-          />
-        </div>
+          >
+            {avatarCount >= 1 && (
+              <img 
+                src={avatarImage1}
+                alt="User 1" 
+                className="avatar-proof" 
+                style={{
+                  width: avatarSize,
+                  height: avatarSize,
+                  borderRadius: '50%',
+                  marginRight: '-8px',
+                  border: `2px solid ${avatarBorderColor}`,
+                  objectFit: 'cover',
+                  zIndex: 3
+                }}
+              />
+            )}
+            {avatarCount >= 2 && (
+              <img 
+                src={avatarImage2}
+                alt="User 2" 
+                className="avatar-proof" 
+                style={{
+                  width: avatarSize,
+                  height: avatarSize,
+                  borderRadius: '50%',
+                  marginRight: avatarCount >= 3 ? '-8px' : '0',
+                  border: `2px solid ${avatarBorderColor}`,
+                  objectFit: 'cover',
+                  zIndex: 2
+                }}
+              />
+            )}
+            {avatarCount >= 3 && (
+              <img 
+                src={avatarImage3}
+                alt="User 3" 
+                className="avatar-proof" 
+                style={{
+                  width: avatarSize,
+                  height: avatarSize,
+                  borderRadius: '50%',
+                  marginRight: '0',
+                  border: `2px solid ${avatarBorderColor}`,
+                  objectFit: 'cover',
+                  zIndex: 1
+                }}
+              />
+            )}
+          </div>
+        )}
         <div 
           className="user-text-proof" 
           style={{
-            marginLeft: '12px',
-            lineHeight: '1.2'
+            marginLeft: avatarCount > 0 ? '12px' : '0',
+            lineHeight: '1.3',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center'
           }}
         >
-          <strong>{firstName1}, {firstName2}</strong>
-          <img 
-            src={verifiedImage}
-            alt="Verifiziert" 
-            className="verified-badge-proof" 
-            style={{
-              width: '16px',
-              height: '16px',
-              marginLeft: '2px',
-              position: 'relative',
-              top: '2px'
-            }}
-          />
-          <span> und <strong>{userCount}</strong> andere sind begeistert von 
+          <div style={{ display: 'flex', alignItems: 'center', marginRight: '4px' }}>
+            <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
+            <img 
+              src={verifiedImage}
+              alt="Verifiziert" 
+              className="verified-badge-proof" 
+              style={{
+                width: '16px',
+                height: '16px',
+                marginLeft: '4px',
+                position: 'relative',
+                top: '-1px'
+              }}
+            />
+          </div>
+          <span style={{ fontWeight: '400' }}> und <strong style={{ fontWeight: '600' }}>{userCount}</strong> andere sind begeistert von 
             <span 
               className="break-on-large" 
               style={{
                 display: showBreakOnLarge ? 'block' : 'inline',
+                fontWeight: '500'
               }}
             > {brandName}</span>
           </span>
@@ -422,14 +561,35 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
 {% endcomment %}
 
 <div class="social-proof-box-proof">
+  {% if section.settings.avatar_count > 0 %}
   <div class="user-avatars-proof">
-    <img src="{{ section.settings.avatar_image_1 }}" alt="User 1" class="avatar-proof">
-    <img src="{{ section.settings.avatar_image_2 }}" alt="User 2" class="avatar-proof">
+    {% if section.settings.avatar_count >= 1 and section.settings.avatar_image_1 != blank %}
+    <img src="{{ section.settings.avatar_image_1 | img_url: 'master' }}" alt="User 1" class="avatar-proof avatar-1">
+    {% endif %}
+    {% if section.settings.avatar_count >= 2 and section.settings.avatar_image_2 != blank %}
+    <img src="{{ section.settings.avatar_image_2 | img_url: 'master' }}" alt="User 2" class="avatar-proof avatar-2">
+    {% endif %}
+    {% if section.settings.avatar_count >= 3 and section.settings.avatar_image_3 != blank %}
+    <img src="{{ section.settings.avatar_image_3 | img_url: 'master' }}" alt="User 3" class="avatar-proof avatar-3">
+    {% endif %}
   </div>
+  {% endif %}
   <div class="user-text-proof">
-    <strong>{{ section.settings.first_name_1 }}, {{ section.settings.first_name_2 }}</strong>
-    <img src="{{ section.settings.verified_image }}" alt="Verifiziert" class="verified-badge-proof">
-    <span> und <strong>{{ section.settings.user_count }}</strong> andere sind begeistert von 
+    <div class="names-container">
+      <strong class="user-names">
+        {% if section.settings.avatar_count == 1 %}
+          {{ section.settings.first_name_1 }}
+        {% elsif section.settings.avatar_count == 2 %}
+          {{ section.settings.first_name_1 }}, {{ section.settings.first_name_2 }}
+        {% elsif section.settings.avatar_count == 3 %}
+          {{ section.settings.first_name_1 }}, {{ section.settings.first_name_2 }}, {{ section.settings.first_name_3 }}
+        {% else %}
+          Nutzer
+        {% endif %}
+      </strong>
+      <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
+    </div>
+    <span class="user-count-text"> und <strong>{{ section.settings.user_count }}</strong> andere sind begeistert von 
       <span class="break-on-large">{{ section.settings.brand_name }}</span>
     </span>
   </div>
@@ -444,6 +604,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     border-radius: ${borderRadius};
     font-family: Arial, sans-serif;
     font-size: 14px;
+    font-weight: 500;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 12px;
     color: ${textColor};
@@ -456,24 +617,54 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     width: ${avatarSize};
     height: ${avatarSize};
     border-radius: 50%;
-    margin-right: -8px;
     border: 2px solid ${avatarBorderColor};
     object-fit: cover;
   }
+  .avatar-1 {
+    z-index: 3;
+    margin-right: -8px;
+  }
+  .avatar-2 {
+    z-index: 2;
+    {% if section.settings.avatar_count >= 3 %}
+    margin-right: -8px;
+    {% endif %}
+  }
+  .avatar-3 {
+    z-index: 1;
+  }
   .user-text-proof {
-    margin-left: 12px;
-    line-height: 1.2;
+    margin-left: {% if section.settings.avatar_count > 0 %}12px{% else %}0{% endif %};
+    line-height: 1.3;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .names-container {
+    display: flex;
+    align-items: center;
+    margin-right: 4px;
+  }
+  .user-names {
+    font-weight: 600;
+  }
+  .user-count-text {
+    font-weight: 400;
+  }
+  .user-count-text strong {
+    font-weight: 600;
   }
   .verified-badge-proof {
     width: 16px;
     height: 16px;
-    margin-left: 2px;
+    margin-left: 4px;
     position: relative;
-    top: 2px;
+    top: -1px;
   }
   @media (min-width: 1300px) {
     .break-on-large {
       display: ${showBreakOnLarge ? 'block' : 'inline'};
+      font-weight: 500;
     }
   }
 </style>
@@ -482,6 +673,18 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
 {
   "name": "Social Proof #1",
   "settings": [
+    {
+      "type": "select",
+      "id": "avatar_count",
+      "label": "Anzahl Avatare",
+      "options": [
+        { "value": "0", "label": "Keine" },
+        { "value": "1", "label": "1 Avatar" },
+        { "value": "2", "label": "2 Avatare" },
+        { "value": "3", "label": "3 Avatare" }
+      ],
+      "default": "${avatarCount}"
+    },
     {
       "type": "text",
       "id": "first_name_1",
@@ -493,6 +696,12 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       "id": "first_name_2",
       "label": "Name 2",
       "default": "${firstName2}"
+    },
+    {
+      "type": "text",
+      "id": "first_name_3",
+      "label": "Name 3",
+      "default": "${firstName3}"
     },
     {
       "type": "text",
@@ -515,6 +724,11 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       "type": "image_picker",
       "id": "avatar_image_2",
       "label": "Avatar 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "avatar_image_3",
+      "label": "Avatar 3"
     },
     {
       "type": "image_picker",
@@ -562,6 +776,12 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       "id": "show_break_on_large",
       "label": "Markenname auf großen Bildschirmen umbrechen",
       "default": ${showBreakOnLarge}
+    },
+    {
+      "type": "text",
+      "id": "padding",
+      "label": "Padding (z.B. 15px oder 15px 20px)",
+      "default": "${padding}"
     }
   ],
   "presets": [

@@ -139,7 +139,20 @@ function SocialProofEditor() {
   useEffect(() => {
     if (Object.keys(originalSectionData).length > 0) {
       try {
-        const hasChanges = JSON.stringify(sectionData) !== JSON.stringify(originalSectionData);
+        // Sort the keys in both objects to ensure consistent comparison
+        const sortObjectKeys = (obj: any) => {
+          const sorted: any = {};
+          Object.keys(obj).sort().forEach(key => {
+            sorted[key] = obj[key];
+          });
+          return sorted;
+        };
+        
+        const sortedCurrentData = sortObjectKeys(sectionData);
+        const sortedOriginalData = sortObjectKeys(originalSectionData);
+        
+        const hasChanges = JSON.stringify(sortedCurrentData) !== JSON.stringify(sortedOriginalData);
+        console.log("Has unsaved changes:", hasChanges);
         setHasUnsavedChanges(hasChanges);
       } catch (e) {
         console.error("Error comparing section data:", e);

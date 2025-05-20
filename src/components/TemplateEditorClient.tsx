@@ -655,6 +655,15 @@ export default function TemplateEditorClient({
   // Create exit confirmation dialog
   const createExitConfirmation = (targetUrl: string) => {
     console.log("⚡ Creating exit confirmation dialog with target:", targetUrl);
+    console.log("⚡ Current unsaved changes state:", hasUnsavedChanges);
+    
+    // Double-check if we actually have unsaved changes
+    // If we don't, just navigate directly without showing the dialog
+    if (!hasUnsavedChanges) {
+      console.log("⚡ No unsaved changes detected, navigating directly to:", targetUrl);
+      window.location.href = targetUrl;
+      return;
+    }
     
     try {
       // Create a modern confirmation dialog with a blurred background
@@ -722,6 +731,8 @@ export default function TemplateEditorClient({
       document.body.appendChild(overlay);
     } catch (error) {
       console.error("⚡ Error creating exit confirmation dialog:", error);
+      // In case of error, still try to navigate
+      window.location.href = targetUrl;
     }
   };
 
@@ -729,11 +740,35 @@ export default function TemplateEditorClient({
   const handleBack = () => {
     console.log("Back button clicked, hasUnsavedChanges:", hasUnsavedChanges);
     
-    if (hasUnsavedChanges) {
+    // Double-check if the data has actually changed
+    let realChanges = false;
+    
+    try {
+      // Use a more robust comparison by sorting object keys
+      const sortObjectKeys = (obj: any) => {
+        const sorted: any = {};
+        Object.keys(obj).sort().forEach(key => {
+          sorted[key] = obj[key];
+        });
+        return sorted;
+      };
+      
+      if (Object.keys(originalSectionData).length > 0 && Object.keys(currentSectionData).length > 0) {
+        const sortedCurrent = sortObjectKeys(currentSectionData);
+        const sortedOriginal = sortObjectKeys(originalSectionData);
+        
+        realChanges = JSON.stringify(sortedCurrent) !== JSON.stringify(sortedOriginal);
+      }
+    } catch (e) {
+      console.error("Error comparing data in handleBack:", e);
+    }
+    
+    // Only show confirmation if there are actual changes
+    if (realChanges) {
       createExitConfirmation('/mysections');
     } else {
       // Force direct navigation without using Next.js router
-      console.log("No unsaved changes, navigating directly to /mysections");
+      console.log("No real unsaved changes, navigating directly to /mysections");
       window.location.href = '/mysections';
     }
   };
