@@ -14,8 +14,9 @@ let lastAttemptedNavigation: string | null = null; // Store the last attempted n
 
 // Initialize global variables on window
 if (typeof window !== 'undefined') {
-  window.hasUnsavedChangesGlobal = window.hasUnsavedChangesGlobal || false;
-  window.createExitConfirmationGlobal = window.createExitConfirmationGlobal || null;
+  // Safely initialize global variables, ensuring TypeScript is happy
+  (window as Window & typeof globalThis).hasUnsavedChangesGlobal = (window as any).hasUnsavedChangesGlobal || false;
+  (window as Window & typeof globalThis).createExitConfirmationGlobal = (window as any).createExitConfirmationGlobal || null;
 }
 
 export const registerNavigationManager = (
@@ -25,8 +26,8 @@ export const registerNavigationManager = (
   if (typeof window === 'undefined') return;
   
   console.log("Updating navigation manager:", { hasUnsavedChanges });
-  window.hasUnsavedChangesGlobal = hasUnsavedChanges;
-  window.createExitConfirmationGlobal = createExitConfirmation;
+  (window as Window & typeof globalThis).hasUnsavedChangesGlobal = hasUnsavedChanges;
+  (window as Window & typeof globalThis).createExitConfirmationGlobal = createExitConfirmation;
   
   // If no unsaved changes, clear any event handlers
   if (!hasUnsavedChanges) {
@@ -44,7 +45,7 @@ export default function NavigationManager() {
     if (typeof window === 'undefined') return;
     
     // Skip if no unsaved changes or no confirmation function registered
-    if (!window.hasUnsavedChangesGlobal || !window.createExitConfirmationGlobal) {
+    if (!(window as Window & typeof globalThis).hasUnsavedChangesGlobal || !(window as Window & typeof globalThis).createExitConfirmationGlobal) {
       console.log("Navigation not intercepted - no unsaved changes or no confirmation function");
       return;
     }
@@ -73,8 +74,8 @@ export default function NavigationManager() {
     
     // Show confirmation dialog with the target URL directly
     console.log("NavigationManager: Showing confirmation for navigation to:", href);
-    if (window.createExitConfirmationGlobal && typeof window.createExitConfirmationGlobal === 'function') {
-      window.createExitConfirmationGlobal(href);
+    if ((window as Window & typeof globalThis).createExitConfirmationGlobal && typeof (window as Window & typeof globalThis).createExitConfirmationGlobal === 'function') {
+      (window as Window & typeof globalThis).createExitConfirmationGlobal(href);
     } else {
       console.error("No exit confirmation function defined");
       // Allow navigation to proceed anyway
@@ -93,10 +94,10 @@ export default function NavigationManager() {
         // Store the URL for later use
         const targetUrl = args[2] as string | null;
         
-        if (window.hasUnsavedChangesGlobal && window.createExitConfirmationGlobal && targetUrl) {
+        if ((window as Window & typeof globalThis).hasUnsavedChangesGlobal && (window as Window & typeof globalThis).createExitConfirmationGlobal && targetUrl) {
           console.log("NavigationManager: Intercepting pushState to:", targetUrl);
-          if (typeof window.createExitConfirmationGlobal === 'function') {
-            window.createExitConfirmationGlobal(targetUrl);
+          if (typeof (window as Window & typeof globalThis).createExitConfirmationGlobal === 'function') {
+            (window as Window & typeof globalThis).createExitConfirmationGlobal(targetUrl);
           }
           return;
         }
@@ -108,10 +109,10 @@ export default function NavigationManager() {
         // Store the URL for later use
         const targetUrl = args[2] as string | null;
         
-        if (window.hasUnsavedChangesGlobal && window.createExitConfirmationGlobal && targetUrl) {
+        if ((window as Window & typeof globalThis).hasUnsavedChangesGlobal && (window as Window & typeof globalThis).createExitConfirmationGlobal && targetUrl) {
           console.log("NavigationManager: Intercepting replaceState to:", targetUrl);
-          if (typeof window.createExitConfirmationGlobal === 'function') {
-            window.createExitConfirmationGlobal(targetUrl);
+          if (typeof (window as Window & typeof globalThis).createExitConfirmationGlobal === 'function') {
+            (window as Window & typeof globalThis).createExitConfirmationGlobal(targetUrl);
           }
           return;
         }

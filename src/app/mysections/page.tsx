@@ -12,6 +12,7 @@ interface SectionEntry {
   title: string
   template_id: string
   created_at: string
+  updated_at?: string
   templates?: any // Der Typ, wie er direkt von Supabase kommt
   template?: {
     name: string
@@ -107,10 +108,11 @@ export default function MySectionsPage() {
           title, 
           template_id, 
           created_at,
+          updated_at,
           templates:template_id (name, image_url)
         `)
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+        .order('updated_at', { ascending: false })
       
       if (sectionsError) {
         console.error('Error loading sections:', sectionsError)
@@ -358,7 +360,7 @@ export default function MySectionsPage() {
                                     {section.title || 'Version ' + (sections.indexOf(section) + 1)}
                                   </h3>
                                   <p className="text-xs text-gray-500">
-                                    Bearbeitet: {new Date(section.created_at).toLocaleDateString('de-DE')}
+                                    Bearbeitet: {new Date(section.updated_at || section.created_at).toLocaleDateString('de-DE')}
                                   </p>
                                 </div>
                                 <div className="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-medium">

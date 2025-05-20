@@ -262,7 +262,7 @@ export default function TemplateEditorClient({
         setHasUnsavedChanges(false);
         
         // Reset the global variables directly to ensure navigation works
-        window.hasUnsavedChangesGlobal = false;
+        (window as Window & typeof globalThis).hasUnsavedChangesGlobal = false;
         
         // Show a single success notification
         const notification = document.createElement('div');
@@ -653,7 +653,7 @@ export default function TemplateEditorClient({
   };
 
   // Create exit confirmation dialog
-  const createExitConfirmation = (targetUrl) => {
+  const createExitConfirmation = (targetUrl: string) => {
     console.log("⚡ Creating exit confirmation dialog with target:", targetUrl);
     
     try {
@@ -696,7 +696,7 @@ export default function TemplateEditorClient({
         try {
           // First turn off the unsaved changes flag - critical step!
           setHasUnsavedChanges(false);
-          window.hasUnsavedChangesGlobal = false;
+          (window as Window & typeof globalThis).hasUnsavedChangesGlobal = false;
           
           document.body.removeChild(overlay);
           

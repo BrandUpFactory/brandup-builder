@@ -1,5 +1,5 @@
 // Global type definitions
 interface Window {
-  hasUnsavedChangesGlobal?: boolean;
-  createExitConfirmationGlobal?: any;
+  hasUnsavedChangesGlobal: boolean;
+  createExitConfirmationGlobal: ((targetUrl: string) => void) | null;
 }
