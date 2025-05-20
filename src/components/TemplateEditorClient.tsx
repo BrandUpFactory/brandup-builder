@@ -796,8 +796,17 @@ function EditorWrapper({
     // Get template name to determine which section component to use
     const templateName = template?.name?.toLowerCase() || '';
     
+    // Check for Social Proof template
+    if (templateName.includes('social proof')) {
+      const SocialProofSection = require('@/sections/SocialProofSection').default;
+      const { settings, preview, code } = SocialProofSection({
+        initialData: sectionData,
+        onDataChange: onDataChange
+      });
+      return { settings, preview, code };
+    }
     // Check if template name contains "feature" for feature section
-    if (templateName.includes('feature') || templateName.includes('funktion')) {
+    else if (templateName.includes('feature') || templateName.includes('funktion')) {
       const FeatureSection = require('@/sections/FeatureSection').default;
       const { settings, preview, code } = FeatureSection({
         initialData: sectionData,
