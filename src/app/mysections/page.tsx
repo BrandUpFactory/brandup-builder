@@ -396,9 +396,6 @@ export default function MySectionsPage() {
                                     Bearbeitet: {formatDate(section.updated_at || section.created_at)}
                                   </p>
                                 </div>
-                                <div className="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-medium">
-                                  Variante {sections.indexOf(section) + 1}
-                                </div>
                               </div>
                               
                               <div className="flex justify-between mt-4">

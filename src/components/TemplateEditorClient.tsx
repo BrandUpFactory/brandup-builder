@@ -791,15 +791,27 @@ function EditorWrapper({
 }) {
   // Check if we have a version create function
   const hasVersionCreate = !!onVersionCreate;
-  // Create the hero section component
+  // Create the section component based on template type
   const editorContent = () => {
-    // For now, we always use HeroSection
-    const { settings, preview, code } = HeroSection({
-      initialData: sectionData,
-      onDataChange: onDataChange
-    });
+    // Get template name to determine which section component to use
+    const templateName = template?.name?.toLowerCase() || '';
     
-    return { settings, preview, code };
+    // Check if template name contains "feature" for feature section
+    if (templateName.includes('feature') || templateName.includes('funktion')) {
+      const FeatureSection = require('@/sections/FeatureSection').default;
+      const { settings, preview, code } = FeatureSection({
+        initialData: sectionData,
+        onDataChange: onDataChange
+      });
+      return { settings, preview, code };
+    } else {
+      // Default: use hero section for all other templates
+      const { settings, preview, code } = HeroSection({
+        initialData: sectionData,
+        onDataChange: onDataChange
+      });
+      return { settings, preview, code };
+    }
   };
   
   // Get the content safely
@@ -824,7 +836,10 @@ function EditorWrapper({
               <span
                 className="text-lg font-bold text-[#1c2838] max-w-[250px]"
               >
-                Hero Section
+                Section Builder
+                <span className="ml-2 bg-gradient-to-r from-[#1c2838] to-[#354153] text-white text-xs px-2 py-0.5 rounded-full">
+                  Editor
+                </span>
               </span>
             </div>
             <p className="text-xs text-gray-500">Template: {template.name}</p>

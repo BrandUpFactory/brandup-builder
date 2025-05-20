@@ -175,27 +175,6 @@ export default function Home() {
             </div>
           </div>
           
-          {/* Trust badges */}
-          <div className="mt-16 flex justify-center">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 items-center opacity-70">
-              <div className="flex flex-col items-center">
-                <div className="text-3xl font-bold text-[#1c2838]">100+</div>
-                <div className="text-sm text-gray-600">Templates</div>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="text-3xl font-bold text-[#1c2838]">1000+</div>
-                <div className="text-sm text-gray-600">Nutzer</div>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="text-3xl font-bold text-[#1c2838]">5⭐</div>
-                <div className="text-sm text-gray-600">Bewertung</div>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="text-3xl font-bold text-[#1c2838]">24/7</div>
-                <div className="text-sm text-gray-600">Support</div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 

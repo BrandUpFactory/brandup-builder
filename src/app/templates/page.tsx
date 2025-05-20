@@ -178,7 +178,7 @@ export default function TemplatesPage() {
                 <div className="mt-auto flex flex-col gap-2">
                   {hasAccessToTemplate(template.id) ? (
                     <Link
-                      href={`/editor/${template.id}`}
+                      href={`/mysections`}
                       className="bg-[#1c2838] hover:opacity-90 text-white text-xs px-4 py-1.5 rounded-full w-full text-center transition"
                     >
                       Bearbeiten
