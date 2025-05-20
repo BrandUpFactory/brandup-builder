@@ -225,13 +225,6 @@ export default function Navbar() {
               >
                 Lizenzverwaltung
               </Link>
-              <Link 
-                href="/admin/products"
-                className="block text-left hover:text-[#8db5d8] transition mb-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Produkt-Mapping
-              </Link>
               <button
                 onClick={handleLogout}
                 className="w-full text-left hover:text-[#8db5d8] transition"
@@ -336,13 +329,6 @@ export default function Navbar() {
                     onClick={() => setDropdownOpen(false)}
                   >
                     Lizenzverwaltung
-                  </Link>
-                  <Link 
-                    href="/admin/products"
-                    className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100"
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    Produkt-Mapping
                   </Link>
                   <button
                     onClick={handleLogout}

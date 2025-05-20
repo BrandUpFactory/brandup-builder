@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import isAdmin from '@/utils/isAdmin'
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
       }
     )
 
-    // Get the current user and ensure they're authorized (admin check could be added here)
+    // Get the current user and ensure they're authorized
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     
     if (userError || !user) {
@@ -33,6 +34,14 @@ export async function POST(request: NextRequest) {
         success: false, 
         error: 'Nicht autorisiert. Bitte melden Sie sich an.' 
       }, { status: 401 })
+    }
+    
+    // Überprüfen, ob der Benutzer Admin-Rechte hat
+    if (!isAdmin(user)) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Keine Berechtigung für diese Aktion.' 
+      }, { status: 403 })
     }
 
     // Get request body data

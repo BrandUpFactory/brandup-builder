@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import LicenseManagementClient from '@/components/admin/LicenseManagementClient'
+import isAdmin from '@/utils/isAdmin'
 
 export default async function AdminLicensesPage() {
   const supabase = createClient()
@@ -12,8 +13,11 @@ export default async function AdminLicensesPage() {
     redirect('/login?from=/admin/licenses')
   }
   
-  // In a real app, you'd check if the user has admin privileges
-  // For now, we'll just use authorization based on login
+  // Überprüfen, ob der Benutzer Admin-Rechte hat
+  if (!isAdmin(user)) {
+    // Kein Zugriff - zurück zur Startseite
+    redirect('/')
+  }
   
   // Fetch all templates for the dropdown
   const { data: templates } = await supabase
