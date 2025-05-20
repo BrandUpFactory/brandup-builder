@@ -362,7 +362,7 @@ export default function MySectionsPage() {
                                   </p>
                                 </div>
                                 <div className="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-medium">
-                                  Version {sections.indexOf(section) + 1}
+                                  Version {sections.length - sections.indexOf(section)}
                                 </div>
                               </div>
                               

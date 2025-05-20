@@ -268,17 +268,48 @@ export default function TemplateEditorClient({
         // Mark that there are no unsaved changes
         setHasUnsavedChanges(false);
         
-        // Also show as an alert for better visibility
-        alert('Änderungen wurden erfolgreich gespeichert!');
+        // Custom notification instead of alert
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn';
+        notification.textContent = 'Änderungen wurden erfolgreich gespeichert!';
+        document.body.appendChild(notification);
+        setTimeout(() => {
+          notification.classList.add('animate-fadeOut');
+          setTimeout(() => {
+            document.body.removeChild(notification);
+          }, 500);
+        }, 3000);
       } else {
         console.error("⚡ SaveAction: Save operation failed");
         setSaveMessage({ text: 'Fehler beim Speichern', type: 'error' });
-        alert('Fehler beim Speichern. Bitte versuchen Sie es erneut.');
+        
+        // Custom error notification instead of alert
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn';
+        notification.textContent = 'Fehler beim Speichern. Bitte versuchen Sie es erneut.';
+        document.body.appendChild(notification);
+        setTimeout(() => {
+          notification.classList.add('animate-fadeOut');
+          setTimeout(() => {
+            document.body.removeChild(notification);
+          }, 500);
+        }, 3000);
       }
     } catch (error) {
       console.error('⚡ SaveAction: Exception during save:', error);
       setSaveMessage({ text: 'Ein unerwarteter Fehler ist aufgetreten', type: 'error' });
-      alert('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
+      
+      // Custom error notification instead of alert
+      const notification = document.createElement('div');
+      notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn';
+      notification.textContent = 'Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.';
+      document.body.appendChild(notification);
+      setTimeout(() => {
+        notification.classList.add('animate-fadeOut');
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 500);
+      }, 3000);
     } finally {
       setIsSaving(false);
       
@@ -609,10 +640,47 @@ export default function TemplateEditorClient({
   // Handle back navigation with unsaved changes check
   const handleBack = () => {
     if (hasUnsavedChanges) {
-      const confirmLeave = window.confirm('Es gibt ungespeicherte Änderungen. Möchten Sie wirklich zurückgehen?');
-      if (confirmLeave) {
+      // Create a modern confirmation dialog
+      const overlay = document.createElement('div');
+      overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000] animate-fadeIn';
+      
+      const dialog = document.createElement('div');
+      dialog.className = 'bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4 animate-slideUp';
+      
+      const title = document.createElement('h2');
+      title.className = 'text-xl font-bold mb-4 text-[#1c2838]';
+      title.textContent = 'Ungespeicherte Änderungen';
+      
+      const message = document.createElement('p');
+      message.className = 'text-gray-600 mb-6';
+      message.textContent = 'Es gibt ungespeicherte Änderungen. Möchten Sie wirklich zurückgehen? Alle nicht gespeicherten Änderungen gehen verloren.';
+      
+      const buttonContainer = document.createElement('div');
+      buttonContainer.className = 'flex justify-end gap-4';
+      
+      const cancelButton = document.createElement('button');
+      cancelButton.className = 'px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition';
+      cancelButton.textContent = 'Abbrechen';
+      cancelButton.onclick = () => {
+        document.body.removeChild(overlay);
+      };
+      
+      const confirmButton = document.createElement('button');
+      confirmButton.className = 'px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition';
+      confirmButton.textContent = 'Zurückgehen';
+      confirmButton.onclick = () => {
+        document.body.removeChild(overlay);
         router.push('/mysections');
-      }
+      };
+      
+      buttonContainer.appendChild(cancelButton);
+      buttonContainer.appendChild(confirmButton);
+      
+      dialog.appendChild(title);
+      dialog.appendChild(message);
+      dialog.appendChild(buttonContainer);
+      overlay.appendChild(dialog);
+      document.body.appendChild(overlay);
     } else {
       router.push('/mysections');
     }
