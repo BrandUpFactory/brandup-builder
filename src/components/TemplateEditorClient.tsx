@@ -275,7 +275,10 @@ export default function TemplateEditorClient({
         // Mark that there are no unsaved changes
         setHasUnsavedChanges(false);
         
-        // Create and show success notification
+        // Register the navigation manager with current state (no unsaved changes now)
+        registerNavigationManager(false, createExitConfirmation);
+        
+        // Show a single success notification
         const notification = document.createElement('div');
         notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn';
         notification.textContent = 'Änderungen wurden erfolgreich gespeichert!';
@@ -289,7 +292,7 @@ export default function TemplateEditorClient({
               document.body.removeChild(notification);
             }
           }, 500);
-        }, 3000);
+        }, 2000);
       } else {
         console.error("⚡ SaveAction: Save operation failed");
         setSaveMessage({ text: 'Fehler beim Speichern', type: 'error' });
@@ -308,7 +311,7 @@ export default function TemplateEditorClient({
               document.body.removeChild(notification);
             }
           }, 500);
-        }, 3000);
+        }, 2000);
       }
     } catch (error) {
       console.error('⚡ SaveAction: Exception during save:', error);
@@ -328,7 +331,7 @@ export default function TemplateEditorClient({
             document.body.removeChild(notification);
           }
         }, 500);
-      }, 3000);
+      }, 2000);
     } finally {
       // Reset the saving state
       setIsSaving(false);
@@ -339,10 +342,10 @@ export default function TemplateEditorClient({
         saveButton.classList.remove('opacity-50');
       }
       
-      // Clear message after 3 seconds
+      // Clear message after 2 seconds
       setTimeout(() => {
         setSaveMessage(null);
-      }, 3000);
+      }, 2000);
     }
   };
 
@@ -667,54 +670,69 @@ export default function TemplateEditorClient({
   const createExitConfirmation = (targetUrl) => {
     console.log("⚡ Creating exit confirmation dialog with target:", targetUrl);
     
-    // Create a modern confirmation dialog with a blurred background
-    const overlay = document.createElement('div');
-    overlay.className = 'fixed inset-0 backdrop-blur-sm flex items-center justify-center z-[1000] animate-fadeIn';
-    
-    const dialog = document.createElement('div');
-    dialog.className = 'bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4 animate-slideUp';
-    
-    const title = document.createElement('h2');
-    title.className = 'text-xl font-bold mb-4 text-[#1c2838]';
-    title.textContent = 'Ungespeicherte Änderungen';
-    
-    const message = document.createElement('p');
-    message.className = 'text-gray-600 mb-6';
-    message.textContent = 'Es gibt ungespeicherte Änderungen. Möchten Sie wirklich zurückgehen? Alle nicht gespeicherten Änderungen gehen verloren.';
-    
-    const buttonContainer = document.createElement('div');
-    buttonContainer.className = 'flex justify-end gap-4';
-    
-    const cancelButton = document.createElement('button');
-    cancelButton.className = 'px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition';
-    cancelButton.textContent = 'Abbrechen';
-    cancelButton.onclick = () => {
-      console.log("⚡ Cancel button clicked");
-      document.body.removeChild(overlay);
-    };
-    
-    const confirmButton = document.createElement('button');
-    confirmButton.className = 'px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition';
-    confirmButton.textContent = 'Ohne Speichern verlassen';
-    confirmButton.onclick = () => {
-      console.log("⚡ Ohne Speichern verlassen clicked, navigating to:", targetUrl);
-      document.body.removeChild(overlay);
-      // Direct navigation to the target URL
-      if (targetUrl) {
-        router.push(targetUrl);
-      } else {
-        console.error("⚡ No target URL provided for navigation");
-      }
-    };
-    
-    buttonContainer.appendChild(cancelButton);
-    buttonContainer.appendChild(confirmButton);
-    
-    dialog.appendChild(title);
-    dialog.appendChild(message);
-    dialog.appendChild(buttonContainer);
-    overlay.appendChild(dialog);
-    document.body.appendChild(overlay);
+    try {
+      // Create a modern confirmation dialog with a blurred background
+      const overlay = document.createElement('div');
+      overlay.className = 'fixed inset-0 backdrop-blur-sm flex items-center justify-center z-[1000] animate-fadeIn';
+      
+      const dialog = document.createElement('div');
+      dialog.className = 'bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4 animate-slideUp';
+      
+      const title = document.createElement('h2');
+      title.className = 'text-xl font-bold mb-4 text-[#1c2838]';
+      title.textContent = 'Ungespeicherte Änderungen';
+      
+      const message = document.createElement('p');
+      message.className = 'text-gray-600 mb-6';
+      message.textContent = 'Es gibt ungespeicherte Änderungen. Möchten Sie wirklich zurückgehen? Alle nicht gespeicherten Änderungen gehen verloren.';
+      
+      const buttonContainer = document.createElement('div');
+      buttonContainer.className = 'flex justify-end gap-4';
+      
+      const cancelButton = document.createElement('button');
+      cancelButton.className = 'px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition';
+      cancelButton.textContent = 'Abbrechen';
+      cancelButton.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("⚡ Cancel button clicked");
+        document.body.removeChild(overlay);
+      };
+      
+      const confirmButton = document.createElement('button');
+      confirmButton.className = 'px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition';
+      confirmButton.textContent = 'Ohne Speichern verlassen';
+      confirmButton.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("⚡ Ohne Speichern verlassen clicked, navigating to:", targetUrl);
+        
+        try {
+          document.body.removeChild(overlay);
+          
+          // Direct navigation using window.location for more reliable navigation
+          if (targetUrl) {
+            console.log("⚡ Redirecting to:", targetUrl);
+            window.location.href = targetUrl;
+          } else {
+            console.error("⚡ No target URL provided for navigation");
+          }
+        } catch (error) {
+          console.error("⚡ Error during navigation:", error);
+        }
+      };
+      
+      buttonContainer.appendChild(cancelButton);
+      buttonContainer.appendChild(confirmButton);
+      
+      dialog.appendChild(title);
+      dialog.appendChild(message);
+      dialog.appendChild(buttonContainer);
+      overlay.appendChild(dialog);
+      document.body.appendChild(overlay);
+    } catch (error) {
+      console.error("⚡ Error creating exit confirmation dialog:", error);
+    }
   };
 
   // Handle back navigation with unsaved changes check
@@ -730,18 +748,6 @@ export default function TemplateEditorClient({
   return (
     <>
       <NavigationManager />
-      <div className="fixed bottom-4 right-4 z-[100]">
-        <button 
-          onClick={handleSave}
-          className={`${hasUnsavedChanges ? 'animate-pulse' : ''} bg-[#1c2838] text-white px-4 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium shadow-lg flex items-center gap-1.5 cursor-pointer`}
-          id="fixedSaveButton"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-          </svg>
-          {hasUnsavedChanges ? 'Speichern!' : 'Speichern'}
-        </button>
-      </div>
       
       <EditorWrapper 
         section={section}
