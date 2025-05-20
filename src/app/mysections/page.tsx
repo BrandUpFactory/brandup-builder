@@ -397,11 +397,7 @@ export default function MySectionsPage() {
                                   </p>
                                 </div>
                                 <div className="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-medium">
-                                  {section.title.includes('Version ') 
-                                    ? section.title.split('Version ')[0] + 'V' + section.title.split('Version ')[1]
-                                    : section.title.match(/\d+$/) 
-                                      ? section.title.replace(/\d+$/, v => 'V' + v)
-                                      : 'Version ' + (sections.indexOf(section) + 1)}
+                                  Variante {sections.indexOf(section) + 1}
                                 </div>
                               </div>
                               

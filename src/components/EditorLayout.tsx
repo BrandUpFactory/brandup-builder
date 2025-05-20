@@ -345,7 +345,7 @@ export default function EditorLayout({
                 Code kopieren
               </button>
               <button 
-                onClick={() => window.open('https://www.brandupfactory.com/help-center', '_blank')}
+                onClick={() => window.location.href = '/help'}
                 className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-1.5 transition font-medium border-l border-gray-200"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
