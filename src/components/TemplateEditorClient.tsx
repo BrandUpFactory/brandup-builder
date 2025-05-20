@@ -204,22 +204,8 @@ export default function TemplateEditorClient({
   // Track if there are unsaved changes
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
-  // Handle navigation prevention
-  useEffect(() => {
-    // Function to confirm exit if there are unsaved changes
-    const beforeUnloadHandler = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        // Standard message for modern browsers
-        const message = 'Es gibt ungespeicherte Änderungen. Möchten Sie wirklich die Seite verlassen?';
-        e.preventDefault();
-        e.returnValue = message;
-        return message;
-      }
-    };
-
-    window.addEventListener('beforeunload', beforeUnloadHandler);
-    return () => window.removeEventListener('beforeunload', beforeUnloadHandler);
-  }, [hasUnsavedChanges]);
+  // No longer using the browser's built-in beforeunload handler
+  // Using our custom exit dialog instead
   
   // Mark changes as unsaved when data changes
   useEffect(() => {
@@ -857,6 +843,17 @@ function EditorWrapper({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
               Zurück
+            </button>
+            
+            <button 
+              onClick={handleSave}
+              className={`${hasUnsavedChanges ? 'animate-pulse' : ''} bg-[#1c2838] text-white px-4 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium shadow-sm flex items-center gap-1.5 cursor-pointer`}
+              id="saveButton"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+              </svg>
+              {hasUnsavedChanges ? 'Speichern!' : 'Speichern'}
             </button>
           </div>
         </div>
