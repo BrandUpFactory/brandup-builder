@@ -846,7 +846,7 @@ function EditorWrapper({
             </button>
             
             <button 
-              onClick={handleSave}
+              onClick={onSave}
               className={`${hasUnsavedChanges ? 'animate-pulse' : ''} bg-[#1c2838] text-white px-4 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium shadow-sm flex items-center gap-1.5 cursor-pointer`}
               id="saveButton"
             >
@@ -868,6 +868,8 @@ function EditorWrapper({
           versionName={versionName}
           onVersionNameChange={onVersionNameChange}
           onVersionCreate={onVersionCreate}
+          onSave={onSave}
+          hasUnsavedChanges={hasUnsavedChanges}
         />
       </div>
     </div>
