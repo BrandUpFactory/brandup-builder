@@ -44,7 +44,7 @@ export default async function AdminLicensesPage() {
   
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-2xl md:text-3xl font-bold mb-8">Lizenzverwaltung</h1>
+      <h1 className="text-2xl md:text-3xl font-bold mb-8 text-[#1c2838]">Lizenzverwaltung</h1>
       
       <LicenseManagementClient 
         user={user}

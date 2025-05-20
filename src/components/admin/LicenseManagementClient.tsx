@@ -163,7 +163,7 @@ export default function LicenseManagementClient({
               <div className="mb-4">
                 <label className="block text-sm font-medium text-[#1c2838] mb-1">Template</label>
                 <select
-                  className="w-full p-2 border border-[#1c2838]/40 rounded-lg focus:border-[#1c2838] focus:ring-1 focus:ring-[#1c2838] focus:outline-none"
+                  className="w-full p-2 border border-[#1c2838]/60 rounded-lg bg-[#1c2838]/5 text-[#1c2838] focus:border-[#1c2838] focus:ring-1 focus:ring-[#1c2838] focus:outline-none"
                   value={selectedTemplate}
                   onChange={(e) => setSelectedTemplate(e.target.value)}
                   required
@@ -183,7 +183,7 @@ export default function LicenseManagementClient({
                   type="number"
                   min="1"
                   max="100"
-                  className="w-full p-2 border border-[#1c2838]/40 rounded-lg focus:border-[#1c2838] focus:ring-1 focus:ring-[#1c2838] focus:outline-none"
+                  className="w-full p-2 border border-[#1c2838]/60 rounded-lg bg-[#1c2838]/5 text-[#1c2838] focus:border-[#1c2838] focus:ring-1 focus:ring-[#1c2838] focus:outline-none"
                   value={quantity}
                   onChange={(e) => setQuantity(parseInt(e.target.value))}
                   required
@@ -196,7 +196,7 @@ export default function LicenseManagementClient({
                 </label>
                 <input
                   type="text"
-                  className="w-full p-2 border border-[#1c2838]/40 rounded-lg focus:border-[#1c2838] focus:ring-1 focus:ring-[#1c2838] focus:outline-none"
+                  className="w-full p-2 border border-[#1c2838]/60 rounded-lg bg-[#1c2838]/5 text-[#1c2838] focus:border-[#1c2838] focus:ring-1 focus:ring-[#1c2838] focus:outline-none"
                   value={customPrefix}
                   onChange={(e) => setCustomPrefix(e.target.value)}
                   placeholder="z.B. LIC-2025"
@@ -212,7 +212,7 @@ export default function LicenseManagementClient({
                 </label>
                 <input
                   type="text"
-                  className="w-full p-2 border border-[#1c2838]/40 rounded-lg focus:border-[#1c2838] focus:ring-1 focus:ring-[#1c2838] focus:outline-none"
+                  className="w-full p-2 border border-[#1c2838]/60 rounded-lg bg-[#1c2838]/5 text-[#1c2838] focus:border-[#1c2838] focus:ring-1 focus:ring-[#1c2838] focus:outline-none"
                   value={shopifyOrderId}
                   onChange={(e) => setShopifyOrderId(e.target.value)}
                   placeholder="z.B. order_12345678"
