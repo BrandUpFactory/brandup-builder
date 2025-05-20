@@ -307,7 +307,7 @@ export default function LicenseManagementClient({
                       <td className="px-4 py-3 font-mono text-sm font-medium text-[#1c2838]">
                         {license.license_code}
                       </td>
-                      <td className="px-4 py-3 text-sm font-medium">
+                      <td className="px-4 py-3 text-sm font-medium text-[#1c2838]">
                         {license.templates?.name || '-'}
                       </td>
                       <td className="px-4 py-3 text-sm text-[#1c2838]/70">

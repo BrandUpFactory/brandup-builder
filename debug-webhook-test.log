@@ -1,0 +1,52 @@
+=== Debug-Webhook-Test 2025-05-20T14:17:04.176Z ===
+
+
+📦 Verwendete Produkt-ID für Test:
+📦 Verwendete Varianten-ID für Test:
+
+🔏 HMAC-Signatur generiert:
+
+🌐 Sende Debug-Webhook-Request an:
+
+📋 Request Headers:
+  Content-Type: application/json
+  Content-Length: 357
+  X-Shopify-Hmac-SHA256: y2L5zHC49gBarL3HKpx3Z8N6ILS3uM2wTDzseqtXjrg=
+  X-Shopify-Topic: orders/create
+  X-Shopify-Shop-Domain: 1aa0nn-wh.myshopify.com
+  X-Shopify-API-Version: 2023-07
+  X-Shopify-Order-Id: 12345678901234
+
+🚀 Sende Anfrage...
+
+⏳ Debug-Webhook-Request gesendet. Warte auf Antwort...
+
+📢 Statuscode: 200
+📢 Response Headers:
+  content-type: application/json
+  date: Tue, 20 May 2025 14:17:05 GMT
+  connection: keep-alive
+  keep-alive: timeout=5
+  transfer-encoding: chunked
+
+📄 Response erhalten
+
+✅ Debug-Ergebnisse erhalten
+
+📝 Detaillierte Debug-Informationen wurden in ./debug-webhook-details.json gespeichert
+
+✅ Erfolg: 1 Lizenzen für Bestellung #1001 erstellt
+
+🔑 Erzeugte Lizenzen (1):
+  1. HW2-V8UY-RQMG für Product Benefits
+
+🔍 Wichtige Debug-Informationen:
+
+📋 Letzte Verarbeitungsschritte:
+  +761ms ✅ Lizenzcode generiert
+  +762ms 📝 Erstelle Lizenz in der Datenbank
+  +887ms ✅ Lizenz erfolgreich erstellt
+  +887ms 📧 Könnte E-Mail senden
+  +887ms ✅ Webhook-Verarbeitung abgeschlossen
+
+📝 Test abgeschlossen

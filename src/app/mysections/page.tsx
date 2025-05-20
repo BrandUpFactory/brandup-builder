@@ -102,11 +102,28 @@ export default function MySectionsPage() {
     const fetchTemplatesAndSections = async () => {
       setLoading(true)
       
-      // Get all templates
+      // Hole die aktivierten Templates des Benutzers durch Lizenzen
+      const { data: userLicenses, error: licensesError } = await supabase
+        .from('licenses')
+        .select('template_id')
+        .eq('user_id', user.id)
+        .eq('used', true)
+      
+      if (licensesError) {
+        console.error('Error loading licenses:', licensesError)
+        setLoading(false)
+        return
+      }
+      
+      // Erstelle ein Set mit den Template-IDs, für die der Benutzer Lizenzen hat
+      const userTemplateIds = new Set(userLicenses?.map(license => license.template_id) || [])
+      
+      // Hole nur die Templates, für die der Benutzer Lizenzen hat
       const { data: templatesData, error: templatesError } = await supabase
         .from('templates')
         .select('*')
         .eq('active', true)
+        .in('id', Array.from(userTemplateIds))
       
       if (templatesError) {
         console.error('Error loading templates:', templatesError)

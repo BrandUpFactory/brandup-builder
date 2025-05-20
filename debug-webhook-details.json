@@ -1,0 +1,286 @@
+{
+  "success": true,
+  "message": "1 Lizenzen für Bestellung #1001 erstellt",
+  "licenses": [
+    {
+      "license_code": "HW2-V8UY-RQMG",
+      "template_id": "62c86fb3-4656-46e6-b4b3-f23dc04c3f15",
+      "template_name": "Product Benefits",
+      "id": "42cb097c-e38e-4f88-9721-3cbb5733b784",
+      "user_id": null,
+      "shopify_order_id": "12345678901234",
+      "created_at": "2025-05-20T14:16:44.251929+00:00",
+      "used": false,
+      "activation_date": null,
+      "activation_ip": null,
+      "activation_device": null
+    }
+  ],
+  "debug": [
+    {
+      "timestamp": "+0ms",
+      "message": "🔍 Debug-Webhook gestartet",
+      "details": null,
+      "error": null
+    },
+    {
+      "timestamp": "+0ms",
+      "message": "📋 Umgebungsvariablen",
+      "details": {
+        "SUPABASE_URL": "✓ (gesetzt)",
+        "SUPABASE_ANON_KEY": "✓ (gesetzt)",
+        "SHOPIFY_API_KEY": "✓ (gesetzt)",
+        "SHOPIFY_API_SECRET": "✓ (gesetzt)",
+        "SHOPIFY_SHOP_NAME": "✓ (gesetzt)",
+        "SHOPIFY_WEBHOOK_SECRET": "✓ (gesetzt)"
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+0ms",
+      "message": "📋 Request-Headers",
+      "details": {
+        "connection": "keep-alive",
+        "content-length": "357",
+        "content-type": "application/json",
+        "host": "localhost:3000",
+        "x-forwarded-for": "::1",
+        "x-forwarded-host": "localhost:3000",
+        "x-forwarded-port": "3000",
+        "x-forwarded-proto": "http",
+        "x-shopify-api-version": "2023-07",
+        "x-shopify-hmac-sha256": "y2L5zHC49gBarL3HKpx3Z8N6ILS3uM2wTDzseqtXjrg=",
+        "x-shopify-order-id": "12345678901234",
+        "x-shopify-shop-domain": "1aa0nn-wh.myshopify.com",
+        "x-shopify-topic": "orders/create"
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+1ms",
+      "message": "🔐 Secret für HMAC-Validierung",
+      "details": {
+        "useWebhookSecret": true,
+        "useApiSecret": false
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+1ms",
+      "message": "🔐 HMAC-Header",
+      "details": {
+        "hmacHeader": "y2L5zHC49gBarL3HKpx3Z8N6ILS3uM2wTDzseqtXjrg="
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+1ms",
+      "message": "📦 Raw-Body empfangen",
+      "details": {
+        "length": 357
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+1ms",
+      "message": "📦 Versuche JSON zu parsen",
+      "details": {
+        "bodyLength": 357
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+1ms",
+      "message": "📦 JSON-Body erfolgreich geparst",
+      "details": {
+        "id": 12345678901234,
+        "name": "#1001",
+        "email": "customer@example.com",
+        "items_count": 1
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+2ms",
+      "message": "🔐 Berechne HMAC-Signatur",
+      "details": {
+        "received": "y2L5zHC49gBarL3HKpx3Z8N6ILS3uM2wTDzseqtXjrg=",
+        "calculated": "y2L5zHC49gBarL3HKpx3Z8N6ILS3uM2wTDzseqtXjrg="
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+2ms",
+      "message": "✅ HMAC-Validierung erfolgreich",
+      "details": null,
+      "error": null
+    },
+    {
+      "timestamp": "+2ms",
+      "message": "🔌 Erstelle Supabase-Client",
+      "details": null,
+      "error": null
+    },
+    {
+      "timestamp": "+4ms",
+      "message": "✅ Supabase-Client erstellt",
+      "details": null,
+      "error": null
+    },
+    {
+      "timestamp": "+4ms",
+      "message": "🔌 Teste Supabase-Verbindung",
+      "details": null,
+      "error": null
+    },
+    {
+      "timestamp": "+413ms",
+      "message": "✅ Supabase-Verbindungstest erfolgreich",
+      "details": {
+        "testData": [
+          {
+            "id": "bf88e809-079b-4cc9-8ccf-702bcb928b30",
+            "name": "Hero Section"
+          }
+        ]
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+414ms",
+      "message": "🛒 Bestellinformationen",
+      "details": {
+        "orderId": 12345678901234,
+        "orderName": "#1001",
+        "customerEmail": "customer@example.com",
+        "itemCount": 1
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+414ms",
+      "message": "📦 Verarbeite Artikel",
+      "details": {
+        "title": "Test Template",
+        "productId": 15067425112408,
+        "variantId": null,
+        "quantity": 1
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+529ms",
+      "message": "ℹ️ Vorhandene Mappings",
+      "details": {
+        "count": 2,
+        "mappings": [
+          {
+            "id": "81a8a4db-374b-419d-aaf4-c473917951b2",
+            "shopify_product_id": "15067425112408",
+            "shopify_variant_id": null,
+            "template_id": "62c86fb3-4656-46e6-b4b3-f23dc04c3f15",
+            "created_at": "2025-05-20T12:32:31.747347+00:00"
+          },
+          {
+            "id": "b0a52df1-354c-40b9-a518-2ff769336dff",
+            "shopify_product_id": "9568022962438",
+            "shopify_variant_id": null,
+            "template_id": "62c86fb3-4656-46e6-b4b3-f23dc04c3f15",
+            "created_at": "2025-05-20T14:13:26.176251+00:00"
+          }
+        ]
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+529ms",
+      "message": "🔍 Suche Mapping nur mit Produkt-ID",
+      "details": {
+        "productId": 15067425112408
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+647ms",
+      "message": "✅ Mapping ohne Variante gefunden",
+      "details": {
+        "data": {
+          "template_id": "62c86fb3-4656-46e6-b4b3-f23dc04c3f15",
+          "templates": {
+            "id": "62c86fb3-4656-46e6-b4b3-f23dc04c3f15",
+            "name": "Product Benefits"
+          }
+        }
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+647ms",
+      "message": "🎯 Template gefunden",
+      "details": {
+        "templateId": "62c86fb3-4656-46e6-b4b3-f23dc04c3f15",
+        "templateName": "Product Benefits"
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+647ms",
+      "message": "🔑 Generiere Lizenz 1 von 1",
+      "details": null,
+      "error": null
+    },
+    {
+      "timestamp": "+761ms",
+      "message": "✅ Lizenzcode generiert",
+      "details": {
+        "licenseCode": "HW2-V8UY-RQMG"
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+762ms",
+      "message": "📝 Erstelle Lizenz in der Datenbank",
+      "details": {
+        "license_code": "HW2-V8UY-RQMG",
+        "template_id": "62c86fb3-4656-46e6-b4b3-f23dc04c3f15",
+        "shopify_order_id": "12345678901234",
+        "used": false
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+887ms",
+      "message": "✅ Lizenz erfolgreich erstellt",
+      "details": {
+        "id": "42cb097c-e38e-4f88-9721-3cbb5733b784",
+        "license_code": "HW2-V8UY-RQMG",
+        "template_id": "62c86fb3-4656-46e6-b4b3-f23dc04c3f15",
+        "user_id": null,
+        "shopify_order_id": "12345678901234",
+        "created_at": "2025-05-20T14:16:44.251929+00:00",
+        "used": false,
+        "activation_date": null,
+        "activation_ip": null,
+        "activation_device": null
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+887ms",
+      "message": "📧 Könnte E-Mail senden",
+      "details": {
+        "email": "customer@example.com",
+        "licenseCount": 1
+      },
+      "error": null
+    },
+    {
+      "timestamp": "+887ms",
+      "message": "✅ Webhook-Verarbeitung abgeschlossen",
+      "details": {
+        "createdLicenses": 1
+      },
+      "error": null
+    }
+  ]
+}

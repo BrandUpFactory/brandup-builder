@@ -70,28 +70,22 @@ CREATE POLICY "Sections nur vom Besitzer löschbar" ON sections
 CREATE OR REPLACE FUNCTION generate_license_code()
 RETURNS TEXT AS $$
 DECLARE
-  chars TEXT := 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; -- ohne I, O, 0, 1 zur Vermeidung von Verwechslungen
+  letter_chars TEXT := 'ABCDEFGHJKLMNPQRSTUVWXYZ'; -- ohne I, O zur Vermeidung von Verwechslungen
+  number_chars TEXT := '23456789'; -- ohne 0, 1 zur Vermeidung von Verwechslungen
   result TEXT := '';
   i INTEGER;
 BEGIN
-  -- Format: XXX-XXXX-XXXX
-  -- Erster Block
+  -- Format: XXX-YYYYY (3 Buchstaben, Bindestrich, 5 Zahlen)
+  -- Erster Block - 3 Buchstaben
   FOR i IN 1..3 LOOP
-    result := result || substr(chars, floor(random() * length(chars))::integer + 1, 1);
+    result := result || substr(letter_chars, floor(random() * length(letter_chars))::integer + 1, 1);
   END LOOP;
   
   result := result || '-';
   
-  -- Zweiter Block
-  FOR i IN 1..4 LOOP
-    result := result || substr(chars, floor(random() * length(chars))::integer + 1, 1);
-  END LOOP;
-  
-  result := result || '-';
-  
-  -- Dritter Block
-  FOR i IN 1..4 LOOP
-    result := result || substr(chars, floor(random() * length(chars))::integer + 1, 1);
+  -- Zweiter Block - 5 Zahlen
+  FOR i IN 1..5 LOOP
+    result := result || substr(number_chars, floor(random() * length(number_chars))::integer + 1, 1);
   END LOOP;
   
   RETURN result;

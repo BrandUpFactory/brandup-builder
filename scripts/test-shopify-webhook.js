@@ -30,8 +30,8 @@ const orderPayload = {
   line_items: [
     {
       id: 987654321,
-      product_id: 9568022962438, // WICHTIG: Hier deine tatsächliche Produkt-ID von Shopify eintragen
-      variant_id: 47260059009286, // WICHTIG: Hier deine tatsächliche Varianten-ID von Shopify eintragen
+      product_id: 15067425112408, // Korrekte Shopify Produkt-ID aus: https://admin.shopify.com/store/1aa0nn-wh/products/15067425112408
+      variant_id: null, // Keine spezifische Variante verwenden
       quantity: 1,
       title: "Test Template",
       price: "19.99",

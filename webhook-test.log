@@ -1,0 +1,42 @@
+=== Webhook-Test 2025-05-20T13:56:42.216Z ===
+
+
+📋 Umgebungsvariablen:
+SHOPIFY_API_KEY: ✗ (nicht gesetzt)
+SHOPIFY_API_SECRET: ✗ (nicht gesetzt)
+SHOPIFY_SHOP_NAME: ✗ (nicht gesetzt)
+SHOPIFY_WEBHOOK_SECRET: ✗ (nicht gesetzt)
+
+📦 Verwendete Produkt-ID für Test:
+📦 Verwendete Varianten-ID für Test:
+
+🔏 HMAC-Signatur generiert:
+
+🌐 Sende Webhook-Request an:
+🧪 Webhook Payload:
+
+📋 Request Headers:
+  Content-Type: application/json
+  Content-Length: 366
+  X-Shopify-Hmac-SHA256: CbJNr4mFU9I2HLKuXRkqv7whciWLt8i80mWMMRQZa4s=
+  X-Shopify-Topic: orders/create
+  X-Shopify-Shop-Domain: 1aa0nn-wh.myshopify.com
+  X-Shopify-API-Version: 2023-07
+  X-Shopify-Order-Id: 12345678901234
+
+🚀 Sende Anfrage...
+
+⏳ Webhook-Request gesendet. Warte auf Antwort...
+
+📢 Statuscode: 500
+📢 Response Headers:
+  date: Tue, 20 May 2025 13:56:42 GMT
+  connection: keep-alive
+  keep-alive: timeout=5
+  transfer-encoding: chunked
+
+📄 Response Body:
+
+⚠️ Leere Antwort vom Server
+
+📝 Test abgeschlossen. Ergebnisse wurden in webhook-test.log gespeichert.
