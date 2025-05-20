@@ -7,19 +7,26 @@ import { useCallback, useEffect } from 'react'
 type CreateExitConfirmationFn = (targetUrl: string) => void;
 
 // Global variables to track state
-let hasUnsavedChangesGlobal = false;
-let createExitConfirmationGlobal: CreateExitConfirmationFn | null = null;
+// Using window to ensure they're truly global across all components
 let originalPushState: typeof history.pushState | null = null;
 let originalReplaceState: typeof history.replaceState | null = null;
 let lastAttemptedNavigation: string | null = null; // Store the last attempted navigation URL
+
+// Initialize global variables on window
+if (typeof window !== 'undefined') {
+  window.hasUnsavedChangesGlobal = window.hasUnsavedChangesGlobal || false;
+  window.createExitConfirmationGlobal = window.createExitConfirmationGlobal || null;
+}
 
 export const registerNavigationManager = (
   hasUnsavedChanges: boolean,
   createExitConfirmation: CreateExitConfirmationFn
 ) => {
+  if (typeof window === 'undefined') return;
+  
   console.log("Updating navigation manager:", { hasUnsavedChanges });
-  hasUnsavedChangesGlobal = hasUnsavedChanges;
-  createExitConfirmationGlobal = createExitConfirmation;
+  window.hasUnsavedChangesGlobal = hasUnsavedChanges;
+  window.createExitConfirmationGlobal = createExitConfirmation;
   
   // If no unsaved changes, clear any event handlers
   if (!hasUnsavedChanges) {
@@ -34,8 +41,13 @@ export default function NavigationManager() {
 
   // Function to intercept navigation
   const intercept = useCallback((event: MouseEvent) => {
+    if (typeof window === 'undefined') return;
+    
     // Skip if no unsaved changes or no confirmation function registered
-    if (!hasUnsavedChangesGlobal || !createExitConfirmationGlobal) return;
+    if (!window.hasUnsavedChangesGlobal || !window.createExitConfirmationGlobal) {
+      console.log("Navigation not intercepted - no unsaved changes or no confirmation function");
+      return;
+    }
 
     // Only intercept clicks on anchor tags
     const target = event.target as HTMLElement;
@@ -50,6 +62,8 @@ export default function NavigationManager() {
     // Skip if the link has a target attribute
     if (anchor.hasAttribute('target')) return;
     
+    console.log("NavigationManager: Intercepting navigation to:", href);
+    
     // Save the navigation target
     lastAttemptedNavigation = href;
     
@@ -59,7 +73,13 @@ export default function NavigationManager() {
     
     // Show confirmation dialog with the target URL directly
     console.log("NavigationManager: Showing confirmation for navigation to:", href);
-    createExitConfirmationGlobal(href);
+    if (window.createExitConfirmationGlobal && typeof window.createExitConfirmationGlobal === 'function') {
+      window.createExitConfirmationGlobal(href);
+    } else {
+      console.error("No exit confirmation function defined");
+      // Allow navigation to proceed anyway
+      window.location.href = href;
+    }
   }, [router]);
 
   // Override history methods to intercept programmatic navigation
@@ -73,9 +93,11 @@ export default function NavigationManager() {
         // Store the URL for later use
         const targetUrl = args[2] as string | null;
         
-        if (hasUnsavedChangesGlobal && createExitConfirmationGlobal && targetUrl) {
+        if (window.hasUnsavedChangesGlobal && window.createExitConfirmationGlobal && targetUrl) {
           console.log("NavigationManager: Intercepting pushState to:", targetUrl);
-          createExitConfirmationGlobal(targetUrl);
+          if (typeof window.createExitConfirmationGlobal === 'function') {
+            window.createExitConfirmationGlobal(targetUrl);
+          }
           return;
         }
         if (originalPushState) originalPushState.apply(this, args);
@@ -86,9 +108,11 @@ export default function NavigationManager() {
         // Store the URL for later use
         const targetUrl = args[2] as string | null;
         
-        if (hasUnsavedChangesGlobal && createExitConfirmationGlobal && targetUrl) {
+        if (window.hasUnsavedChangesGlobal && window.createExitConfirmationGlobal && targetUrl) {
           console.log("NavigationManager: Intercepting replaceState to:", targetUrl);
-          createExitConfirmationGlobal(targetUrl);
+          if (typeof window.createExitConfirmationGlobal === 'function') {
+            window.createExitConfirmationGlobal(targetUrl);
+          }
           return;
         }
         if (originalReplaceState) originalReplaceState.apply(this, args);

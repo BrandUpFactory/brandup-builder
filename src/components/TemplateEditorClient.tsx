@@ -261,8 +261,8 @@ export default function TemplateEditorClient({
         // Mark that there are no unsaved changes
         setHasUnsavedChanges(false);
         
-        // Disable navigation interception completely after saving
-        registerNavigationManager(false, () => {});
+        // Reset the global variables directly to ensure navigation works
+        window.hasUnsavedChangesGlobal = false;
         
         // Show a single success notification
         const notification = document.createElement('div');
@@ -694,6 +694,10 @@ export default function TemplateEditorClient({
         console.log("⚡ Ohne Speichern verlassen clicked, navigating to:", targetUrl);
         
         try {
+          // First turn off the unsaved changes flag - critical step!
+          setHasUnsavedChanges(false);
+          window.hasUnsavedChangesGlobal = false;
+          
           document.body.removeChild(overlay);
           
           // Direct navigation using window.location for more reliable navigation
@@ -723,10 +727,14 @@ export default function TemplateEditorClient({
 
   // Handle back navigation with unsaved changes check
   const handleBack = () => {
+    console.log("Back button clicked, hasUnsavedChanges:", hasUnsavedChanges);
+    
     if (hasUnsavedChanges) {
       createExitConfirmation('/mysections');
     } else {
-      router.push('/mysections');
+      // Force direct navigation without using Next.js router
+      console.log("No unsaved changes, navigating directly to /mysections");
+      window.location.href = '/mysections';
     }
   };
 
