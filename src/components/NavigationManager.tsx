@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useCallback, useEffect } from 'react'
 
 // Define the type for the createExitConfirmation function
-type CreateExitConfirmationFn = (onConfirm: () => void) => void;
+type CreateExitConfirmationFn = (targetUrl: string) => void;
 
 // Global variables to track state
 let hasUnsavedChangesGlobal = false;
@@ -50,14 +50,9 @@ export default function NavigationManager() {
     event.preventDefault();
     event.stopPropagation();
     
-    // Show confirmation dialog
-    createExitConfirmationGlobal(() => {
-      // Navigate to the href if user confirms
-      console.log("NavigationManager: Navigating to saved URL:", lastAttemptedNavigation);
-      if (lastAttemptedNavigation) {
-        router.push(lastAttemptedNavigation);
-      }
-    });
+    // Show confirmation dialog with the target URL directly
+    console.log("NavigationManager: Showing confirmation for navigation to:", href);
+    createExitConfirmationGlobal(href);
   }, [router]);
 
   // Override history methods to intercept programmatic navigation
@@ -69,15 +64,11 @@ export default function NavigationManager() {
       // Override pushState
       history.pushState = function(...args) {
         // Store the URL for later use
-        if (args[2]) {
-          lastAttemptedNavigation = args[2] as string;
-        }
+        const targetUrl = args[2] as string | null;
         
-        if (hasUnsavedChangesGlobal && createExitConfirmationGlobal) {
-          createExitConfirmationGlobal(() => {
-            console.log("NavigationManager: Executing saved pushState:", lastAttemptedNavigation);
-            if (originalPushState) originalPushState.apply(this, args);
-          });
+        if (hasUnsavedChangesGlobal && createExitConfirmationGlobal && targetUrl) {
+          console.log("NavigationManager: Intercepting pushState to:", targetUrl);
+          createExitConfirmationGlobal(targetUrl);
           return;
         }
         if (originalPushState) originalPushState.apply(this, args);
@@ -86,15 +77,11 @@ export default function NavigationManager() {
       // Override replaceState
       history.replaceState = function(...args) {
         // Store the URL for later use
-        if (args[2]) {
-          lastAttemptedNavigation = args[2] as string;
-        }
+        const targetUrl = args[2] as string | null;
         
-        if (hasUnsavedChangesGlobal && createExitConfirmationGlobal) {
-          createExitConfirmationGlobal(() => {
-            console.log("NavigationManager: Executing saved replaceState:", lastAttemptedNavigation);
-            if (originalReplaceState) originalReplaceState.apply(this, args);
-          });
+        if (hasUnsavedChangesGlobal && createExitConfirmationGlobal && targetUrl) {
+          console.log("NavigationManager: Intercepting replaceState to:", targetUrl);
+          createExitConfirmationGlobal(targetUrl);
           return;
         }
         if (originalReplaceState) originalReplaceState.apply(this, args);

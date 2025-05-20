@@ -664,8 +664,8 @@ export default function TemplateEditorClient({
   };
 
   // Create exit confirmation dialog
-  const createExitConfirmation = (onConfirm) => {
-    console.log("⚡ Creating exit confirmation dialog");
+  const createExitConfirmation = (targetUrl) => {
+    console.log("⚡ Creating exit confirmation dialog with target:", targetUrl);
     
     // Create a modern confirmation dialog with a blurred background
     const overlay = document.createElement('div');
@@ -697,12 +697,13 @@ export default function TemplateEditorClient({
     confirmButton.className = 'px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition';
     confirmButton.textContent = 'Ohne Speichern verlassen';
     confirmButton.onclick = () => {
-      console.log("⚡ Ohne Speichern verlassen clicked, executing onConfirm");
+      console.log("⚡ Ohne Speichern verlassen clicked, navigating to:", targetUrl);
       document.body.removeChild(overlay);
-      if (typeof onConfirm === 'function') {
-        onConfirm();
+      // Direct navigation to the target URL
+      if (targetUrl) {
+        router.push(targetUrl);
       } else {
-        console.error("⚡ onConfirm is not a function:", onConfirm);
+        console.error("⚡ No target URL provided for navigation");
       }
     };
     
@@ -719,9 +720,7 @@ export default function TemplateEditorClient({
   // Handle back navigation with unsaved changes check
   const handleBack = () => {
     if (hasUnsavedChanges) {
-      createExitConfirmation(() => {
-        router.push('/mysections');
-      });
+      createExitConfirmation('/mysections');
     } else {
       router.push('/mysections');
     }
@@ -731,6 +730,19 @@ export default function TemplateEditorClient({
   return (
     <>
       <NavigationManager />
+      <div className="fixed bottom-4 right-4 z-[100]">
+        <button 
+          onClick={handleSave}
+          className={`${hasUnsavedChanges ? 'animate-pulse' : ''} bg-[#1c2838] text-white px-4 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium shadow-lg flex items-center gap-1.5 cursor-pointer`}
+          id="fixedSaveButton"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+          </svg>
+          {hasUnsavedChanges ? 'Speichern!' : 'Speichern'}
+        </button>
+      </div>
+      
       <EditorWrapper 
         section={section}
         template={template}
