@@ -261,8 +261,8 @@ export default function TemplateEditorClient({
         // Mark that there are no unsaved changes
         setHasUnsavedChanges(false);
         
-        // Register the navigation manager with current state (no unsaved changes now)
-        registerNavigationManager(false, createExitConfirmation);
+        // Disable navigation interception completely after saving
+        registerNavigationManager(false, () => {});
         
         // Show a single success notification
         const notification = document.createElement('div');
@@ -847,13 +847,13 @@ function EditorWrapper({
             
             <button 
               onClick={onSave}
-              className={`${hasUnsavedChanges ? 'animate-pulse' : ''} bg-[#1c2838] text-white px-4 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium shadow-sm flex items-center gap-1.5 cursor-pointer`}
+              className={`bg-[#1c2838] text-white px-4 py-2 rounded-lg hover:opacity-90 transition text-sm font-medium shadow-sm flex items-center gap-1.5 cursor-pointer`}
               id="saveButton"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
               </svg>
-              {hasUnsavedChanges ? 'Speichern!' : 'Speichern'}
+              Speichern
             </button>
           </div>
         </div>

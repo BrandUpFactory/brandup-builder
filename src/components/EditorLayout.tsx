@@ -267,12 +267,7 @@ export default function EditorLayout({
         </div>
       )}
       
-      {/* Unsaved changes indicator */}
-      {hasUnsavedChanges && (
-        <div className="fixed top-16 right-4 bg-yellow-500 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn">
-          Ungespeicherte Änderungen!
-        </div>
-      )}
+      {/* Removed unsaved changes indicator */}
       {/* Version limit error notification */}
       {versionLimitError && (
         <div className="fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn">

@@ -17,8 +17,15 @@ export const registerNavigationManager = (
   hasUnsavedChanges: boolean,
   createExitConfirmation: CreateExitConfirmationFn
 ) => {
+  console.log("Updating navigation manager:", { hasUnsavedChanges });
   hasUnsavedChangesGlobal = hasUnsavedChanges;
   createExitConfirmationGlobal = createExitConfirmation;
+  
+  // If no unsaved changes, clear any event handlers
+  if (!hasUnsavedChanges) {
+    // No need to show confirmation dialog
+    console.log("Navigation interception disabled - no unsaved changes");
+  }
 };
 
 // Component that handles navigation interception
