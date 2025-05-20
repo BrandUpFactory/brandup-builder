@@ -12,8 +12,14 @@ const https = require('https');
 const http = require('http');
 
 // Konfiguration - passe diese Werte an
+const API_SECRET = process.env.SHOPIFY_API_SECRET || '01fb4b03c54c798dbde3466ac838913a';
 const WEBHOOK_SECRET = process.env.SHOPIFY_WEBHOOK_SECRET || '6e4331044b9af29e8abf549c227b385bdaeadc8cfaddc2d5981151a26f4eeeb7';
 const WEBHOOK_URL = 'http://localhost:3000/api/shopify-webhook'; // Anpassen an deine URL
+// In Produktion verwende die richtige URL, z.B.: https://deine-domain.com/api/shopify-webhook
+
+// Secret auswählen - entweder das Webhook-Secret oder das API-Secret als Fallback
+const secretToUse = WEBHOOK_SECRET || API_SECRET;
+console.log('Verwende folgendes Secret für HMAC:', secretToUse);
 
 // Beispiel-Bestellung (anpassen an deine Produkt-IDs)
 const orderPayload = {
@@ -24,8 +30,8 @@ const orderPayload = {
   line_items: [
     {
       id: 987654321,
-      product_id: 1234567890, // WICHTIG: Hier deine tatsächliche Produkt-ID eintragen
-      variant_id: 98765432109876,
+      product_id: 9568022962438, // WICHTIG: Hier deine tatsächliche Produkt-ID von Shopify eintragen
+      variant_id: 47260059009286, // WICHTIG: Hier deine tatsächliche Varianten-ID von Shopify eintragen
       quantity: 1,
       title: "Test Template",
       price: "19.99",
@@ -45,7 +51,7 @@ const orderJSON = JSON.stringify(orderPayload);
 
 // Erstelle die HMAC-Signatur
 const hmac = crypto
-  .createHmac('sha256', WEBHOOK_SECRET)
+  .createHmac('sha256', secretToUse)
   .update(orderJSON)
   .digest('base64');
 
