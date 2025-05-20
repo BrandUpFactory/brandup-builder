@@ -6,6 +6,7 @@ import { createClient } from '@/utils/supabase/client'
 import { hasAccessToTemplate } from '@/features/template'
 import EditorLayout from '@/components/EditorLayout'
 import HeroSection from '@/sections/HeroSection'
+import NavigationManager, { registerNavigationManager } from '@/components/NavigationManager'
 
 // Error component 
 const ErrorDisplay = ({ message }: { message: string }) => (
@@ -224,7 +225,11 @@ export default function TemplateEditorClient({
   useEffect(() => {
     if (Object.keys(currentSectionData).length > 0 && Object.keys(sectionData).length > 0) {
       // Check if current data is different from original data
-      setHasUnsavedChanges(JSON.stringify(currentSectionData) !== JSON.stringify(sectionData));
+      const unsavedChanges = JSON.stringify(currentSectionData) !== JSON.stringify(sectionData);
+      setHasUnsavedChanges(unsavedChanges);
+      
+      // Register the navigation manager with current state
+      registerNavigationManager(unsavedChanges, createExitConfirmation);
     }
   }, [currentSectionData, sectionData]);
 
@@ -232,18 +237,12 @@ export default function TemplateEditorClient({
   const handleSave = async () => {
     console.log("⚡ SaveAction: Save button clicked");
     
-    // Disable all save buttons to prevent multiple clicks
+    // Disable save button to prevent multiple clicks
     const saveButton = document.getElementById('saveButton');
-    const headerSaveButton = document.getElementById('headerSaveButton');
     
     if (saveButton) {
       saveButton.setAttribute('disabled', 'true');
       saveButton.classList.add('opacity-50');
-    }
-    
-    if (headerSaveButton) {
-      headerSaveButton.setAttribute('disabled', 'true');
-      headerSaveButton.classList.add('opacity-50');
     }
     
     // Set saving state and clear any previous messages
@@ -334,15 +333,10 @@ export default function TemplateEditorClient({
       // Reset the saving state
       setIsSaving(false);
       
-      // Re-enable all save buttons
+      // Re-enable the save button
       if (saveButton) {
         saveButton.removeAttribute('disabled');
         saveButton.classList.remove('opacity-50');
-      }
-      
-      if (headerSaveButton) {
-        headerSaveButton.removeAttribute('disabled');
-        headerSaveButton.classList.remove('opacity-50');
       }
       
       // Clear message after 3 seconds
@@ -669,50 +663,57 @@ export default function TemplateEditorClient({
     }
   };
 
+  // Create exit confirmation dialog
+  const createExitConfirmation = (onConfirm) => {
+    // Create a modern confirmation dialog with a blurred background
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 backdrop-blur-sm bg-black bg-opacity-10 flex items-center justify-center z-[1000] animate-fadeIn';
+    
+    const dialog = document.createElement('div');
+    dialog.className = 'bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4 animate-slideUp';
+    
+    const title = document.createElement('h2');
+    title.className = 'text-xl font-bold mb-4 text-[#1c2838]';
+    title.textContent = 'Ungespeicherte Änderungen';
+    
+    const message = document.createElement('p');
+    message.className = 'text-gray-600 mb-6';
+    message.textContent = 'Es gibt ungespeicherte Änderungen. Möchten Sie wirklich zurückgehen? Alle nicht gespeicherten Änderungen gehen verloren.';
+    
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'flex justify-end gap-4';
+    
+    const cancelButton = document.createElement('button');
+    cancelButton.className = 'px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition';
+    cancelButton.textContent = 'Abbrechen';
+    cancelButton.onclick = () => {
+      document.body.removeChild(overlay);
+    };
+    
+    const confirmButton = document.createElement('button');
+    confirmButton.className = 'px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition';
+    confirmButton.textContent = 'Ohne Speichern verlassen';
+    confirmButton.onclick = () => {
+      document.body.removeChild(overlay);
+      onConfirm();
+    };
+    
+    buttonContainer.appendChild(cancelButton);
+    buttonContainer.appendChild(confirmButton);
+    
+    dialog.appendChild(title);
+    dialog.appendChild(message);
+    dialog.appendChild(buttonContainer);
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+  };
+
   // Handle back navigation with unsaved changes check
   const handleBack = () => {
     if (hasUnsavedChanges) {
-      // Create a modern confirmation dialog with a blurred background
-      const overlay = document.createElement('div');
-      overlay.className = 'fixed inset-0 backdrop-blur-sm bg-white bg-opacity-30 flex items-center justify-center z-[1000] animate-fadeIn';
-      
-      const dialog = document.createElement('div');
-      dialog.className = 'bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4 animate-slideUp';
-      
-      const title = document.createElement('h2');
-      title.className = 'text-xl font-bold mb-4 text-[#1c2838]';
-      title.textContent = 'Ungespeicherte Änderungen';
-      
-      const message = document.createElement('p');
-      message.className = 'text-gray-600 mb-6';
-      message.textContent = 'Es gibt ungespeicherte Änderungen. Möchten Sie wirklich zurückgehen? Alle nicht gespeicherten Änderungen gehen verloren.';
-      
-      const buttonContainer = document.createElement('div');
-      buttonContainer.className = 'flex justify-end gap-4';
-      
-      const cancelButton = document.createElement('button');
-      cancelButton.className = 'px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition';
-      cancelButton.textContent = 'Abbrechen';
-      cancelButton.onclick = () => {
-        document.body.removeChild(overlay);
-      };
-      
-      const confirmButton = document.createElement('button');
-      confirmButton.className = 'px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition';
-      confirmButton.textContent = 'Ohne Speichern verlassen';
-      confirmButton.onclick = () => {
-        document.body.removeChild(overlay);
+      createExitConfirmation(() => {
         router.push('/mysections');
-      };
-      
-      buttonContainer.appendChild(cancelButton);
-      buttonContainer.appendChild(confirmButton);
-      
-      dialog.appendChild(title);
-      dialog.appendChild(message);
-      dialog.appendChild(buttonContainer);
-      overlay.appendChild(dialog);
-      document.body.appendChild(overlay);
+      });
     } else {
       router.push('/mysections');
     }
@@ -720,20 +721,23 @@ export default function TemplateEditorClient({
 
   // Render the editor with a wrapper component to handle HeroSection properly
   return (
-    <EditorWrapper 
-      section={section}
-      template={template}
-      sectionData={currentSectionData}
-      onDataChange={handleDataChange}
-      onSave={handleSave}
-      isSaving={isSaving}
-      saveMessage={saveMessage}
-      onBack={handleBack}
-      versionName={section?.title}
-      onVersionNameChange={handleVersionNameChange}
-      onVersionCreate={createNewSectionVersion}
-      hasUnsavedChanges={hasUnsavedChanges}
-    />
+    <>
+      <NavigationManager />
+      <EditorWrapper 
+        section={section}
+        template={template}
+        sectionData={currentSectionData}
+        onDataChange={handleDataChange}
+        onSave={handleSave}
+        isSaving={isSaving}
+        saveMessage={saveMessage}
+        onBack={handleBack}
+        versionName={section?.title}
+        onVersionNameChange={handleVersionNameChange}
+        onVersionCreate={createNewSectionVersion}
+        hasUnsavedChanges={hasUnsavedChanges}
+      />
+    </>
   );
 }
 
@@ -827,17 +831,6 @@ function EditorWrapper({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
               Zurück
-            </button>
-            
-            <button 
-              onClick={onSave}
-              className={`${hasUnsavedChanges ? 'bg-red-600 animate-pulse' : 'bg-[#1c2838]'} text-white px-4 py-2 text-sm rounded-lg hover:opacity-90 transition shadow-sm flex items-center gap-1.5`}
-              id="headerSaveButton"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-              </svg>
-              {hasUnsavedChanges ? 'Speichern!' : 'Speichern'}
             </button>
           </div>
         </div>
