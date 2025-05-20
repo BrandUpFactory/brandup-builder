@@ -7,6 +7,22 @@ import { useRouter } from 'next/navigation'
 import { User } from '@supabase/supabase-js'
 import RenameDialog from '@/components/RenameDialog'
 
+// Function to format date nicely with time
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  
+  // Format date as dd.mm.yyyy
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  
+  // Format time as hh:mm
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  
+  return `${day}.${month}.${year} ${hours}:${minutes}`;
+};
+
 interface SectionEntry {
   id: number
   title: string
@@ -360,11 +376,15 @@ export default function MySectionsPage() {
                                     {section.title || 'Version ' + (sections.indexOf(section) + 1)}
                                   </h3>
                                   <p className="text-xs text-gray-500">
-                                    Bearbeitet: {new Date(section.updated_at || section.created_at).toLocaleDateString('de-DE')}
+                                    Bearbeitet: {formatDate(section.updated_at || section.created_at)}
                                   </p>
                                 </div>
                                 <div className="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-medium">
-                                  Version {sections.length - sections.indexOf(section)}
+                                  {section.title.includes('Version ') 
+                                    ? section.title.split('Version ')[0] + 'V' + section.title.split('Version ')[1]
+                                    : section.title.match(/\d+$/) 
+                                      ? section.title.replace(/\d+$/, v => 'V' + v)
+                                      : 'Version ' + (sections.indexOf(section) + 1)}
                                 </div>
                               </div>
                               

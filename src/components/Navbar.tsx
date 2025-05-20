@@ -217,14 +217,28 @@ export default function Navbar() {
               Login
             </Link>
           ) : (
-            <div>
+            <>
+              <Link 
+                href="/admin/licenses"
+                className="block text-left hover:text-[#8db5d8] transition mb-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Lizenzverwaltung
+              </Link>
+              <Link 
+                href="/admin/products"
+                className="block text-left hover:text-[#8db5d8] transition mb-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Produkt-Mapping
+              </Link>
               <button
                 onClick={handleLogout}
                 className="w-full text-left hover:text-[#8db5d8] transition"
               >
                 Abmelden
               </button>
-            </div>
+            </>
           )}
 
           <Link 
@@ -316,6 +330,20 @@ export default function Navbar() {
               </button>
               {dropdownOpen && (
                 <div className="absolute left-0 mt-2 bg-white shadow border rounded w-full z-50">
+                  <Link 
+                    href="/admin/licenses"
+                    className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    Lizenzverwaltung
+                  </Link>
+                  <Link 
+                    href="/admin/products"
+                    className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    Produkt-Mapping
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100"
