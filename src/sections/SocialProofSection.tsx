@@ -315,6 +315,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     
     return processedText;
   };
+  
+  // Different code output types
+  const [codeOutputType, setCodeOutputType] = useState<'liquid-block' | 'section'>('liquid-block');
 
   // Help tooltip component
   const HelpTooltip = ({ text }: { text: string }) => {
@@ -1163,7 +1166,257 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     </div>
   )
 
-  const code = `{% comment %}
+  // Code Switcher Component
+  const CodeSwitcher = () => {
+    return (
+      <div className="flex border-b mb-4 pb-2">
+        <button 
+          onClick={() => setCodeOutputType('liquid-block')}
+          className={`flex items-center px-3 py-1.5 text-xs rounded-l-md ${codeOutputType === 'liquid-block' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+        >
+          <span>Liquid Block</span>
+          <div className="relative ml-1 group">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+              <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM8.94 6.94a.75.75 0 1 1-1.06-1.06 2.5 2.5 0 0 1 3.536 0A.75.75 0 0 1 10.354 6.94 1 1 0 0 0 9.75 6.75a1 1 0 0 0-.81.31Zm-3.24 7.9a.75.75 0 1 0 1.06 1.06l4.25-4.25a.75.75 0 1 0-1.06-1.06L6.33 14.44 5.56 13.7a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l1.2 1.2a.75.75 0 0 0 1.06 0Z" clipRule="evenodd" />
+            </svg>
+            <div className="absolute left-0 bottom-full mb-2 p-2 bg-gray-800 text-white text-xs rounded w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity z-10">
+              Optimierter Code für Shopify Liquid Blocks - ohne Syntax-Fehler, ideal für Theme Code Editoren.
+            </div>
+          </div>
+        </button>
+        <button 
+          onClick={() => setCodeOutputType('section')}
+          className={`flex items-center px-3 py-1.5 text-xs rounded-r-md ${codeOutputType === 'section' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+        >
+          <span>Sektion</span>
+          <div className="relative ml-1 group">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+              <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM8.94 6.94a.75.75 0 1 1-1.06-1.06 2.5 2.5 0 0 1 3.536 0A.75.75 0 0 1 10.354 6.94 1 1 0 0 0 9.75 6.75a1 1 0 0 0-.81.31Zm-3.24 7.9a.75.75 0 1 0 1.06 1.06l4.25-4.25a.75.75 0 1 0-1.06-1.06L6.33 14.44 5.56 13.7a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l1.2 1.2a.75.75 0 0 0 1.06 0Z" clipRule="evenodd" />
+            </svg>
+            <div className="absolute right-0 bottom-full mb-2 p-2 bg-gray-800 text-white text-xs rounded w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity z-10">
+              Komplette Sektion zum Kopieren & Einfügen über die Shopify-Oberfläche.
+            </div>
+          </div>
+        </button>
+      </div>
+    );
+  };
+
+  // Liquid Block Code - optimized for syntax correctness
+  const liquidBlockCode = `{% comment %}Social Proof Box (BrandUp Builder){% endcomment %}
+
+{% assign user_display_names = "" %}
+{% if section.settings.avatar_count == 1 %}
+  {% assign user_display_names = section.settings.first_name_1 %}
+{% elsif section.settings.avatar_count == 2 %}
+  {% assign user_display_names = section.settings.first_name_1 | append: ", " | append: section.settings.first_name_2 %}
+{% elsif section.settings.avatar_count == 3 %}
+  {% assign user_display_names = section.settings.first_name_1 | append: ", " | append: section.settings.first_name_2 | append: ", " | append: section.settings.first_name_3 %}
+{% else %}
+  {% assign user_display_names = "Nutzer" %}
+{% endif %}
+
+{% comment %}Process placeholders and HTML tags{% endcomment %}
+{% assign formatted_text = section.settings.custom_text %}
+{% assign formatted_text = formatted_text | replace: '(Zahl)', section.settings.user_count | replace: '(Marke)', section.settings.brand_name %}
+{% assign formatted_text = formatted_text | replace: '{userCount}', section.settings.user_count | replace: '{brandName}', section.settings.brand_name %}
+
+{% comment %}For line breaks, extract last two words if needed{% endcomment %}
+{% if section.settings.show_break_on_large %}
+  {% assign words = formatted_text | split: ' ' %}
+  {% assign word_count = words | size %}
+  
+  {% if word_count > 2 %}
+    {% assign last_word = words[word_count | minus: 1] %}
+    {% assign second_last_word = words[word_count | minus: 2] %}
+    {% assign last_two_words = second_last_word | append: " " | append: last_word %}
+    
+    {% assign main_text = "" %}
+    {% for i in (0..word_count | minus: 3) %}
+      {% assign main_text = main_text | append: words[i] | append: " " %}
+    {% endfor %}
+    
+    <div class="social-proof-box-proof">
+      {% if section.settings.avatar_count > 0 %}
+      <div class="user-avatars-proof">
+        {% if section.settings.avatar_count >= 1 and section.settings.avatar_image_1 != blank %}
+        <img src="{{ section.settings.avatar_image_1 | img_url: 'master' }}" alt="User 1" class="avatar-proof avatar-1">
+        {% endif %}
+        {% if section.settings.avatar_count >= 2 and section.settings.avatar_image_2 != blank %}
+        <img src="{{ section.settings.avatar_image_2 | img_url: 'master' }}" alt="User 2" class="avatar-proof avatar-2">
+        {% endif %}
+        {% if section.settings.avatar_count >= 3 and section.settings.avatar_image_3 != blank %}
+        <img src="{{ section.settings.avatar_image_3 | img_url: 'master' }}" alt="User 3" class="avatar-proof avatar-3">
+        {% endif %}
+      </div>
+      {% endif %}
+      <div class="user-text-proof">
+        <span class="names-container">
+          <strong class="user-names">{{ user_display_names }}</strong>
+          <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
+        </span>
+        <span class="user-count-text">
+          {{ main_text }}
+          <span class="line-break-desktop"></span>
+          {{ last_two_words }}
+        </span>
+      </div>
+    </div>
+  {% else %}
+    <div class="social-proof-box-proof">
+      {% if section.settings.avatar_count > 0 %}
+      <div class="user-avatars-proof">
+        {% if section.settings.avatar_count >= 1 and section.settings.avatar_image_1 != blank %}
+        <img src="{{ section.settings.avatar_image_1 | img_url: 'master' }}" alt="User 1" class="avatar-proof avatar-1">
+        {% endif %}
+        {% if section.settings.avatar_count >= 2 and section.settings.avatar_image_2 != blank %}
+        <img src="{{ section.settings.avatar_image_2 | img_url: 'master' }}" alt="User 2" class="avatar-proof avatar-2">
+        {% endif %}
+        {% if section.settings.avatar_count >= 3 and section.settings.avatar_image_3 != blank %}
+        <img src="{{ section.settings.avatar_image_3 | img_url: 'master' }}" alt="User 3" class="avatar-proof avatar-3">
+        {% endif %}
+      </div>
+      {% endif %}
+      <div class="user-text-proof">
+        <span class="names-container">
+          <strong class="user-names">{{ user_display_names }}</strong>
+          <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
+        </span>
+        <span class="user-count-text">{{ formatted_text }}</span>
+      </div>
+    </div>
+  {% endif %}
+{% else %}
+  <div class="social-proof-box-proof">
+    {% if section.settings.avatar_count > 0 %}
+    <div class="user-avatars-proof">
+      {% if section.settings.avatar_count >= 1 and section.settings.avatar_image_1 != blank %}
+      <img src="{{ section.settings.avatar_image_1 | img_url: 'master' }}" alt="User 1" class="avatar-proof avatar-1">
+      {% endif %}
+      {% if section.settings.avatar_count >= 2 and section.settings.avatar_image_2 != blank %}
+      <img src="{{ section.settings.avatar_image_2 | img_url: 'master' }}" alt="User 2" class="avatar-proof avatar-2">
+      {% endif %}
+      {% if section.settings.avatar_count >= 3 and section.settings.avatar_image_3 != blank %}
+      <img src="{{ section.settings.avatar_image_3 | img_url: 'master' }}" alt="User 3" class="avatar-proof avatar-3">
+      {% endif %}
+    </div>
+    {% endif %}
+    <div class="user-text-proof">
+      <span class="names-container">
+        <strong class="user-names">{{ user_display_names }}</strong>
+        <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
+      </span>
+      <span class="user-count-text">{{ formatted_text }}</span>
+    </div>
+  </div>
+{% endif %}
+
+<style>
+  .social-proof-box-proof {
+    display: flex;
+    align-items: center;
+    background: {{ section.settings.background_color }};
+    padding: {{ section.settings.padding }};
+    border-radius: {{ section.settings.border_radius }}px;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 12px;
+    color: {{ section.settings.text_color }};
+    font-weight: 500;
+  }
+  
+  /* Font size responsive settings */
+  @media (min-width: 768px) {
+    .social-proof-box-proof {
+      font-size: {{ section.settings.font_size_desktop }}px;
+    }
+  }
+  
+  @media (max-width: 767px) {
+    .social-proof-box-proof {
+      font-size: {{ section.settings.font_size_mobile }}px;
+    }
+  }
+  .user-avatars-proof {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .avatar-proof {
+    width: {{ section.settings.avatar_size }}px;
+    height: {{ section.settings.avatar_size }}px;
+    border-radius: 50%;
+    border: 2px solid {{ section.settings.avatar_border_color }};
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .avatar-1 {
+    z-index: 3;
+    margin-right: {% if section.settings.avatar_count > 1 %}-8px{% else %}0{% endif %};
+  }
+  .avatar-2 {
+    z-index: 2;
+    margin-right: {% if section.settings.avatar_count >= 3 %}-8px{% else %}0{% endif %};
+  }
+  .avatar-3 {
+    z-index: 1;
+  }
+  .user-text-proof {
+    margin-left: {% if section.settings.avatar_count > 0 %}12px{% else %}0{% endif %};
+    line-height: 1.3;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+  }
+  .names-container {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 4px;
+  }
+  .user-names {
+    font-weight: 600;
+  }
+  .user-count-text {
+    font-weight: 400;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .user-count-text strong {
+    font-weight: 600;
+    margin: 0 2px;
+    padding: 0 1px;
+  }
+  .verified-badge-proof {
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
+    position: relative;
+    top: -1px;
+    flex-shrink: 0;
+  }
+  @media (min-width: 1300px) {
+    {% if section.settings.show_break_on_large %}
+    .line-break-desktop {
+      display: block !important;
+      content: '';
+      height: 4px;
+      width: 100%;
+    }
+    {% else %}
+    .line-break-desktop {
+      display: inline !important;
+      content: '';
+      height: 0;
+      width: 0;
+    }
+    {% endif %}
+  }
+</style>`;
+
+  // Section Code - for traditional copy-paste in Shopify admin
+  const sectionCode = `{% comment %}
   Social Proof Box (BrandUp Builder)
 {% endcomment %}
 
@@ -1209,42 +1462,29 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
         {% comment %}For line breaks, split the last two words to next line{% endcomment %}
         {% assign html_stripped = processed_text | strip_html %}
         {% assign words = html_stripped | split: ' ' %}
-        {% assign filtered_words = words | where_exp: "word", "word != ''" %}
-        {% assign word_count = filtered_words | size %}
+        {% assign word_count = words.size %}
         
         {% if word_count > 2 %}
           {% comment %}Get all but the last two words{% endcomment %}
-          {% assign main_text = '' %}
-          {% for i in (0..word_count | minus: 3) %}
-            {% assign main_text = main_text | append: filtered_words[i] | append: ' ' %}
+          {% assign main_text = "" %}
+          {% assign last_index = word_count | minus: 3 %}
+          {% for i in (0..last_index) %}
+            {% assign main_text = main_text | append: words[i] | append: " " %}
           {% endfor %}
           
           {% comment %}Get last two words{% endcomment %}
-          {% assign last_words = filtered_words[word_count | minus: 2] | append: ' ' | append: filtered_words[word_count | minus: 1] %}
+          {% assign last_two = words[word_count | minus: 2] | append: " " | append: words[word_count | minus: 1] %}
           
-          {% comment %}Find the last two words in the original text{% endcomment %}
-          {% assign last_words_index = processed_text | split: last_words | first | size %}
-          {% assign first_part = processed_text | slice: 0, last_words_index %}
-          {% assign last_part = processed_text | slice: last_words_index, processed_text.size %}
-          
-          {{ first_part }}
+          {{ main_text }}
           <span class="line-break-desktop"></span>
-          {{ last_part }}
+          {{ last_two }}
         {% else %}
           {% comment %}Not enough words to split{% endcomment %}
-          {% if processed_text contains section.settings.brand_name %}
-            {{ processed_text | replace: section.settings.brand_name, '<span class="brand-name">' | append: section.settings.brand_name | append: '</span>' }}
-          {% else %}
-            {{ processed_text }}
-          {% endif %}
+          {{ processed_text }}
         {% endif %}
       {% else %}
         {% comment %}Regular display without line break{% endcomment %}
-        {% if processed_text contains section.settings.brand_name %}
-          {{ processed_text | replace: section.settings.brand_name, '<span class="brand-name">' | append: section.settings.brand_name | append: '</span>' }}
-        {% else %}
-          {{ processed_text }}
-        {% endif %}
+        {{ processed_text }}
       {% endif %}
     </span>
   </div>
@@ -1537,6 +1777,14 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   ]
 }
 {% endschema %}`
+
+  // Select the code to display based on selected type
+  const code = (
+    <>
+      <CodeSwitcher />
+      {codeOutputType === 'liquid-block' ? liquidBlockCode : sectionCode}
+    </>
+  )
 
   return { settings, preview, code }
 }
