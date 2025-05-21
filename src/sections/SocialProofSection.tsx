@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import ImageManager from '@/components/ImageManager'
-import DevicePreview from '@/components/DevicePreview'
 
 interface SocialProofSectionProps {
   initialData?: {
@@ -628,7 +627,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 <ImageManager
                   onSelect={setAvatarImage1}
                   currentImage={avatarImage1}
-                  buttonText="Bild wählen"
                 />
               </div>
             </label>
@@ -659,7 +657,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 <ImageManager
                   onSelect={setAvatarImage2}
                   currentImage={avatarImage2}
-                  buttonText="Bild wählen"
                 />
               </div>
             </label>
@@ -690,7 +687,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 <ImageManager
                   onSelect={setAvatarImage3}
                   currentImage={avatarImage3}
-                  buttonText="Bild wählen"
                 />
               </div>
             </label>
@@ -720,7 +716,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               <ImageManager
                 onSelect={setVerifiedImage}
                 currentImage={verifiedImage}
-                buttonText="Bild wählen"
               />
             </div>
           </label>
@@ -984,38 +979,37 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   )
 
   const preview = (
-    <div className="min-h-full flex items-center justify-center p-4">
-      <div className="w-full">
-        {/* Add device toggle buttons */}
-        <div className="flex justify-center mb-4">
-          <div className="inline-flex rounded-md shadow-sm" role="group">
-            <button
-              type="button"
-              onClick={() => setPreviewDevice('desktop')}
-              className={`px-4 py-2 text-xs font-medium rounded-l-lg ${
-                previewDevice === 'desktop' 
-                  ? 'bg-[#1c2838] text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Desktop ({fontSizeDesktop})
-            </button>
-            <button
-              type="button"
-              onClick={() => setPreviewDevice('mobile')}
-              className={`px-4 py-2 text-xs font-medium rounded-r-lg ${
-                previewDevice === 'mobile' 
-                  ? 'bg-[#1c2838] text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Mobile ({fontSizeMobile})
-            </button>
-          </div>
+    <div className="min-h-full flex flex-col items-center justify-center p-4">
+      {/* Device toggle buttons */}
+      <div className="flex justify-center mb-4">
+        <div className="inline-flex rounded-md shadow-sm" role="group">
+          <button
+            type="button"
+            onClick={() => setPreviewDevice('desktop')}
+            className={`px-4 py-2 text-xs font-medium rounded-l-lg ${
+              previewDevice === 'desktop' 
+                ? 'bg-[#1c2838] text-white' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Desktop ({fontSizeDesktop})
+          </button>
+          <button
+            type="button"
+            onClick={() => setPreviewDevice('mobile')}
+            className={`px-4 py-2 text-xs font-medium rounded-r-lg ${
+              previewDevice === 'mobile' 
+                ? 'bg-[#1c2838] text-white' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Mobile ({fontSizeMobile})
+          </button>
         </div>
-        
-        <DevicePreview onDeviceChange={setPreviewDevice}>
-          <div className="min-h-full flex items-center justify-center p-4">
+      </div>
+      
+      {/* Preview container with conditional width based on device */}
+      <div className={`flex items-center justify-center ${previewDevice === 'mobile' ? 'max-w-[375px]' : 'w-full'}`}>
             <div 
               className="social-proof-box-proof" 
               style={{
@@ -1197,7 +1191,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           </div>
         </div>
           </div>
-        </DevicePreview>
+        </div>
       </div>
     </div>
   )
