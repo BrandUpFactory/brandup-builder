@@ -81,7 +81,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   const [firstName3, setFirstName3] = useState(safeInitialData.firstName3 || 'Maria')
   const [userCount, setUserCount] = useState(safeInitialData.userCount || '12.752')
   const [brandName, setBrandName] = useState(safeInitialData.brandName || 'Regenliebe')
-  const [customText, setCustomText] = useState(safeInitialData.customText || ' und (Zahl) andere sind begeistert von (Marke)')
+  const [customText, setCustomText] = useState(safeInitialData.customText || 'und 12.752 andere sind begeistert von Regenliebe')
   const [avatarImage1, setAvatarImage1] = useState(safeInitialData.avatarImage1 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619')
   const [avatarImage2, setAvatarImage2] = useState(safeInitialData.avatarImage2 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098')
   const [avatarImage3, setAvatarImage3] = useState(safeInitialData.avatarImage3 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-1.jpg?v=1738073619')
@@ -212,27 +212,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     }
   };
   
-  // Format the custom text with variables
+  // Format the custom text for the preview
   const getFormattedText = () => {
-    // First process HTML tags - keep the existing HTML formatting
-    let processedText = customText;
-    
-    // Replace (Zahl) with userCount in bold
-    processedText = processedText.replace(/\(Zahl\)/g, `<strong>${userCount}</strong>`);
-    
-    // Replace (Marke) with brandName - add font-weight for brand name bold
-    processedText = processedText.replace(/\(Marke\)/g, `<span style="padding:0 2px; font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
-    
-    // Support older format for backward compatibility
-    processedText = processedText.replace(/\{userCount\}/g, `<strong>${userCount}</strong>`);
-    processedText = processedText.replace(/\{brandName\}/g, `<span style="padding:0 2px; font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
-    
-    // Add spaces between elements for better readability if needed
-    processedText = processedText.replace(/(<\/strong>)([^\s<])/g, '$1 $2');
-    processedText = processedText.replace(/(<\/span>)([^\s<])/g, '$1 $2');
-    processedText = processedText.replace(/([^\s>])(<strong>|<span)/g, '$1 $2');
-    
-    return processedText;
+    return customText;
   };
   
   // Function to get the last two words for line breaking
@@ -301,20 +283,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   
   // Format the text for Shopify Liquid (used in code export)
   const getLiquidFormattedText = () => {
-    // Process text in the same way as the other functions for consistency
-    let processedText = customText;
-    
-    // Replace new format placeholders
-    processedText = processedText
-      .replace(/\(Zahl\)/g, "{{ section.settings.user_count }}")
-      .replace(/\(Marke\)/g, "{{ section.settings.brand_name }}");
-      
-    // Support older format for backward compatibility
-    processedText = processedText
-      .replace(/\{userCount\}/g, "{{ section.settings.user_count }}")
-      .replace(/\{brandName\}/g, "{{ section.settings.brand_name }}");
-    
-    return processedText;
+    return customText;
   };
   
   // Different code output types
@@ -441,132 +410,27 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           
           <div className="grid grid-cols-1 gap-3">
             <label className="block text-sm text-[#1c2838]">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <span>Text:</span>
-                  <HelpTooltip text="Wähle Text aus und nutze die Buttons unten für die Formatierung." />
-                </div>
-                <div className="flex items-center">
-                  <span className="text-xs text-gray-500">Verwende <strong>(Zahl)</strong> und <strong>(Marke)</strong> im Text für Formatierung</span>
-                </div>
+              <div className="flex items-center">
+                <span>Text:</span>
               </div>
               
-              {/* Enhanced text editor with preview */}
-              <div className="mt-1 space-y-2">
-                {/* Text editor */}
-                <div className="relative">
-                  <textarea
-                    id="text-editor"
-                    value={customText}
-                    onChange={(e) => {
-                      setCustomText(e.target.value);
-                      // Force refresh for immediate preview update
-                      onDataChange && onDataChange({
-                        ...sectionData,
-                        customText: e.target.value
-                      });
-                    }}
-                    className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                    placeholder="Steffi, Daniela und (Zahl) andere sind begeistert von (Marke)"
-                    rows={3}
-                  />
-                </div>
-                
-                {/* Live preview of formatted text */}
-                <div className="border border-dashed border-gray-300 rounded-md px-3 py-2 bg-gray-50">
-                  <div className="text-xs text-gray-500 mb-1 font-medium">Vorschau der Formatierung:</div>
-                  <div 
-                    className="text-sm"
-                    dangerouslySetInnerHTML={{
-                      __html: getFormattedText() // Using the same function that formats for the main preview
-                    }}
-                  ></div>
-                </div>
-                
-                {/* Formatting toolbar */}
-                <div className="flex justify-start">
-                  <div className="flex items-center space-x-1 bg-gray-100 p-1 rounded-md">
-                    {/* Bold button */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        applyFormatting('bold');
-                      }}
-                      className="hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold transition"
-                      title="Fett"
-                    >
-                      <strong>B</strong>
-                    </button>
-                    
-                    {/* Italic button */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        applyFormatting('italic');
-                      }}
-                      className="hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold transition"
-                      title="Kursiv"
-                    >
-                      <em>I</em>
-                    </button>
-                    
-                    {/* Underline button */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        applyFormatting('underline');
-                      }}
-                      className="hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold transition"
-                      title="Unterstrichen"
-                    >
-                      <u>U</u>
-                    </button>
-                    
-                    {/* Add (Zahl) placeholder button */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        insertPlaceholder('(Zahl)');
-                      }}
-                      className="hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold transition ml-2"
-                      title="Anzahl einfügen"
-                    >
-                      (Zahl)
-                    </button>
-                    
-                    {/* Add (Marke) placeholder button */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        insertPlaceholder('(Marke)');
-                      }}
-                      className="hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold transition"
-                      title="Markenname einfügen"
-                    >
-                      (Marke)
-                    </button>
-                    
-                    {/* Clear all formatting button */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        clearFormatting();
-                      }}
-                      className="hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded transition ml-4"
-                      title="Formatierung entfernen"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828l6.879-6.879zm2.121.707a1 1 0 0 0-1.414 0L4.16 7.547l5.293 5.293 4.633-4.633a1 1 0 0 0 0-1.414l-3.879-3.879zM8.746 13.547 3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293l.16-.16z"/>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
+              {/* Simplified text editor */}
+              <div className="mt-1">
+                <textarea
+                  id="text-editor"
+                  value={customText}
+                  onChange={(e) => {
+                    setCustomText(e.target.value);
+                    // Force refresh for immediate preview update
+                    onDataChange && onDataChange({
+                      ...sectionData,
+                      customText: e.target.value
+                    });
+                  }}
+                  className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+                  placeholder="und 12.752 andere sind begeistert von Regenliebe"
+                  rows={3}
+                />
               </div>
             </label>
           </div>
@@ -953,132 +817,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     </div>
   )
 
-  // Text editor formatting functions
-  const applyFormatting = (type: 'bold' | 'italic' | 'underline') => {
-    try {
-      // Get the textarea
-      const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
-      if (!textarea) return;
-      
-      // Get selection
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      
-      if (start === end) {
-        alert('Bitte wähle zuerst Text aus, der formatiert werden soll.');
-        return; // No selection
-      }
-      
-      // Get the selected text
-      const selectedText = customText.substring(start, end);
-      
-      // Determine the tags to use
-      let openTag = '';
-      let closeTag = '';
-      
-      switch (type) {
-        case 'bold':
-          openTag = '<strong>';
-          closeTag = '</strong>';
-          break;
-        case 'italic':
-          openTag = '<em>';
-          closeTag = '</em>';
-          break;
-        case 'underline':
-          openTag = '<u>';
-          closeTag = '</u>';
-          break;
-      }
-      
-      // Replace selection with styled version
-      const newText = 
-        customText.substring(0, start) + 
-        `${openTag}${selectedText}${closeTag}` + 
-        customText.substring(end);
-      
-      // Update state
-      setCustomText(newText);
-      
-      // Set cursor position after the formatted text
-      setTimeout(() => {
-        textarea.focus();
-        textarea.selectionStart = start + (openTag + selectedText + closeTag).length;
-        textarea.selectionEnd = start + (openTag + selectedText + closeTag).length;
-      }, 10);
-      
-      // Force full refresh to update the preview
-      onDataChange && onDataChange({
-        ...sectionData,
-        customText: newText
-      });
-    } catch (err) {
-      console.error(`Error applying ${type} formatting:`, err);
-    }
-  };
-  
-  // Insert placeholder at cursor position or replace selection
-  const insertPlaceholder = (placeholder: string) => {
-    try {
-      // Get the textarea
-      const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
-      if (!textarea) return;
-      
-      // Get cursor position or selection
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      
-      // Add placeholder at cursor position or replace selection
-      const newText = 
-        customText.substring(0, start) + 
-        placeholder + 
-        customText.substring(end);
-      
-      // Update state
-      setCustomText(newText);
-      
-      // Set cursor position after the inserted placeholder
-      setTimeout(() => {
-        textarea.focus();
-        const newCursorPos = start + placeholder.length;
-        textarea.selectionStart = newCursorPos;
-        textarea.selectionEnd = newCursorPos;
-      }, 10);
-      
-      // Force full refresh to update the preview
-      onDataChange && onDataChange({
-        ...sectionData,
-        customText: newText
-      });
-    } catch (err) {
-      console.error('Error inserting placeholder:', err);
-    }
-  };
-  
-  // Clear all HTML formatting from text
-  const clearFormatting = () => {
-    try {
-      // Remove all HTML tags but keep content
-      const cleanText = customText.replace(/<\/?[^>]+(>|$)/g, '');
-      
-      // Update state
-      setCustomText(cleanText);
-      
-      // Force full refresh to update the preview
-      onDataChange && onDataChange({
-        ...sectionData,
-        customText: cleanText
-      });
-      
-      // Refocus the textarea
-      setTimeout(() => {
-        const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
-        if (textarea) textarea.focus();
-      }, 10);
-    } catch (err) {
-      console.error('Error clearing formatting:', err);
-    }
-  };
+  // Remove all formatting functions since we're not using them anymore
   
   // Update preview on device change
   const handleDeviceChange = (device: 'desktop' | 'tablet' | 'mobile') => {
@@ -1321,13 +1060,11 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
 {% elsif section.settings.avatar_count == 3 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank and section.settings.first_name_3 != blank %}
   {% assign user_display_names = section.settings.first_name_1 | append: ", " | append: section.settings.first_name_2 | append: ", " | append: section.settings.first_name_3 %}
 {% else %}
-  {% assign user_display_names = "Steffi, Daniela" %} {% comment %}Default names instead of just "Nutzer"{% endcomment %}
+  {% assign user_display_names = "Steffi, Daniela" %}
 {% endif %}
 
-{% comment %}Process placeholders and HTML tags{% endcomment %}
-{% assign formatted_text = section.settings.custom_text %}
-{% assign formatted_text = formatted_text | replace: '(Zahl)', section.settings.user_count | replace: '(Marke)', section.settings.brand_name %}
-{% assign formatted_text = formatted_text | replace: '{userCount}', section.settings.user_count | replace: '{brandName}', section.settings.brand_name %}
+{% comment %}Get full text content to display{% endcomment %}
+{% assign formatted_text = user_display_names | append: " " | append: section.settings.custom_text %}
 
 {% comment %}For line breaks, extract last two words if needed{% endcomment %}
 {% if section.settings.show_break_on_large %}
@@ -1335,23 +1072,12 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   {% assign word_count = words.size %}
   
   {% if word_count > 2 %}
-    {% assign last_index = word_count | minus: 1 %}
-    {% assign prev_index = word_count | minus: 2 %}
-    
-    {% assign last_word = "" %}
-    {% assign second_last_word = "" %}
-    
-    {% for index in (0..last_index) %}
-      {% if index == last_index %}
-        {% assign last_word = words[index] %}
-      {% endif %}
-      {% if index == prev_index %}
-        {% assign second_last_word = words[index] %}
-      {% endif %}
-    {% endfor %}
-    
+    {% comment %}Extract last two words safely{% endcomment %}
+    {% assign last_word = words[word_count | minus: 1] %}
+    {% assign second_last_word = words[word_count | minus: 2] %}
     {% assign last_two_words = second_last_word | append: " " | append: last_word %}
     
+    {% comment %}Get all but the last two words{% endcomment %}
     {% assign main_text = "" %}
     {% assign max_index = word_count | minus: 3 %}
     
@@ -1573,13 +1299,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
     </span>
     <span class="user-count-text">
-      {% comment %}Process placeholders and HTML tags{% endcomment %}
-      {% assign html_processed = section.settings.custom_text %}
-      {% assign processed_text = html_processed | 
-        replace: '(Zahl)', '<strong>' | append: section.settings.user_count | append: '</strong>' | 
-        replace: '(Marke)', '<span class="brand-name">' | append: section.settings.brand_name | append: '</span>' |
-        replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | 
-        replace: '{brandName}', '<span class="brand-name">' | append: section.settings.brand_name | append: '</span>' %}
+      {% comment %}Create full text content to display{% endcomment %}
+      {% assign processed_text = user_display_names | append: " " | append: section.settings.custom_text %}
       
       {% if section.settings.show_break_on_large %}
         {% comment %}For line breaks, split the last two words to next line{% endcomment %}
