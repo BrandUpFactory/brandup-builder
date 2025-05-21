@@ -330,7 +330,43 @@ export default function EditorLayout({
             <div className="bg-gray-50 rounded-lg flex shadow-sm">
               <button 
                 onClick={() => {
-                  navigator.clipboard.writeText(code?.toString() || '');
+                  // Extract text content from JSX elements if needed
+                  const getTextContent = (element: any): string => {
+                    if (!element) return '';
+                    
+                    // If it's a string or number, return it directly
+                    if (typeof element === 'string' || typeof element === 'number') {
+                      return element.toString();
+                    }
+                    
+                    // If it's a React element with props.children
+                    if (element.props && element.props.children) {
+                      // Handle arrays of children
+                      if (Array.isArray(element.props.children)) {
+                        return element.props.children.map(getTextContent).join('');
+                      }
+                      // Handle single child
+                      return getTextContent(element.props.children);
+                    }
+                    
+                    // If it's a DOM element with innerText or textContent
+                    if (element.innerText) return element.innerText;
+                    if (element.textContent) return element.textContent;
+                    
+                    // For pre-formatted code blocks with dangerouslySetInnerHTML
+                    if (element.props && element.props.dangerouslySetInnerHTML) {
+                      return element.props.dangerouslySetInnerHTML.__html || '';
+                    }
+                    
+                    // If nothing else worked, try to convert to string
+                    return element.toString();
+                  };
+                  
+                  // Try to get plain text content from the code JSX
+                  const textContent = getTextContent(code);
+                  
+                  // Copy to clipboard
+                  navigator.clipboard.writeText(textContent);
                   setCopySuccess(true);
                   setTimeout(() => setCopySuccess(false), 2000);
                 }}

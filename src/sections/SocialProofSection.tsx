@@ -153,40 +153,41 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     setUseSinglePadding(true);
   };
   
+  // Define sectionData object for reuse
+  const sectionData = {
+    firstName1,
+    firstName2,
+    firstName3,
+    userCount,
+    brandName,
+    backgroundColor,
+    avatarImage1,
+    avatarImage2,
+    avatarImage3,
+    verifiedImage,
+    avatarBorderColor,
+    textColor,
+    showBreakOnLarge,
+    avatarSize,
+    borderRadius,
+    padding: getEffectivePadding(),
+    paddingTop,
+    paddingRight,
+    paddingBottom,
+    paddingLeft,
+    avatarCount,
+    customText,
+    selectedStyle,
+    fontSizeDesktop,
+    fontSizeMobile,
+    brandNameBold
+  };
+
   // Update parent component when data changes
   useEffect(() => {
     if (onDataChange) {
-      const data = {
-        firstName1,
-        firstName2,
-        firstName3,
-        userCount,
-        brandName,
-        backgroundColor,
-        avatarImage1,
-        avatarImage2,
-        avatarImage3,
-        verifiedImage,
-        avatarBorderColor,
-        textColor,
-        showBreakOnLarge,
-        avatarSize,
-        borderRadius,
-        padding: getEffectivePadding(),
-        paddingTop,
-        paddingRight,
-        paddingBottom,
-        paddingLeft,
-        avatarCount,
-        customText,
-        selectedStyle,
-        fontSizeDesktop,
-        fontSizeMobile,
-        brandNameBold
-      };
-      
       // Always notify parent to handle the data
-      onDataChange(data);
+      onDataChange(sectionData);
     }
   }, [
     firstName1, firstName2, firstName3, userCount, brandName, customText,
@@ -496,11 +497,21 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                           `<strong>${selectedText}</strong>` + 
                           customText.substring(end);
                         
-                        // Update state - force preview to refresh
+                        // Update state
                         setCustomText(newText);
                         
-                        // Force update to the preview by setting the preview device again
-                        setPreviewDevice(previewDevice);
+                        // Set cursor position after the formatted text
+                        setTimeout(() => {
+                          textarea.focus();
+                          textarea.selectionStart = start + `<strong>${selectedText}</strong>`.length;
+                          textarea.selectionEnd = start + `<strong>${selectedText}</strong>`.length;
+                        }, 10);
+                        
+                        // Force full refresh to update the preview
+                        onDataChange && onDataChange({
+                          ...sectionData,
+                          customText: newText
+                        });
                       } catch (err) {
                         console.error('Error formatting text:', err);
                       }
@@ -534,11 +545,21 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                           `<em>${selectedText}</em>` + 
                           customText.substring(end);
                         
-                        // Update state - force preview to refresh
+                        // Update state
                         setCustomText(newText);
                         
-                        // Force update to the preview by setting the preview device again
-                        setPreviewDevice(previewDevice);
+                        // Set cursor position after the formatted text
+                        setTimeout(() => {
+                          textarea.focus();
+                          textarea.selectionStart = start + `<em>${selectedText}</em>`.length;
+                          textarea.selectionEnd = start + `<em>${selectedText}</em>`.length;
+                        }, 10);
+                        
+                        // Force full refresh to update the preview
+                        onDataChange && onDataChange({
+                          ...sectionData,
+                          customText: newText
+                        });
                       } catch (err) {
                         console.error('Error formatting text:', err);
                       }
@@ -572,11 +593,21 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                           `<u>${selectedText}</u>` + 
                           customText.substring(end);
                         
-                        // Update state - force preview to refresh
+                        // Update state
                         setCustomText(newText);
                         
-                        // Force update to the preview by setting the preview device again
-                        setPreviewDevice(previewDevice);
+                        // Set cursor position after the formatted text
+                        setTimeout(() => {
+                          textarea.focus();
+                          textarea.selectionStart = start + `<u>${selectedText}</u>`.length;
+                          textarea.selectionEnd = start + `<u>${selectedText}</u>`.length;
+                        }, 10);
+                        
+                        // Force full refresh to update the preview
+                        onDataChange && onDataChange({
+                          ...sectionData,
+                          customText: newText
+                        });
                       } catch (err) {
                         console.error('Error formatting text:', err);
                       }
@@ -1171,7 +1202,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     return (
       <div className="flex border-b mb-4 pb-2">
         <button 
-          onClick={() => setCodeOutputType('liquid-block')}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCodeOutputType('liquid-block'); }}
           className={`flex items-center px-3 py-1.5 text-xs rounded-l-md ${codeOutputType === 'liquid-block' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
         >
           <span>Liquid Block</span>
@@ -1185,7 +1216,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           </div>
         </button>
         <button 
-          onClick={() => setCodeOutputType('section')}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCodeOutputType('section'); }}
           className={`flex items-center px-3 py-1.5 text-xs rounded-r-md ${codeOutputType === 'section' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
         >
           <span>Sektion</span>
@@ -1224,16 +1255,31 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
 {% comment %}For line breaks, extract last two words if needed{% endcomment %}
 {% if section.settings.show_break_on_large %}
   {% assign words = formatted_text | split: ' ' %}
-  {% assign word_count = words | size %}
+  {% assign word_count = words.size %}
   
   {% if word_count > 2 %}
-    {% assign last_word = words[word_count | minus: 1] %}
-    {% assign second_last_word = words[word_count | minus: 2] %}
+    {% assign last_index = word_count | minus: 1 %}
+    {% assign prev_index = word_count | minus: 2 %}
+    
+    {% assign last_word = "" %}
+    {% assign second_last_word = "" %}
+    
+    {% for index in (0..last_index) %}
+      {% if index == last_index %}
+        {% assign last_word = words[index] %}
+      {% endif %}
+      {% if index == prev_index %}
+        {% assign second_last_word = words[index] %}
+      {% endif %}
+    {% endfor %}
+    
     {% assign last_two_words = second_last_word | append: " " | append: last_word %}
     
     {% assign main_text = "" %}
-    {% for i in (0..word_count | minus: 3) %}
-      {% assign main_text = main_text | append: words[i] | append: " " %}
+    {% assign max_index = word_count | minus: 3 %}
+    
+    {% for index in (0..max_index) %}
+      {% assign main_text = main_text | append: words[index] | append: " " %}
     {% endfor %}
     
     <div class="social-proof-box-proof">
@@ -1779,12 +1825,17 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
 {% endschema %}`
 
   // Select the code to display based on selected type
-  const code = (
+  const code = codeOutputType === 'liquid-block' ? liquidBlockCode : sectionCode;
+  
+  // Complete code display with the switcher
+  const codeDisplay = (
     <>
       <CodeSwitcher />
-      {codeOutputType === 'liquid-block' ? liquidBlockCode : sectionCode}
+      <pre className="whitespace-pre-wrap text-xs font-mono bg-gray-50 p-4 rounded-md overflow-x-auto">
+        {code}
+      </pre>
     </>
   )
 
-  return { settings, preview, code }
+  return { settings, preview, code: codeDisplay }
 }
