@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/utils/supabase/client'
+import { createClient, fixImagePath } from '@/utils/supabase/client'
 import { User } from '@supabase/supabase-js'
 import AccessCodeModal from '@/components/AccessCodeModal'
 
@@ -37,6 +37,18 @@ export default function TemplatesPage() {
 
   // Benutzer prüfen
   useEffect(() => {
+    // Add test image when component loads to check if public files are accessible
+    const testImg = new Image();
+    testImg.onload = () => console.log('Test image loaded successfully');
+    testImg.onerror = (e) => console.error('Test image failed to load:', e);
+    testImg.src = '/delivery_info_1.jpg'; // The specific image mentioned
+
+    // Another test with the logo
+    const logoImg = new Image();
+    logoImg.onload = () => console.log('Logo image loaded successfully');
+    logoImg.onerror = (e) => console.error('Logo image failed to load:', e);
+    logoImg.src = '/BrandUp_Elements_Logo_2000_800.png';
+    
     const fetchUser = async () => {
       const { data, error } = await supabase.auth.getUser()
       if (!error && data.user) {
@@ -131,6 +143,7 @@ export default function TemplatesPage() {
           className="px-4 py-2 border border-gray-300 rounded-full text-sm w-full sm:w-64 md:w-72 bg-[#f4f7fa] text-[#1c2838] focus:outline-none focus:ring-2 focus:ring-[#1c2838]"
         />
       </div>
+      
 
       {loading ? (
         <p className="text-sm text-gray-500">⏳ Lade Templates...</p>
@@ -148,13 +161,21 @@ export default function TemplatesPage() {
               <div className="relative bg-gray-50 aspect-square w-full overflow-hidden">
                 <div className="h-full w-full flex items-center justify-center">
                   <img
-                    src={template.image_url}
+                    src={template.image_url ? 
+                      (template.image_url.startsWith('\\') ? 
+                        '/' + template.image_url.substring(1) : 
+                        template.image_url) 
+                      : '/BrandUp_Elements_Logo_2000_800.png'}
                     alt={template.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/BrandUp_Elements_Logo_2000_800.png';
+                    }}
                   />
                 </div>
                 {!hasAccessToTemplate(template.id) && (
-                  <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none bg-black bg-opacity-20">
+                  <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none bg-black/20">
                     <img
                       src="/Schloss_Icon.png"
                       alt="Locked"

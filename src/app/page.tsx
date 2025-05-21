@@ -680,9 +680,17 @@ export default function Home() {
                 >
                   <div className="aspect-square bg-gray-100 relative overflow-hidden">
                     <img 
-                      src={template.image_url} 
+                      src={template.image_url ? 
+                        (template.image_url.startsWith('\\') ? 
+                          '/' + template.image_url.substring(1) : 
+                          template.image_url) 
+                        : '/BrandUp_Elements_Logo_2000_800.png'}
                       alt={template.name} 
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/BrandUp_Elements_Logo_2000_800.png';
+                      }}
                     />
                     
                     {/* Overlay with gradient */}

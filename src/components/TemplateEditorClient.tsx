@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { createClient } from '@/utils/supabase/client'
+import { createClient, fixImagePath } from '@/utils/supabase/client'
 import { hasAccessToTemplate } from '@/features/template'
 import EditorLayout from '@/components/EditorLayout'
 import HeroSection from '@/sections/HeroSection'
@@ -362,7 +362,7 @@ export default function TemplateEditorClient({
         color: "#f5f7fa",
         buttonText: "Jetzt entdecken",
         buttonLink: "#",
-        imageUrl: "/BG_Card_55.jpg",
+        imageUrl: fixImagePath(defaultData?.imageUrl || "/BG_Card_55.jpg"),
         alignment: "center",
         textColor: "#ffffff",
         padding: "80px",
@@ -540,7 +540,7 @@ export default function TemplateEditorClient({
               color: "#f5f7fa",
               buttonText: "Jetzt entdecken",
               buttonLink: "#",
-              imageUrl: "/BG_Card_55.jpg",
+              imageUrl: fixImagePath(newData.imageUrl),
               alignment: "center",
               textColor: "#ffffff",
               padding: "80px",
