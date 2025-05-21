@@ -110,13 +110,37 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   
   // Apply style template
   const applyStyleTemplate = (index: number) => {
-    const template = styleTemplates[index];
+    // Only update the style index without overriding user changes
+    // This ensures user customizations are preserved
     setSelectedStyle(index);
-    setBackgroundColor(template.backgroundColor);
-    setTextColor(index === 1 ? '#ffffff' : '#000000');
-    setAvatarBorderColor(template.avatarBorderColor);
-    setBorderRadius(template.borderRadius);
-    setPadding(template.padding);
+    
+    // Check if this is the initial application (from default) or a user just clicked a template
+    const isFirstTimeSelection = 
+      (backgroundColor === styleTemplates[0].backgroundColor && 
+       textColor === '#000000' && 
+       avatarBorderColor === styleTemplates[0].avatarBorderColor &&
+       borderRadius === styleTemplates[0].borderRadius &&
+       padding === styleTemplates[0].padding) ||
+      (backgroundColor === styleTemplates[1].backgroundColor && 
+       textColor === '#ffffff' && 
+       avatarBorderColor === styleTemplates[1].avatarBorderColor &&
+       borderRadius === styleTemplates[1].borderRadius &&
+       padding === styleTemplates[1].padding) ||
+      (backgroundColor === styleTemplates[2].backgroundColor && 
+       textColor === '#0c4a6e' && 
+       avatarBorderColor === styleTemplates[2].avatarBorderColor &&
+       borderRadius === styleTemplates[2].borderRadius &&
+       padding === styleTemplates[2].padding);
+    
+    // Only apply template styles if it's the first time or user hasn't made custom changes
+    if (isFirstTimeSelection) {
+      const template = styleTemplates[index];
+      setBackgroundColor(template.backgroundColor);
+      setTextColor(index === 1 ? '#ffffff' : index === 2 ? '#0c4a6e' : '#000000');
+      setAvatarBorderColor(template.avatarBorderColor);
+      setBorderRadius(template.borderRadius);
+      setPadding(template.padding);
+    }
   };
   
   // Update parent component when data changes
@@ -176,9 +200,20 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   
   // Format the custom text with variables
   const getFormattedText = () => {
+    // First, escape any curly braces by doubling them for the preview
+    let formattedText = customText
+      .replace(/\{userCount\}/g, `<strong>${userCount}</strong>`)
+      .replace(/\{brandName\}/g, brandName);
+    
+    return formattedText;
+  };
+  
+  // Format the text for Shopify Liquid (used in code export)
+  const getLiquidFormattedText = () => {
+    // For Liquid output, we need to use proper Liquid variable syntax
     return customText
-      .replace('{userCount}', `<strong>${userCount}</strong>`)
-      .replace('{brandName}', brandName);
+      .replace(/\{userCount\}/g, "{{ section.settings.user_count }}")
+      .replace(/\{brandName\}/g, "{{ section.settings.brand_name }}");
   };
 
   // Help tooltip component
@@ -208,7 +243,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               key={index}
               onClick={() => applyStyleTemplate(index)}
               className={`border rounded p-3 h-16 flex items-center justify-center text-xs transition
-                ${selectedStyle === index ? 'border-blue-500 shadow-sm bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}`}
+                ${selectedStyle === index ? 'border-[#1c2838] shadow-sm bg-[#1c2838]/5' : 'border-gray-200 hover:bg-gray-50'}`}
               style={{ 
                 backgroundColor: template.backgroundColor,
                 color: index === 1 ? '#fff' : '#000',
@@ -229,25 +264,25 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           <div className="flex gap-2 mt-1">
             <button
               onClick={() => setAvatarCount(1)}
-              className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 1 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'}`}
+              className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 1 ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
               1 Avatar
             </button>
             <button
               onClick={() => setAvatarCount(2)}
-              className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 2 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'}`}
+              className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 2 ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
               2 Avatare
             </button>
             <button
               onClick={() => setAvatarCount(3)}
-              className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 3 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'}`}
+              className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 3 ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
               3 Avatare
             </button>
             <button
               onClick={() => setAvatarCount(0)}
-              className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 0 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'}`}
+              className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 0 ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
               Keine
             </button>
@@ -267,7 +302,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 type="text"
                 value={firstName1}
                 onChange={(e) => setFirstName1(e.target.value)}
-                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm"
+                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                 disabled={avatarCount === 0}
               />
             </label>
@@ -278,7 +313,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 type="text"
                 value={firstName2}
                 onChange={(e) => setFirstName2(e.target.value)}
-                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm"
+                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                 disabled={avatarCount < 2}
               />
             </label>
@@ -292,7 +327,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   type="text"
                   value={firstName3}
                   onChange={(e) => setFirstName3(e.target.value)}
-                  className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm"
+                  className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                 />
               </label>
             </div>
@@ -305,7 +340,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 type="text"
                 value={userCount}
                 onChange={(e) => setUserCount(e.target.value)}
-                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm"
+                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
               />
             </label>
             
@@ -315,7 +350,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 type="text"
                 value={brandName}
                 onChange={(e) => setBrandName(e.target.value)}
-                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm"
+                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
               />
             </label>
           </div>
@@ -330,7 +365,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 type="text"
                 value={customText}
                 onChange={(e) => setCustomText(e.target.value)}
-                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm"
+                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                 placeholder=" und {userCount} andere sind begeistert von {brandName}"
               />
             </label>
@@ -360,7 +395,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                     type="text"
                     value={avatarImage1}
                     onChange={(e) => setAvatarImage1(e.target.value)}
-                    className="w-full border px-3 py-1.5 rounded-md text-sm"
+                    className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                     placeholder="URL des Avatarbildes 1"
                   />
                 </div>
@@ -391,7 +426,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                     type="text"
                     value={avatarImage2}
                     onChange={(e) => setAvatarImage2(e.target.value)}
-                    className="w-full border px-3 py-1.5 rounded-md text-sm"
+                    className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                     placeholder="URL des Avatarbildes 2"
                   />
                 </div>
@@ -422,7 +457,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                     type="text"
                     value={avatarImage3}
                     onChange={(e) => setAvatarImage3(e.target.value)}
-                    className="w-full border px-3 py-1.5 rounded-md text-sm"
+                    className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                     placeholder="URL des Avatarbildes 3"
                   />
                 </div>
@@ -452,7 +487,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   type="text"
                   value={verifiedImage}
                   onChange={(e) => setVerifiedImage(e.target.value)}
-                  className="w-full border px-3 py-1.5 rounded-md text-sm"
+                  className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                   placeholder="URL des Verifizierungsbadges"
                 />
               </div>
@@ -521,7 +556,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 step="2"
                 value={avatarSize.replace('px', '')}
                 onChange={(e) => setAvatarSize(`${e.target.value}px`)}
-                className="w-full"
+                className="w-full accent-[#1c2838]"
               />
               <span className="ml-2 text-xs text-gray-500 w-12">{avatarSize}</span>
             </div>
@@ -537,7 +572,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 step="1"
                 value={borderRadius.replace('px', '')}
                 onChange={(e) => setBorderRadius(`${e.target.value}px`)}
-                className="w-full"
+                className="w-full accent-[#1c2838]"
               />
               <span className="ml-2 text-xs text-gray-500 w-12">{borderRadius}</span>
             </div>
@@ -553,7 +588,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                     onChange={(e) => setShowBreakOnLarge(e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#1c2838]/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#1c2838]"></div>
                   <span className="ml-2 text-sm text-gray-600">Markenname umbrechen</span>
                 </label>
                 <HelpTooltip text="Bricht den Markennamen auf großen Bildschirmen in eine neue Zeile um." />
@@ -569,7 +604,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                     onChange={(e) => setSingleLine(e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#1c2838]/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#1c2838]"></div>
                   <span className="ml-2 text-sm text-gray-600">Einzeilig anzeigen</span>
                 </label>
                 <HelpTooltip text="Zeigt den gesamten Text in einer Zeile an, statt umzubrechen." />
@@ -586,13 +621,13 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
         <div className="flex gap-3 mb-3">
           <button
             onClick={() => setUseSinglePadding(true)}
-            className={`px-3 py-1.5 rounded text-xs flex-1 ${useSinglePadding ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'}`}
+            className={`px-3 py-1.5 rounded text-xs flex-1 ${useSinglePadding ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
           >
             Einfach
           </button>
           <button
             onClick={() => setUseSinglePadding(false)}
-            className={`px-3 py-1.5 rounded text-xs flex-1 ${!useSinglePadding ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'}`}
+            className={`px-3 py-1.5 rounded text-xs flex-1 ${!useSinglePadding ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
           >
             Individuell
           </button>
@@ -609,7 +644,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   const value = e.target.value;
                   setPadding(value);
                 }}
-                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm"
+                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                 placeholder="15"
               />
               <p className="text-xs text-gray-500 mt-1">Gib einen Wert ein (z.B. 15)</p>
@@ -617,54 +652,58 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           </div>
         ) : (
           <div className="space-y-2">
-            <div className="border rounded-lg p-4 bg-gray-50 relative">
+            <div className="border border-gray-300 rounded-lg p-4 bg-gray-50 relative hover:border-[#1c2838]/30 transition">
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-2/3 h-2/3 border-2 border-dashed border-gray-300 rounded flex items-center justify-center">
-                  <span className="text-xs text-gray-400">Inhalt</span>
+                <div className="w-2/3 h-2/3 border-2 border-dashed border-[#1c2838]/20 rounded flex items-center justify-center bg-white/80">
+                  <span className="text-xs text-[#1c2838]/70 font-medium">Inhalt</span>
                 </div>
               </div>
               
               {/* Top padding input */}
-              <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
+              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+                <div className="text-[10px] text-gray-500 mb-1">oben</div>
                 <input
                   type="text"
                   value={paddingTop}
                   onChange={(e) => setPaddingTop(e.target.value)}
-                  className="w-12 h-6 text-xs border text-center rounded"
+                  className="w-12 h-6 text-xs border border-gray-300 text-center rounded focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                 />
               </div>
               
               {/* Right padding input */}
-              <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center">
+                <div className="text-[10px] text-gray-500 mr-1">rechts</div>
                 <input
                   type="text"
                   value={paddingRight}
                   onChange={(e) => setPaddingRight(e.target.value)}
-                  className="w-12 h-6 text-xs border text-center rounded"
+                  className="w-12 h-6 text-xs border border-gray-300 text-center rounded focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                 />
               </div>
               
               {/* Bottom padding input */}
-              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
                 <input
                   type="text"
                   value={paddingBottom}
                   onChange={(e) => setPaddingBottom(e.target.value)}
-                  className="w-12 h-6 text-xs border text-center rounded"
+                  className="w-12 h-6 text-xs border border-gray-300 text-center rounded focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                 />
+                <div className="text-[10px] text-gray-500 mt-1">unten</div>
               </div>
               
               {/* Left padding input */}
-              <div className="absolute left-2 top-1/2 transform -translate-y-1/2">
+              <div className="absolute left-2 top-1/2 transform -translate-y-1/2 flex items-center">
                 <input
                   type="text"
                   value={paddingLeft}
                   onChange={(e) => setPaddingLeft(e.target.value)}
-                  className="w-12 h-6 text-xs border text-center rounded"
+                  className="w-12 h-6 text-xs border border-gray-300 text-center rounded focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                 />
+                <div className="text-[10px] text-gray-500 ml-1">links</div>
               </div>
               
-              <div className="h-32"></div>
+              <div className="h-40"></div>
             </div>
             <p className="text-xs text-gray-500">Gib für jede Seite den gewünschten Abstand ein.</p>
           </div>
@@ -788,10 +827,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               alignItems: 'center'
             }}
             dangerouslySetInnerHTML={{ 
-              __html: getFormattedText() + 
-                (showBreakOnLarge ? 
-                  `<span class="break-on-large" style="display: ${showBreakOnLarge ? 'block' : 'inline'}; font-weight: 500;"></span>` 
-                  : '')
+              __html: showBreakOnLarge ? 
+                getFormattedText().replace(brandName, `<span class="brand-name" style="display: inline;"><span class="line-break-desktop" style="display: inline-block;"></span>${brandName}</span>`) :
+                getFormattedText()
             }}
           />
         </div>
@@ -832,7 +870,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       </strong>
       <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
     </div>
-    <span class="user-count-text">{{ section.settings.custom_text | replace: '{userCount}', section.settings.user_count | replace: '{brandName}', section.settings.brand_name }}</span>
+    <span class="user-count-text">{{ section.settings.custom_text | replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | replace: '{brandName}', section.settings.brand_name }}</span>
   </div>
 </div>
 
@@ -911,9 +949,14 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     flex-shrink: 0;
   }
   @media (min-width: 1300px) {
-    .break-on-large {
-      display: ${showBreakOnLarge ? 'block' : 'inline'};
-      font-weight: 500;
+    .line-break-desktop {
+      display: ${showBreakOnLarge ? 'block !important' : 'inline-block !important'};
+      content: '';
+      height: 0;
+      width: 0;
+    }
+    .brand-name {
+      font-weight: 600;
     }
   }
 </style>
