@@ -4,10 +4,19 @@ import { useState } from 'react'
 
 interface DevicePreviewProps {
   children: React.ReactNode
+  onDeviceChange?: (device: 'desktop' | 'tablet' | 'mobile') => void
 }
 
-export default function DevicePreview({ children }: DevicePreviewProps) {
+export default function DevicePreview({ children, onDeviceChange }: DevicePreviewProps) {
   const [device, setDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
+  
+  // Update device state and call parent callback if provided
+  const handleDeviceChange = (newDevice: 'desktop' | 'tablet' | 'mobile') => {
+    setDevice(newDevice)
+    if (onDeviceChange) {
+      onDeviceChange(newDevice)
+    }
+  }
   // Dark mode removed as per requirements
 
   // Device dimensions mapping
@@ -41,7 +50,7 @@ export default function DevicePreview({ children }: DevicePreviewProps) {
       <div className="flex justify-between items-center p-2 bg-gray-100 rounded-t border-b mb-2">
         <div className="flex space-x-1">
           <button
-            onClick={() => setDevice('mobile')}
+            onClick={() => handleDeviceChange('mobile')}
             className={`p-1.5 rounded ${device === 'mobile' ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-200'}`}
             title="Mobile Ansicht"
           >
@@ -50,7 +59,7 @@ export default function DevicePreview({ children }: DevicePreviewProps) {
             </svg>
           </button>
           <button
-            onClick={() => setDevice('tablet')}
+            onClick={() => handleDeviceChange('tablet')}
             className={`p-1.5 rounded ${device === 'tablet' ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-200'}`}
             title="Tablet Ansicht"
           >
@@ -59,7 +68,7 @@ export default function DevicePreview({ children }: DevicePreviewProps) {
             </svg>
           </button>
           <button
-            onClick={() => setDevice('desktop')}
+            onClick={() => handleDeviceChange('desktop')}
             className={`p-1.5 rounded ${device === 'desktop' ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-200'}`}
             title="Desktop Ansicht"
           >

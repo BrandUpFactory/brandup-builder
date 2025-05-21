@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import ImageManager from '@/components/ImageManager'
+import DevicePreview from '@/components/DevicePreview'
 
 interface SocialProofSectionProps {
   initialData?: {
@@ -28,7 +29,9 @@ interface SocialProofSectionProps {
     avatarCount?: number;
     customText?: string;
     selectedStyle?: number;
-    singleLine?: boolean;
+    fontSizeDesktop?: string;
+    fontSizeMobile?: string;
+    brandNameBold?: boolean;
   };
   onDataChange?: (data: any) => void;
 }
@@ -91,7 +94,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   const [avatarBorderColor, setAvatarBorderColor] = useState(safeInitialData.avatarBorderColor || styleTemplates[0].avatarBorderColor)
   const [textColor, setTextColor] = useState(safeInitialData.textColor || '#000000')
   const [showBreakOnLarge, setShowBreakOnLarge] = useState(safeInitialData.showBreakOnLarge !== undefined ? safeInitialData.showBreakOnLarge : true)
-  const [singleLine, setSingleLine] = useState(safeInitialData.singleLine !== undefined ? safeInitialData.singleLine : false)
   const [avatarSize, setAvatarSize] = useState(safeInitialData.avatarSize || '32px')
   const [borderRadius, setBorderRadius] = useState(safeInitialData.borderRadius || styleTemplates[0].borderRadius)
   const [fontSizeDesktop, setFontSizeDesktop] = useState(safeInitialData.fontSizeDesktop || '14px')
@@ -106,6 +108,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   const [paddingBottom, setPaddingBottom] = useState(safeInitialData.paddingBottom || '15')
   const [paddingLeft, setPaddingLeft] = useState(safeInitialData.paddingLeft || '15')
   
+  // Preview device state - to handle responsive font sizing
+  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
+  
   // Helper function to get effective padding
   const getEffectivePadding = () => {
     if (useSinglePadding) {
@@ -114,6 +119,11 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     } else {
       return `${paddingTop}px ${paddingRight}px ${paddingBottom}px ${paddingLeft}px`;
     }
+  };
+  
+  // Helper function to get current font size based on selected device
+  const getCurrentFontSize = () => {
+    return previewDevice === 'mobile' ? fontSizeMobile : fontSizeDesktop;
   };
   
   // Apply style template
@@ -173,8 +183,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
         selectedStyle,
         fontSizeDesktop,
         fontSizeMobile,
-        brandNameBold,
-        singleLine
+        brandNameBold
       };
       
       // Always notify parent to handle the data
@@ -183,7 +192,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   }, [
     firstName1, firstName2, firstName3, userCount, brandName, customText,
     backgroundColor, avatarImage1, avatarImage2, avatarImage3, verifiedImage,
-    avatarBorderColor, textColor, showBreakOnLarge, singleLine,
+    avatarBorderColor, textColor, showBreakOnLarge,
     avatarSize, borderRadius, padding, paddingTop, paddingRight,
     paddingBottom, paddingLeft, avatarCount, selectedStyle, 
     fontSizeDesktop, fontSizeMobile, brandNameBold, onDataChange
@@ -387,29 +396,31 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       <div className="border-b pb-4">
         <h3 className="text-sm font-semibold mb-3 text-[#1c2838]">Benutzerinformationen</h3>
         <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <label className="block text-sm text-[#1c2838]">
-              Name 1:
-              <input
-                type="text"
-                value={firstName1}
-                onChange={(e) => setFirstName1(e.target.value)}
-                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                disabled={avatarCount === 0}
-              />
-            </label>
-            
-            <label className="block text-sm text-[#1c2838]">
-              Name 2:
-              <input
-                type="text"
-                value={firstName2}
-                onChange={(e) => setFirstName2(e.target.value)}
-                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                disabled={avatarCount < 2}
-              />
-            </label>
-          </div>
+          {avatarCount > 0 && (
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block text-sm text-[#1c2838]">
+                Name 1:
+                <input
+                  type="text"
+                  value={firstName1}
+                  onChange={(e) => setFirstName1(e.target.value)}
+                  className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+                />
+              </label>
+              
+              {avatarCount >= 2 && (
+                <label className="block text-sm text-[#1c2838]">
+                  Name 2:
+                  <input
+                    type="text"
+                    value={firstName2}
+                    onChange={(e) => setFirstName2(e.target.value)}
+                    className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+                  />
+                </label>
+              )}
+            </div>
+          )}
           
           {avatarCount > 2 && (
             <div className="grid grid-cols-1 gap-3">
@@ -429,79 +440,81 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
             <label className="block text-sm text-[#1c2838]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <span>Text mit Formatierung</span>
+                  <span>Text:</span>
                   <HelpTooltip text="Wähle Text aus und nutze die Buttons unten für die Formatierung." />
                 </div>
-                <div>
-                  <label className="flex items-center mr-2 text-xs">
+                <div className="flex items-center space-x-3">
+                  <label className="flex items-center text-xs">
                     <span className="mr-1">Anzahl:</span>
                     <input
                       type="text"
                       value={userCount}
                       onChange={(e) => setUserCount(e.target.value)}
+                      className="border px-2 py-1 rounded-md text-sm border-gray-300 focus:border-[#1c2838] w-16"
+                    />
+                  </label>
+                  <label className="flex items-center text-xs">
+                    <span className="mr-1">Marke:</span>
+                    <input
+                      type="text"
+                      value={brandName}
+                      onChange={(e) => setBrandName(e.target.value)}
                       className="border px-2 py-1 rounded-md text-sm border-gray-300 focus:border-[#1c2838] w-20"
                     />
                   </label>
                 </div>
               </div>
-              <textarea
-                value={customText}
-                onChange={(e) => setCustomText(e.target.value)}
-                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                placeholder="Steffi, Daniela und {userCount} andere sind begeistert von {brandName}"
-                rows={3}
-              />
-              <div className="flex justify-between mt-1">
-                <div className="text-xs text-gray-600">
-                  <span>Platzhalter: </span>
-                  <span className="bg-gray-100 px-1 rounded mr-1 cursor-pointer" 
-                        onClick={() => {
-                          const area = document.querySelector('textarea');
-                          if (area) {
-                            const start = area.selectionStart;
-                            const end = area.selectionEnd;
-                            setCustomText(
-                              customText.substring(0, start) + 
-                              '{userCount}' + 
-                              customText.substring(end)
-                            );
-                          }
-                        }}>
-                    {"{userCount}"}
-                  </span>
-                  <span className="bg-gray-100 px-1 rounded cursor-pointer" 
-                        onClick={() => {
-                          const area = document.querySelector('textarea');
-                          if (area) {
-                            const start = area.selectionStart;
-                            const end = area.selectionEnd;
-                            setCustomText(
-                              customText.substring(0, start) + 
-                              '{brandName}' + 
-                              customText.substring(end)
-                            );
-                          }
-                          
-                        }}>
-                    {"{brandName}"}
-                  </span>
-                  <span className="ml-3">Markenname: </span>
-                  <input
-                    type="text"
-                    value={brandName}
-                    onChange={(e) => setBrandName(e.target.value)}
-                    className="border px-2 py-0 rounded-md text-xs border-gray-300 focus:border-[#1c2838] w-24 inline-block"
-                  />
-                </div>
+              <div className="mt-1 relative">
+                <textarea
+                  id="text-editor"
+                  value={customText}
+                  onChange={(e) => setCustomText(e.target.value)}
+                  className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+                  placeholder="Steffi, Daniela und 12.752 andere sind begeistert von Regenliebe"
+                  rows={3}
+                />
+                <div 
+                  className="absolute inset-0 pointer-events-none rounded-md px-3 py-1.5 text-sm"
+                  style={{
+                    color: 'transparent',
+                    overflow: 'hidden',
+                    display: 'none'
+                  }}
+                  dangerouslySetInnerHTML={{
+                    __html: customText
+                  }}
+                ></div>
+              </div>
+              <div className="flex justify-end mt-1">
                 <div className="flex">
                   <button
                     type="button"
                     onClick={(e) => {
                       e.preventDefault();
-                      const selection = window.getSelection()?.toString();
-                      if (selection && customText.includes(selection)) {
-                        const newText = customText.replace(selection, `<strong>${selection}</strong>`);
+                      try {
+                        // Get the textarea
+                        const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
+                        if (!textarea) return;
+                        
+                        // Get selection
+                        const start = textarea.selectionStart;
+                        const end = textarea.selectionEnd;
+                        
+                        if (start === end) return; // No selection
+                        
+                        // Get the selected text
+                        const selectedText = customText.substring(start, end);
+                        
+                        // Replace selection with styled version
+                        const newText = 
+                          customText.substring(0, start) + 
+                          `<strong>${selectedText}</strong>` + 
+                          customText.substring(end);
+                        
+                        // Update state
                         setCustomText(newText);
+                      } catch (err) {
+                        console.error('Error formatting text:', err);
                       }
                     }}
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded mr-1"
@@ -513,10 +526,30 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                     type="button"
                     onClick={(e) => {
                       e.preventDefault();
-                      const selection = window.getSelection()?.toString();
-                      if (selection && customText.includes(selection)) {
-                        const newText = customText.replace(selection, `<em>${selection}</em>`);
+                      try {
+                        // Get the textarea
+                        const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
+                        if (!textarea) return;
+                        
+                        // Get selection
+                        const start = textarea.selectionStart;
+                        const end = textarea.selectionEnd;
+                        
+                        if (start === end) return; // No selection
+                        
+                        // Get the selected text
+                        const selectedText = customText.substring(start, end);
+                        
+                        // Replace selection with styled version
+                        const newText = 
+                          customText.substring(0, start) + 
+                          `<em>${selectedText}</em>` + 
+                          customText.substring(end);
+                        
+                        // Update state
                         setCustomText(newText);
+                      } catch (err) {
+                        console.error('Error formatting text:', err);
                       }
                     }}
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded mr-1"
@@ -528,10 +561,30 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                     type="button"
                     onClick={(e) => {
                       e.preventDefault();
-                      const selection = window.getSelection()?.toString();
-                      if (selection && customText.includes(selection)) {
-                        const newText = customText.replace(selection, `<u>${selection}</u>`);
+                      try {
+                        // Get the textarea
+                        const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
+                        if (!textarea) return;
+                        
+                        // Get selection
+                        const start = textarea.selectionStart;
+                        const end = textarea.selectionEnd;
+                        
+                        if (start === end) return; // No selection
+                        
+                        // Get the selected text
+                        const selectedText = customText.substring(start, end);
+                        
+                        // Replace selection with styled version
+                        const newText = 
+                          customText.substring(0, start) + 
+                          `<u>${selectedText}</u>` + 
+                          customText.substring(end);
+                        
+                        // Update state
                         setCustomText(newText);
+                      } catch (err) {
+                        console.error('Error formatting text:', err);
                       }
                     }}
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded"
@@ -788,21 +841,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               </div>
             </div>
             
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <button
-                  type="button"
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSingleLine(!singleLine); }}
-                  className="flex items-center cursor-pointer bg-transparent border-none p-0 m-0 focus:outline-none"
-                >
-                  <div className={`relative w-9 h-5 ${singleLine ? 'bg-[#1c2838]' : 'bg-gray-200'} rounded-full transition-colors`}>
-                    <div className={`absolute top-[2px] ${singleLine ? 'right-[2px] translate-x-0' : 'left-[2px] translate-x-0'} bg-white border rounded-full h-4 w-4 transition-all`}></div>
-                  </div>
-                  <span className="ml-2 text-sm text-gray-600">Einzeilig</span>
-                </button>
-                <HelpTooltip text="Zeigt den Text in einer Zeile an und kürzt zu langen Text mit '...' ab." />
-              </div>
-            </div>
             
           </div>
           
@@ -947,33 +985,55 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
 
   const preview = (
     <div className="min-h-full flex items-center justify-center p-4">
-      <style>
-        {`
-          @media (max-width: 767px) {
-            .social-proof-mobile-view {
-              font-size: ${fontSizeMobile} !important;
-            }
-          }
-        `}
-      </style>
-      <div 
-        className="social-proof-box-proof social-proof-mobile-view" 
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          background: backgroundColor,
-          padding: getEffectivePadding(),
-          borderRadius: borderRadius,
-          fontFamily: 'Arial, sans-serif',
-          fontSize: fontSizeDesktop, // This will be overridden by media query for mobile
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-          marginBottom: '12px',
-          color: textColor,
-          maxWidth: '100%',
-          fontWeight: '500',
-          transition: 'font-size 0.3s ease'
-        }}
-      >
+      <div className="w-full">
+        {/* Add device toggle buttons */}
+        <div className="flex justify-center mb-4">
+          <div className="inline-flex rounded-md shadow-sm" role="group">
+            <button
+              type="button"
+              onClick={() => setPreviewDevice('desktop')}
+              className={`px-4 py-2 text-xs font-medium rounded-l-lg ${
+                previewDevice === 'desktop' 
+                  ? 'bg-[#1c2838] text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Desktop ({fontSizeDesktop})
+            </button>
+            <button
+              type="button"
+              onClick={() => setPreviewDevice('mobile')}
+              className={`px-4 py-2 text-xs font-medium rounded-r-lg ${
+                previewDevice === 'mobile' 
+                  ? 'bg-[#1c2838] text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Mobile ({fontSizeMobile})
+            </button>
+          </div>
+        </div>
+        
+        <DevicePreview onDeviceChange={setPreviewDevice}>
+          <div className="min-h-full flex items-center justify-center p-4">
+            <div 
+              className="social-proof-box-proof" 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                background: backgroundColor,
+                padding: getEffectivePadding(),
+                borderRadius: borderRadius,
+                fontFamily: 'Arial, sans-serif',
+                fontSize: getCurrentFontSize(),
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                marginBottom: '12px',
+                color: textColor,
+                maxWidth: '100%',
+                fontWeight: '500',
+                transition: 'font-size 0.3s ease'
+              }}
+            >
         {avatarCount > 0 && (
           <div 
             className="user-avatars-proof" 
@@ -1037,7 +1097,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           </div>
         )}
         <div 
-          className={`user-text-proof${singleLine ? ' single-line' : ''}`} 
+          className="user-text-proof" 
           style={{
             marginLeft: avatarCount > 0 ? '12px' : '0',
             lineHeight: '1.3',
@@ -1053,7 +1113,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
             style={{ 
               display: 'flex',
               flexDirection: 'row',
-              flexWrap: singleLine ? 'nowrap' : 'wrap',
+              flexWrap: 'wrap',
               alignItems: 'center',
               width: '100%'
             }}
@@ -1122,9 +1182,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   display: 'inline-flex',
                   alignItems: 'center',
                   flexShrink: 1,
-                  whiteSpace: singleLine ? 'nowrap' : 'normal',
-                  overflow: singleLine ? 'hidden' : 'visible',
-                  textOverflow: singleLine ? 'ellipsis' : 'clip'
+                  whiteSpace: 'normal',
+                  overflow: 'visible',
+                  textOverflow: 'clip'
                 }}
                 dangerouslySetInnerHTML={{ 
                   __html: getFormattedText().replace(
@@ -1136,6 +1196,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
             )}
           </div>
         </div>
+          </div>
+        </DevicePreview>
       </div>
     </div>
   )
@@ -1158,7 +1220,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     {% endif %}
   </div>
   {% endif %}
-  <div class="user-text-proof{% if section.settings.single_line %} single-line{% endif %}">
+  <div class="user-text-proof">
     <span class="names-container">
       <strong class="user-names">
         {% if section.settings.avatar_count == 1 %}
@@ -1281,11 +1343,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     flex-wrap: wrap;
     align-items: center;
     width: 100%;
-  }
-  .user-text-proof.single-line {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
   .names-container {
     display: inline-flex;
@@ -1475,12 +1532,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       "id": "show_break_on_large",
       "label": "Markenname umbrechen",
       "default": ${showBreakOnLarge}
-    },
-    {
-      "type": "checkbox",
-      "id": "single_line",
-      "label": "Einzeilig anzeigen",
-      "default": ${singleLine}
     },
     {
       "type": "checkbox",
