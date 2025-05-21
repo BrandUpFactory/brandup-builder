@@ -81,7 +81,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   const [firstName3, setFirstName3] = useState(safeInitialData.firstName3 || 'Maria')
   const [userCount, setUserCount] = useState(safeInitialData.userCount || '12.752')
   const [brandName, setBrandName] = useState(safeInitialData.brandName || 'Regenliebe')
-  const [customText, setCustomText] = useState(safeInitialData.customText || ' und {userCount} andere sind begeistert von {brandName}')
+  const [customText, setCustomText] = useState(safeInitialData.customText || ' und (Zahl) andere sind begeistert von (Marke)')
   const [avatarImage1, setAvatarImage1] = useState(safeInitialData.avatarImage1 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619')
   const [avatarImage2, setAvatarImage2] = useState(safeInitialData.avatarImage2 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098')
   const [avatarImage3, setAvatarImage3] = useState(safeInitialData.avatarImage3 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-1.jpg?v=1738073619')
@@ -96,7 +96,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   const [avatarSize, setAvatarSize] = useState(safeInitialData.avatarSize || '32px')
   const [borderRadius, setBorderRadius] = useState(safeInitialData.borderRadius || styleTemplates[0].borderRadius)
   const [fontSizeDesktop, setFontSizeDesktop] = useState(safeInitialData.fontSizeDesktop || '14px')
-  const [fontSizeMobile, setFontSizeMobile] = useState(safeInitialData.fontSizeMobile || '13px')
+  const [fontSizeMobile, setFontSizeMobile] = useState(safeInitialData.fontSizeMobile || '10px')
   const [brandNameBold, setBrandNameBold] = useState(safeInitialData.brandNameBold !== undefined ? safeInitialData.brandNameBold : true)
   
   // Padding settings
@@ -216,21 +216,22 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     // First process HTML tags - keep the existing HTML formatting
     let processedText = customText;
     
-    // Force-add spaces around userCount
-    processedText = processedText.replace(/\{userCount\}/g, ' {userCount} ');
+    // Replace (Zahl) with userCount in bold
+    processedText = processedText.replace(/\(Zahl\)/g, `<strong>${userCount}</strong>`);
     
-    // Force-add spaces around brandName
-    processedText = processedText.replace(/\{brandName\}/g, ' {brandName} ');
+    // Replace (Marke) with brandName - add font-weight for brand name bold
+    processedText = processedText.replace(/\(Marke\)/g, `<span style="padding:0 2px; font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
     
-    // Normalize spaces (remove duplicates) but preserve HTML tags
-    processedText = processedText.replace(/([^>])\s+([^<])/g, '$1 $2').trim();
+    // Support older format for backward compatibility
+    processedText = processedText.replace(/\{userCount\}/g, `<strong>${userCount}</strong>`);
+    processedText = processedText.replace(/\{brandName\}/g, `<span style="padding:0 2px; font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
     
-    // Now replace the variables with actual values - ensure spaces
-    let formattedText = processedText
-      .replace(/\{userCount\}/g, ` <strong>${userCount}</strong> `)
-      .replace(/\{brandName\}/g, ` <span style="padding:0 2px;">${brandName}</span> `);
+    // Add spaces between elements for better readability if needed
+    processedText = processedText.replace(/(<\/strong>)([^\s<])/g, '$1 $2');
+    processedText = processedText.replace(/(<\/span>)([^\s<])/g, '$1 $2');
+    processedText = processedText.replace(/([^\s>])(<strong>|<span)/g, '$1 $2');
     
-    return formattedText;
+    return processedText;
   };
   
   // Function to get the last two words for line breaking
@@ -302,18 +303,17 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     // Process text in the same way as the other functions for consistency
     let processedText = customText;
     
-    // Force-add spaces around userCount and brandName
+    // Replace new format placeholders
     processedText = processedText
-      .replace(/\{userCount\}/g, ' {userCount} ')
-      .replace(/\{brandName\}/g, ' {brandName} ');
-    
-    // Normalize spaces (remove duplicates)
-    processedText = processedText.replace(/\s+/g, ' ').trim();
-    
-    // For Liquid output, we need to use proper Liquid variable syntax
-    return processedText
+      .replace(/\(Zahl\)/g, "{{ section.settings.user_count }}")
+      .replace(/\(Marke\)/g, "{{ section.settings.brand_name }}");
+      
+    // Support older format for backward compatibility
+    processedText = processedText
       .replace(/\{userCount\}/g, "{{ section.settings.user_count }}")
       .replace(/\{brandName\}/g, "{{ section.settings.brand_name }}");
+    
+    return processedText;
   };
 
   // Help tooltip component
@@ -442,25 +442,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   <span>Text:</span>
                   <HelpTooltip text="Wähle Text aus und nutze die Buttons unten für die Formatierung." />
                 </div>
-                <div className="flex items-center space-x-3">
-                  <label className="flex items-center text-xs">
-                    <span className="mr-1">Anzahl:</span>
-                    <input
-                      type="text"
-                      value={userCount}
-                      onChange={(e) => setUserCount(e.target.value)}
-                      className="border px-2 py-1 rounded-md text-sm border-gray-300 focus:border-[#1c2838] w-16"
-                    />
-                  </label>
-                  <label className="flex items-center text-xs">
-                    <span className="mr-1">Marke:</span>
-                    <input
-                      type="text"
-                      value={brandName}
-                      onChange={(e) => setBrandName(e.target.value)}
-                      className="border px-2 py-1 rounded-md text-sm border-gray-300 focus:border-[#1c2838] w-20"
-                    />
-                  </label>
+                <div className="flex items-center">
+                  <span className="text-xs text-gray-500">Verwende <strong>(Zahl)</strong> und <strong>(Marke)</strong> im Text für Formatierung</span>
                 </div>
               </div>
               <div className="mt-1 relative">
@@ -469,7 +452,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   value={customText}
                   onChange={(e) => setCustomText(e.target.value)}
                   className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                  placeholder="Steffi, Daniela und 12.752 andere sind begeistert von Regenliebe"
+                  placeholder="Steffi, Daniela und (Zahl) andere sind begeistert von (Marke)"
                   rows={3}
                 />
                 <div 
@@ -510,8 +493,11 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                           `<strong>${selectedText}</strong>` + 
                           customText.substring(end);
                         
-                        // Update state
+                        // Update state - force preview to refresh
                         setCustomText(newText);
+                        
+                        // Force update to the preview by setting the preview device again
+                        setPreviewDevice(previewDevice);
                       } catch (err) {
                         console.error('Error formatting text:', err);
                       }
@@ -545,8 +531,11 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                           `<em>${selectedText}</em>` + 
                           customText.substring(end);
                         
-                        // Update state
+                        // Update state - force preview to refresh
                         setCustomText(newText);
+                        
+                        // Force update to the preview by setting the preview device again
+                        setPreviewDevice(previewDevice);
                       } catch (err) {
                         console.error('Error formatting text:', err);
                       }
@@ -580,8 +569,11 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                           `<u>${selectedText}</u>` + 
                           customText.substring(end);
                         
-                        // Update state
+                        // Update state - force preview to refresh
                         setCustomText(newText);
+                        
+                        // Force update to the preview by setting the preview device again
+                        setPreviewDevice(previewDevice);
                       } catch (err) {
                         console.error('Error formatting text:', err);
                       }
@@ -864,8 +856,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               <div className="flex items-center mt-1">
                 <input
                   type="range"
-                  min="10"
-                  max="20"
+                  min="5"
+                  max="25"
                   step="1"
                   value={fontSizeMobile.replace('px', '')}
                   onChange={(e) => setFontSizeMobile(`${e.target.value}px`)}
@@ -978,38 +970,28 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     </div>
   )
 
+  // Always set to mobile for preview to show mobile version
+  useEffect(() => {
+    // Only set if it's not already set to mobile
+    if (previewDevice !== 'mobile') {
+      setPreviewDevice('mobile');
+    }
+  }, [previewDevice]);
+  
   const preview = (
     <div className="min-h-full flex flex-col items-center justify-center p-4">
-      {/* Device toggle buttons */}
+      {/* Mobile view indicator */}
       <div className="flex justify-center mb-4">
-        <div className="inline-flex rounded-md shadow-sm" role="group">
-          <button
-            type="button"
-            onClick={() => setPreviewDevice('desktop')}
-            className={`px-4 py-2 text-xs font-medium rounded-l-lg ${
-              previewDevice === 'desktop' 
-                ? 'bg-[#1c2838] text-white' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Desktop ({fontSizeDesktop})
-          </button>
-          <button
-            type="button"
-            onClick={() => setPreviewDevice('mobile')}
-            className={`px-4 py-2 text-xs font-medium rounded-r-lg ${
-              previewDevice === 'mobile' 
-                ? 'bg-[#1c2838] text-white' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Mobile ({fontSizeMobile})
-          </button>
+        <div className="px-4 py-2 text-xs font-medium bg-gray-100 rounded-lg flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+          <span>Mobile Vorschau ({fontSizeMobile})</span>
         </div>
       </div>
       
-      {/* Preview container with conditional width based on device */}
-      <div className={`flex items-center justify-center ${previewDevice === 'mobile' ? 'max-w-[375px]' : 'w-full'}`}>
+      {/* Preview container with mobile width */}
+      <div className="flex items-center justify-center max-w-[375px]">
             <div 
               className="social-proof-box-proof" 
               style={{
@@ -1230,9 +1212,12 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     </span>
     <span class="user-count-text">
       {% comment %}Process placeholders and HTML tags{% endcomment %}
-      {% assign spaced_text = section.settings.custom_text | replace: '{userCount}', ' {userCount} ' | replace: '{brandName}', ' {brandName} ' | replace: '  ', ' ' | strip %}
-      {% assign html_processed = spaced_text %}
-      {% assign processed_text = html_processed | replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | replace: '{brandName}', '<span class="brand-name">' | append: section.settings.brand_name | append: '</span>' %}
+      {% assign html_processed = section.settings.custom_text %}
+      {% assign processed_text = html_processed | 
+        replace: '(Zahl)', '<strong>' | append: section.settings.user_count | append: '</strong>' | 
+        replace: '(Marke)', '<span class="brand-name">' | append: section.settings.brand_name | append: '</span>' |
+        replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | 
+        replace: '{brandName}', '<span class="brand-name">' | append: section.settings.brand_name | append: '</span>' %}
       
       {% if section.settings.show_break_on_large %}
         {% comment %}For line breaks, split the last two words to next line{% endcomment %}
@@ -1461,7 +1446,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       "type": "textarea",
       "id": "custom_text",
       "label": "Benutzerdefinierter Text",
-      "info": "Verwende {userCount} und {brandName} als Platzhalter",
+      "info": "Verwende (Zahl) und (Marke) als Platzhalter",
       "default": "${customText}"
     },
     {
@@ -1544,8 +1529,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     {
       "type": "range",
       "id": "font_size_mobile",
-      "min": 10,
-      "max": 20,
+      "min": 5,
+      "max": 25,
       "step": 1,
       "label": "Schriftgröße (Mobil)",
       "default": ${fontSizeMobile.replace('px', '')}
