@@ -65,10 +65,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   // Ensure initialData is an object
   const safeInitialData = initialData || {};
   
-  // Prevent page jumping for range sliders and other interactive elements
-  const preventJump = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  // Helper for range sliders - we don't prevent default to allow slider functionality
+  const handleRangeInput = (e: React.MouseEvent) => {
+    e.stopPropagation();  // Only stop propagation, not preventDefault
   };
   
   // Style template selection
@@ -206,7 +205,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   
   // Format the custom text with variables
   const getFormattedText = () => {
-    // First, ensure there's a space before and after variables
+    // First process HTML tags - keep the existing HTML formatting
     let processedText = customText;
     
     // Force-add spaces around userCount
@@ -215,37 +214,40 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     // Force-add spaces around brandName
     processedText = processedText.replace(/\{brandName\}/g, ' {brandName} ');
     
-    // Normalize spaces (remove duplicates)
-    processedText = processedText.replace(/\s+/g, ' ').trim();
+    // Normalize spaces (remove duplicates) but preserve HTML tags
+    processedText = processedText.replace(/([^>])\s+([^<])/g, '$1 $2').trim();
     
-    // Now replace the variables with actual values
+    // Now replace the variables with actual values - ensure spaces
     let formattedText = processedText
-      .replace(/\{userCount\}/g, `<strong>${userCount}</strong>`)
-      .replace(/\{brandName\}/g, brandName);
+      .replace(/\{userCount\}/g, ` <strong>${userCount}</strong> `)
+      .replace(/\{brandName\}/g, ` <span style="padding:0 2px;">${brandName}</span> `);
     
     return formattedText;
   };
   
   // Function to get the last two words for line breaking
   const getLastTwoWords = () => {
-    // Process the text in the same way as getFormattedText for consistency
+    // First process HTML tags - keep the existing HTML formatting
     let processedText = customText;
     
+    // Remove HTML tags to get plain text for splitting
+    let plainText = processedText.replace(/<[^>]*>/g, '');
+    
     // Force-add spaces around userCount and brandName
-    processedText = processedText
+    plainText = plainText
       .replace(/\{userCount\}/g, ' {userCount} ')
       .replace(/\{brandName\}/g, ' {brandName} ');
     
     // Normalize spaces (remove duplicates)
-    processedText = processedText.replace(/\s+/g, ' ').trim();
+    plainText = plainText.replace(/\s+/g, ' ').trim();
     
-    // Replace with actual values
-    processedText = processedText
+    // Replace with actual values 
+    plainText = plainText
       .replace(/\{userCount\}/g, userCount)
       .replace(/\{brandName\}/g, brandName);
     
     // More robust word splitting that handles different whitespace
-    const words = processedText.split(/\s+/).filter(word => word.length > 0);
+    const words = plainText.split(/\s+/).filter(word => word.length > 0);
       
     if (words.length <= 2) {
       return { firstPart: '', lastTwoPart: words.join(' ') };
@@ -392,41 +394,64 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
             </div>
           )}
           
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             <label className="block text-sm text-[#1c2838]">
-              Benutzeranzahl:
-              <input
-                type="text"
-                value={userCount}
-                onChange={(e) => setUserCount(e.target.value)}
-                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-              />
-            </label>
-            
-            <label className="block text-sm text-[#1c2838]">
-              Markenname:
-              <input
-                type="text"
-                value={brandName}
-                onChange={(e) => setBrandName(e.target.value)}
-                className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-              />
+              <div className="flex items-center mb-1">
+                Variablen für Text
+              </div>
+              <div className="flex items-center space-x-2 mb-3">
+                <label className="flex items-center">
+                  <span className="text-xs mr-2">Benutzeranzahl:</span>
+                  <input
+                    type="text"
+                    value={userCount}
+                    onChange={(e) => setUserCount(e.target.value)}
+                    className="border px-2 py-1 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition w-24"
+                  />
+                </label>
+                
+                <label className="flex items-center">
+                  <span className="text-xs mr-2">Markenname:</span>
+                  <input
+                    type="text"
+                    value={brandName}
+                    onChange={(e) => setBrandName(e.target.value)}
+                    className="border px-2 py-1 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition w-24"
+                  />
+                </label>
+              </div>
             </label>
           </div>
           
           <div className="grid grid-cols-1 gap-3">
             <label className="block text-sm text-[#1c2838]">
               <div className="flex items-center">
-                Benutzerdefinierter Text:
+                Text mit {'{userCount}'} und {'{brandName}'} als Platzhalter:
                 <HelpTooltip text="Verwende {userCount} und {brandName} als Platzhalter für die entsprechenden Werte." />
               </div>
-              <input
-                type="text"
+              <textarea
                 value={customText}
                 onChange={(e) => setCustomText(e.target.value)}
                 className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                 placeholder=" und {userCount} andere sind begeistert von {brandName}"
+                rows={3}
               />
+              <div className="flex justify-end mt-1">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const selection = window.getSelection()?.toString();
+                    if (selection && customText.includes(selection)) {
+                      const newText = customText.replace(selection, `<strong>${selection}</strong>`);
+                      setCustomText(newText);
+                    }
+                  }}
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded mr-1"
+                >
+                  <strong>B</strong>
+                </button>
+              </div>
             </label>
           </div>
         </div>
@@ -615,7 +640,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 step="2"
                 value={avatarSize.replace('px', '')}
                 onChange={(e) => setAvatarSize(`${e.target.value}px`)}
-                onMouseDown={preventJump}
+                onClick={handleRangeInput}
+                onMouseMove={handleRangeInput}
                 className="w-full accent-[#1c2838]"
               />
               <span className="ml-2 text-xs text-gray-500 w-12">{avatarSize}</span>
@@ -632,7 +658,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 step="1"
                 value={borderRadius.replace('px', '')}
                 onChange={(e) => setBorderRadius(`${e.target.value}px`)}
-                onMouseDown={preventJump}
+                onClick={handleRangeInput}
+                onMouseMove={handleRangeInput}
                 className="w-full accent-[#1c2838]"
               />
               <span className="ml-2 text-xs text-gray-500 w-12">{borderRadius}</span>
@@ -672,21 +699,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               </div>
             </div>
             
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <button
-                  type="button"
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSingleLine(!singleLine); }}
-                  className="flex items-center cursor-pointer bg-transparent border-none p-0 m-0 focus:outline-none"
-                >
-                  <div className={`relative w-9 h-5 ${singleLine ? 'bg-[#1c2838]' : 'bg-gray-200'} rounded-full transition-colors`}>
-                    <div className={`absolute top-[2px] ${singleLine ? 'right-[2px] translate-x-0' : 'left-[2px] translate-x-0'} bg-white border rounded-full h-4 w-4 transition-all`}></div>
-                  </div>
-                  <span className="ml-2 text-sm text-gray-600">Einzeilig anzeigen</span>
-                </button>
-                <HelpTooltip text="Zeigt den gesamten Text in einer Zeile an, statt umzubrechen." />
-              </div>
-            </div>
           </div>
           
           {/* Font Size Controls */}
@@ -701,7 +713,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   step="1"
                   value={fontSizeDesktop.replace('px', '')}
                   onChange={(e) => setFontSizeDesktop(`${e.target.value}px`)}
-                  onMouseDown={preventJump}
+                  onClick={handleRangeInput}
+                  onMouseMove={handleRangeInput}
                   className="w-full accent-[#1c2838]"
                 />
                 <span className="ml-2 text-xs text-gray-500 w-12">{fontSizeDesktop}</span>
@@ -718,7 +731,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   step="1"
                   value={fontSizeMobile.replace('px', '')}
                   onChange={(e) => setFontSizeMobile(`${e.target.value}px`)}
-                  onMouseDown={preventJump}
+                  onClick={handleRangeInput}
+                  onMouseMove={handleRangeInput}
                   className="w-full accent-[#1c2838]"
                 />
                 <span className="ml-2 text-xs text-gray-500 w-12">{fontSizeMobile}</span>
@@ -1036,9 +1050,10 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
     </span>
     <span class="user-count-text">
-      {% comment %}Process placeholders first - ensure spaces around variables{% endcomment %}
+      {% comment %}Process placeholders and HTML tags{% endcomment %}
       {% assign spaced_text = section.settings.custom_text | replace: '{userCount}', ' {userCount} ' | replace: '{brandName}', ' {brandName} ' | replace: '  ', ' ' | strip %}
-      {% assign processed_text = spaced_text | replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | replace: '{brandName}', section.settings.brand_name %}
+      {% assign html_processed = spaced_text %}
+      {% assign processed_text = html_processed | replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | replace: '{brandName}', '<span class="brand-name">' | append: section.settings.brand_name | append: '</span>' %}
       
       {% if section.settings.show_break_on_large %}
         {% comment %}For line breaks, split the last two words to next line{% endcomment %}
@@ -1163,9 +1178,13 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   }
   .user-count-text strong {
     font-weight: 600;
+    margin: 0 2px;
+    padding: 0 1px;
   }
   .brand-name {
     font-weight: {% if section.settings.brand_name_bold %}600{% else %}400{% endif %};
+    margin: 0 2px;
+    padding: 0 1px;
   }
   .verified-badge-proof {
     width: 16px;
