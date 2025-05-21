@@ -1193,7 +1193,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           </div>
         </div>
       </div>
-    </div>
   )
 
   const code = `{% comment %}
