@@ -8,10 +8,14 @@ import { useEffect, useState } from 'react'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [isMobile, setIsMobile] = useState(false)
+  const [isHomepage, setIsHomepage] = useState(false)
 
   useEffect(() => {
     // Prüfen der Bildschirmgröße und Setzen des Mobile-Status
     const checkIfMobile = () => setIsMobile(window.innerWidth < 1024)
+    
+    // Check if we're on the homepage
+    setIsHomepage(window.location.pathname === '/' || window.location.pathname === '')
     
     // Initial Check
     checkIfMobile()
@@ -33,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Navbar />
 
         {/* Main Content - mit bedingter Klasse für Abstand */}
-        <main className={`flex-1 ${isMobile ? 'mt-16' : 'ml-64'} p-4 md:p-8 overflow-y-auto`}>
+        <main className={`flex-1 ${isMobile ? 'mt-16' : 'ml-64'} ${isHomepage ? 'p-0' : 'p-4 md:p-8'} overflow-y-auto`}>
           {children}
           <Analytics />        {/* ✅ Analytics von Vercel */}
           <SpeedInsights />    {/* ✅ Speed Insights von Vercel */}
