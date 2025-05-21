@@ -330,43 +330,64 @@ export default function EditorLayout({
             <div className="bg-gray-50 rounded-lg flex shadow-sm">
               <button 
                 onClick={() => {
-                  // Extract text content from JSX elements if needed
-                  const getTextContent = (element: any): string => {
-                    if (!element) return '';
-                    
-                    // If it's a string or number, return it directly
-                    if (typeof element === 'string' || typeof element === 'number') {
-                      return element.toString();
-                    }
-                    
-                    // If it's a React element with props.children
-                    if (element.props && element.props.children) {
-                      // Handle arrays of children
-                      if (Array.isArray(element.props.children)) {
-                        return element.props.children.map(getTextContent).join('');
-                      }
-                      // Handle single child
-                      return getTextContent(element.props.children);
-                    }
-                    
-                    // If it's a DOM element with innerText or textContent
-                    if (element.innerText) return element.innerText;
-                    if (element.textContent) return element.textContent;
-                    
-                    // For pre-formatted code blocks with dangerouslySetInnerHTML
-                    if (element.props && element.props.dangerouslySetInnerHTML) {
-                      return element.props.dangerouslySetInnerHTML.__html || '';
-                    }
-                    
-                    // If nothing else worked, try to convert to string
-                    return element.toString();
-                  };
+                  // Find the actual code content from ReactNode
+                  let codeText = '';
                   
-                  // Try to get plain text content from the code JSX
-                  const textContent = getTextContent(code);
+                  try {
+                    // Check if code is a React element with pre tag inside
+                    if (code && typeof code === 'object' && 'props' in code) {
+                      // Handle code being a React element with children
+                      const codeElement = code as React.ReactElement;
+                      
+                      // If it has children with a pre tag
+                      if (codeElement.props.children) {
+                        const children = codeElement.props.children;
+                        
+                        // Find the pre element with the actual code
+                        let preElement;
+                        
+                        if (Array.isArray(children)) {
+                          // Look for the pre element in the array
+                          preElement = children.find(child => 
+                            typeof child === 'object' && 
+                            'type' in child && 
+                            child.type === 'pre'
+                          );
+                        } else if (typeof children === 'object' && 'type' in children && children.type === 'pre') {
+                          preElement = children;
+                        }
+                        
+                        // Extract content from pre element
+                        if (preElement && 'props' in preElement && preElement.props.children) {
+                          codeText = preElement.props.children;
+                        }
+                      }
+                    }
+                    
+                    // If we couldn't extract it from the structure, try direct text
+                    if (!codeText && typeof code === 'string') {
+                      codeText = code;
+                    }
+                    
+                    // Final fallback, but skip [object Object]
+                    if (!codeText && code !== undefined && code !== null) {
+                      const tempText = String(code);
+                      if (tempText !== '[object Object]') {
+                        codeText = tempText;
+                      } else {
+                        throw new Error('Unable to extract code content');
+                      }
+                    }
+                  } catch (err) {
+                    // If all else fails, look for a pre element in the DOM to extract the content
+                    const preElement = document.querySelector('pre');
+                    if (preElement) {
+                      codeText = preElement.textContent || '';
+                    }
+                  }
                   
                   // Copy to clipboard
-                  navigator.clipboard.writeText(textContent);
+                  navigator.clipboard.writeText(codeText);
                   setCopySuccess(true);
                   setTimeout(() => setCopySuccess(false), 2000);
                 }}

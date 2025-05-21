@@ -450,173 +450,122 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   <span className="text-xs text-gray-500">Verwende <strong>(Zahl)</strong> und <strong>(Marke)</strong> im Text für Formatierung</span>
                 </div>
               </div>
-              <div className="mt-1 relative">
-                <textarea
-                  id="text-editor"
-                  value={customText}
-                  onChange={(e) => setCustomText(e.target.value)}
-                  className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                  placeholder="Steffi, Daniela und (Zahl) andere sind begeistert von (Marke)"
-                  rows={3}
-                />
-                <div 
-                  className="absolute inset-0 pointer-events-none rounded-md px-3 py-1.5 text-sm"
-                  style={{
-                    color: 'transparent',
-                    overflow: 'hidden',
-                    display: 'none'
-                  }}
-                  dangerouslySetInnerHTML={{
-                    __html: customText
-                  }}
-                ></div>
-              </div>
-              <div className="flex justify-end mt-1">
-                <div className="flex">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      try {
-                        // Get the textarea
-                        const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
-                        if (!textarea) return;
-                        
-                        // Get selection
-                        const start = textarea.selectionStart;
-                        const end = textarea.selectionEnd;
-                        
-                        if (start === end) return; // No selection
-                        
-                        // Get the selected text
-                        const selectedText = customText.substring(start, end);
-                        
-                        // Replace selection with styled version
-                        const newText = 
-                          customText.substring(0, start) + 
-                          `<strong>${selectedText}</strong>` + 
-                          customText.substring(end);
-                        
-                        // Update state
-                        setCustomText(newText);
-                        
-                        // Set cursor position after the formatted text
-                        setTimeout(() => {
-                          textarea.focus();
-                          textarea.selectionStart = start + `<strong>${selectedText}</strong>`.length;
-                          textarea.selectionEnd = start + `<strong>${selectedText}</strong>`.length;
-                        }, 10);
-                        
-                        // Force full refresh to update the preview
-                        onDataChange && onDataChange({
-                          ...sectionData,
-                          customText: newText
-                        });
-                      } catch (err) {
-                        console.error('Error formatting text:', err);
-                      }
+              
+              {/* Enhanced text editor with preview */}
+              <div className="mt-1 space-y-2">
+                {/* Text editor */}
+                <div className="relative">
+                  <textarea
+                    id="text-editor"
+                    value={customText}
+                    onChange={(e) => {
+                      setCustomText(e.target.value);
+                      // Force refresh for immediate preview update
+                      onDataChange && onDataChange({
+                        ...sectionData,
+                        customText: e.target.value
+                      });
                     }}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded mr-1"
-                    title="Fett"
-                  >
-                    <strong>B</strong>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      try {
-                        // Get the textarea
-                        const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
-                        if (!textarea) return;
-                        
-                        // Get selection
-                        const start = textarea.selectionStart;
-                        const end = textarea.selectionEnd;
-                        
-                        if (start === end) return; // No selection
-                        
-                        // Get the selected text
-                        const selectedText = customText.substring(start, end);
-                        
-                        // Replace selection with styled version
-                        const newText = 
-                          customText.substring(0, start) + 
-                          `<em>${selectedText}</em>` + 
-                          customText.substring(end);
-                        
-                        // Update state
-                        setCustomText(newText);
-                        
-                        // Set cursor position after the formatted text
-                        setTimeout(() => {
-                          textarea.focus();
-                          textarea.selectionStart = start + `<em>${selectedText}</em>`.length;
-                          textarea.selectionEnd = start + `<em>${selectedText}</em>`.length;
-                        }, 10);
-                        
-                        // Force full refresh to update the preview
-                        onDataChange && onDataChange({
-                          ...sectionData,
-                          customText: newText
-                        });
-                      } catch (err) {
-                        console.error('Error formatting text:', err);
-                      }
+                    className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+                    placeholder="Steffi, Daniela und (Zahl) andere sind begeistert von (Marke)"
+                    rows={3}
+                  />
+                </div>
+                
+                {/* Live preview of formatted text */}
+                <div className="border border-dashed border-gray-300 rounded-md px-3 py-2 bg-gray-50">
+                  <div className="text-xs text-gray-500 mb-1 font-medium">Vorschau der Formatierung:</div>
+                  <div 
+                    className="text-sm"
+                    dangerouslySetInnerHTML={{
+                      __html: getFormattedText() // Using the same function that formats for the main preview
                     }}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded mr-1"
-                    title="Kursiv"
-                  >
-                    <em>I</em>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      try {
-                        // Get the textarea
-                        const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
-                        if (!textarea) return;
-                        
-                        // Get selection
-                        const start = textarea.selectionStart;
-                        const end = textarea.selectionEnd;
-                        
-                        if (start === end) return; // No selection
-                        
-                        // Get the selected text
-                        const selectedText = customText.substring(start, end);
-                        
-                        // Replace selection with styled version
-                        const newText = 
-                          customText.substring(0, start) + 
-                          `<u>${selectedText}</u>` + 
-                          customText.substring(end);
-                        
-                        // Update state
-                        setCustomText(newText);
-                        
-                        // Set cursor position after the formatted text
-                        setTimeout(() => {
-                          textarea.focus();
-                          textarea.selectionStart = start + `<u>${selectedText}</u>`.length;
-                          textarea.selectionEnd = start + `<u>${selectedText}</u>`.length;
-                        }, 10);
-                        
-                        // Force full refresh to update the preview
-                        onDataChange && onDataChange({
-                          ...sectionData,
-                          customText: newText
-                        });
-                      } catch (err) {
-                        console.error('Error formatting text:', err);
-                      }
-                    }}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded"
-                    title="Unterstrichen"
-                  >
-                    <u>U</u>
-                  </button>
+                  ></div>
+                </div>
+                
+                {/* Formatting toolbar */}
+                <div className="flex justify-start">
+                  <div className="flex items-center space-x-1 bg-gray-100 p-1 rounded-md">
+                    {/* Bold button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        applyFormatting('bold');
+                      }}
+                      className="hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold transition"
+                      title="Fett"
+                    >
+                      <strong>B</strong>
+                    </button>
+                    
+                    {/* Italic button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        applyFormatting('italic');
+                      }}
+                      className="hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold transition"
+                      title="Kursiv"
+                    >
+                      <em>I</em>
+                    </button>
+                    
+                    {/* Underline button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        applyFormatting('underline');
+                      }}
+                      className="hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold transition"
+                      title="Unterstrichen"
+                    >
+                      <u>U</u>
+                    </button>
+                    
+                    {/* Add (Zahl) placeholder button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        insertPlaceholder('(Zahl)');
+                      }}
+                      className="hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold transition ml-2"
+                      title="Anzahl einfügen"
+                    >
+                      (Zahl)
+                    </button>
+                    
+                    {/* Add (Marke) placeholder button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        insertPlaceholder('(Marke)');
+                      }}
+                      className="hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold transition"
+                      title="Markenname einfügen"
+                    >
+                      (Marke)
+                    </button>
+                    
+                    {/* Clear all formatting button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        clearFormatting();
+                      }}
+                      className="hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded transition ml-4"
+                      title="Formatierung entfernen"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828l6.879-6.879zm2.121.707a1 1 0 0 0-1.414 0L4.16 7.547l5.293 5.293 4.633-4.633a1 1 0 0 0 0-1.414l-3.879-3.879zM8.746 13.547 3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293l.16-.16z"/>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
             </label>
@@ -1004,6 +953,133 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     </div>
   )
 
+  // Text editor formatting functions
+  const applyFormatting = (type: 'bold' | 'italic' | 'underline') => {
+    try {
+      // Get the textarea
+      const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
+      if (!textarea) return;
+      
+      // Get selection
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      
+      if (start === end) {
+        alert('Bitte wähle zuerst Text aus, der formatiert werden soll.');
+        return; // No selection
+      }
+      
+      // Get the selected text
+      const selectedText = customText.substring(start, end);
+      
+      // Determine the tags to use
+      let openTag = '';
+      let closeTag = '';
+      
+      switch (type) {
+        case 'bold':
+          openTag = '<strong>';
+          closeTag = '</strong>';
+          break;
+        case 'italic':
+          openTag = '<em>';
+          closeTag = '</em>';
+          break;
+        case 'underline':
+          openTag = '<u>';
+          closeTag = '</u>';
+          break;
+      }
+      
+      // Replace selection with styled version
+      const newText = 
+        customText.substring(0, start) + 
+        `${openTag}${selectedText}${closeTag}` + 
+        customText.substring(end);
+      
+      // Update state
+      setCustomText(newText);
+      
+      // Set cursor position after the formatted text
+      setTimeout(() => {
+        textarea.focus();
+        textarea.selectionStart = start + (openTag + selectedText + closeTag).length;
+        textarea.selectionEnd = start + (openTag + selectedText + closeTag).length;
+      }, 10);
+      
+      // Force full refresh to update the preview
+      onDataChange && onDataChange({
+        ...sectionData,
+        customText: newText
+      });
+    } catch (err) {
+      console.error(`Error applying ${type} formatting:`, err);
+    }
+  };
+  
+  // Insert placeholder at cursor position or replace selection
+  const insertPlaceholder = (placeholder: string) => {
+    try {
+      // Get the textarea
+      const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
+      if (!textarea) return;
+      
+      // Get cursor position or selection
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      
+      // Add placeholder at cursor position or replace selection
+      const newText = 
+        customText.substring(0, start) + 
+        placeholder + 
+        customText.substring(end);
+      
+      // Update state
+      setCustomText(newText);
+      
+      // Set cursor position after the inserted placeholder
+      setTimeout(() => {
+        textarea.focus();
+        const newCursorPos = start + placeholder.length;
+        textarea.selectionStart = newCursorPos;
+        textarea.selectionEnd = newCursorPos;
+      }, 10);
+      
+      // Force full refresh to update the preview
+      onDataChange && onDataChange({
+        ...sectionData,
+        customText: newText
+      });
+    } catch (err) {
+      console.error('Error inserting placeholder:', err);
+    }
+  };
+  
+  // Clear all HTML formatting from text
+  const clearFormatting = () => {
+    try {
+      // Remove all HTML tags but keep content
+      const cleanText = customText.replace(/<\/?[^>]+(>|$)/g, '');
+      
+      // Update state
+      setCustomText(cleanText);
+      
+      // Force full refresh to update the preview
+      onDataChange && onDataChange({
+        ...sectionData,
+        customText: cleanText
+      });
+      
+      // Refocus the textarea
+      setTimeout(() => {
+        const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
+        if (textarea) textarea.focus();
+      }, 10);
+    } catch (err) {
+      console.error('Error clearing formatting:', err);
+    }
+  };
+  
   // Update preview on device change
   const handleDeviceChange = (device: 'desktop' | 'tablet' | 'mobile') => {
     setPreviewDevice(device);
@@ -1219,13 +1295,13 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCodeOutputType('section'); }}
           className={`flex items-center px-3 py-1.5 text-xs rounded-r-md ${codeOutputType === 'section' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
         >
-          <span>Sektion</span>
+          <span>Shopify Theme Code</span>
           <div className="relative ml-1 group">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
               <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM8.94 6.94a.75.75 0 1 1-1.06-1.06 2.5 2.5 0 0 1 3.536 0A.75.75 0 0 1 10.354 6.94 1 1 0 0 0 9.75 6.75a1 1 0 0 0-.81.31Zm-3.24 7.9a.75.75 0 1 0 1.06 1.06l4.25-4.25a.75.75 0 1 0-1.06-1.06L6.33 14.44 5.56 13.7a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l1.2 1.2a.75.75 0 0 0 1.06 0Z" clipRule="evenodd" />
             </svg>
             <div className="absolute right-0 bottom-full mb-2 p-2 bg-gray-800 text-white text-xs rounded w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity z-10">
-              Komplette Sektion zum Kopieren & Einfügen über die Shopify-Oberfläche.
+              Kompletter Shopify Theme Code zum Kopieren & Einfügen über die Shopify-Oberfläche.
             </div>
           </div>
         </button>
@@ -1236,15 +1312,16 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   // Liquid Block Code - optimized for syntax correctness
   const liquidBlockCode = `{% comment %}Social Proof Box (BrandUp Builder){% endcomment %}
 
+{% comment %}Determine user display names based on avatar count{% endcomment %}
 {% assign user_display_names = "" %}
-{% if section.settings.avatar_count == 1 %}
+{% if section.settings.avatar_count == 1 and section.settings.first_name_1 != blank %}
   {% assign user_display_names = section.settings.first_name_1 %}
-{% elsif section.settings.avatar_count == 2 %}
+{% elsif section.settings.avatar_count == 2 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank %}
   {% assign user_display_names = section.settings.first_name_1 | append: ", " | append: section.settings.first_name_2 %}
-{% elsif section.settings.avatar_count == 3 %}
+{% elsif section.settings.avatar_count == 3 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank and section.settings.first_name_3 != blank %}
   {% assign user_display_names = section.settings.first_name_1 | append: ", " | append: section.settings.first_name_2 | append: ", " | append: section.settings.first_name_3 %}
 {% else %}
-  {% assign user_display_names = "Nutzer" %}
+  {% assign user_display_names = "Steffi, Daniela" %} {% comment %}Default names instead of just "Nutzer"{% endcomment %}
 {% endif %}
 
 {% comment %}Process placeholders and HTML tags{% endcomment %}
@@ -1483,14 +1560,14 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   <div class="user-text-proof">
     <span class="names-container">
       <strong class="user-names">
-        {% if section.settings.avatar_count == 1 %}
+        {% if section.settings.avatar_count == 1 and section.settings.first_name_1 != blank %}
           {{ section.settings.first_name_1 }}
-        {% elsif section.settings.avatar_count == 2 %}
+        {% elsif section.settings.avatar_count == 2 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank %}
           {{ section.settings.first_name_1 }}, {{ section.settings.first_name_2 }}
-        {% elsif section.settings.avatar_count == 3 %}
+        {% elsif section.settings.avatar_count == 3 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank and section.settings.first_name_3 != blank %}
           {{ section.settings.first_name_1 }}, {{ section.settings.first_name_2 }}, {{ section.settings.first_name_3 }}
         {% else %}
-          Nutzer
+          Steffi, Daniela
         {% endif %}
       </strong>
       <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
