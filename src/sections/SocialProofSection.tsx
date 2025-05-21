@@ -91,6 +91,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   const [avatarBorderColor, setAvatarBorderColor] = useState(safeInitialData.avatarBorderColor || styleTemplates[0].avatarBorderColor)
   const [textColor, setTextColor] = useState(safeInitialData.textColor || '#000000')
   const [showBreakOnLarge, setShowBreakOnLarge] = useState(safeInitialData.showBreakOnLarge !== undefined ? safeInitialData.showBreakOnLarge : true)
+  const [singleLine, setSingleLine] = useState(safeInitialData.singleLine !== undefined ? safeInitialData.singleLine : false)
   const [avatarSize, setAvatarSize] = useState(safeInitialData.avatarSize || '32px')
   const [borderRadius, setBorderRadius] = useState(safeInitialData.borderRadius || styleTemplates[0].borderRadius)
   const [fontSizeDesktop, setFontSizeDesktop] = useState(safeInitialData.fontSizeDesktop || '14px')
@@ -172,7 +173,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
         selectedStyle,
         fontSizeDesktop,
         fontSizeMobile,
-        brandNameBold
+        brandNameBold,
+        singleLine
       };
       
       // Always notify parent to handle the data
@@ -181,7 +183,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   }, [
     firstName1, firstName2, firstName3, userCount, brandName, customText,
     backgroundColor, avatarImage1, avatarImage2, avatarImage3, verifiedImage,
-    avatarBorderColor, textColor, showBreakOnLarge,
+    avatarBorderColor, textColor, showBreakOnLarge, singleLine,
     avatarSize, borderRadius, padding, paddingTop, paddingRight,
     paddingBottom, paddingLeft, avatarCount, selectedStyle, 
     fontSizeDesktop, fontSizeMobile, brandNameBold, onDataChange
@@ -226,56 +228,64 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   // Function to get the last two words for line breaking
   const getLastTwoWords = () => {
     try {
-      // First process HTML tags - keep the existing HTML formatting
-      let processedText = customText;
+      // Process the HTML text with proper variable replacement
+      const processedText = getFormattedText();
       
-      // Process HTML tags - preserve them
-      const htmlTags = [];
-      let plainText = processedText.replace(/<[^>]*>|<\/[^>]*>/g, (match) => {
-        htmlTags.push(match);
-        return '##HTML##';
-      });
-      
-      // Force-add spaces around userCount and brandName
-      plainText = plainText
-        .replace(/\{userCount\}/g, ' {userCount} ')
-        .replace(/\{brandName\}/g, ' {brandName} ');
+      // First strip HTML tags for word counting
+      const plainText = processedText.replace(/<[^>]*>|<\/[^>]*>/g, '');
       
       // Normalize spaces (remove duplicates)
-      plainText = plainText.replace(/\s+/g, ' ').trim();
+      const normalizedText = plainText.replace(/\s+/g, ' ').trim();
       
-      // Replace with actual values 
-      plainText = plainText
-        .replace(/\{userCount\}/g, userCount)
-        .replace(/\{brandName\}/g, brandName);
-      
-      // More robust word splitting that handles different whitespace
-      const words = plainText.split(/\s+/).filter(word => word.length > 0);
+      // Split into words
+      const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
         
       if (words.length <= 2) {
-        return { firstPart: '', lastTwoPart: processedText };
+        return { firstPart: processedText, lastTwoPart: '' };
       }
       
-      // Get the last two words - this is correct, we want the LAST two words to move to next line
+      // Get the last two words - specifically the LAST two words for line breaking
       const lastTwo = words.slice(-2).join(' ');
-      const firstPart = words.slice(0, -2).join(' ');
       
-      // Get formatted HTML
-      const formattedText = getFormattedText();
-      const lastIndex = formattedText.lastIndexOf(lastTwo);
+      // Find the position of the last two words in the original text
+      const lastIndex = normalizedText.lastIndexOf(lastTwo);
       
       if (lastIndex === -1) {
         // If we can't find the last two words, just return the formatted text
-        return { firstPart: formattedText, lastTwoPart: '' };
+        return { firstPart: processedText, lastTwoPart: '' };
       }
       
-      const htmlFirstPart = formattedText.substring(0, lastIndex);
-      const htmlLastPart = formattedText.substring(lastIndex);
+      // Find the approximate position in the HTML text
+      // We need to search in the processed text for the last occurrence of lastTwo
+      const lastOccurrence = processedText.lastIndexOf(lastTwo);
       
-      return { firstPart: htmlFirstPart, lastTwoPart: htmlLastPart };
+      if (lastOccurrence === -1) {
+        // Try searching for individual words if exact match not found
+        const lastWord = words[words.length - 1];
+        const secondLastWord = words[words.length - 2];
+        
+        // Find the last word position
+        const lastWordPos = processedText.lastIndexOf(lastWord);
+        
+        if (lastWordPos > 0) {
+          // If found, split there
+          return {
+            firstPart: processedText.substring(0, lastWordPos).trim(),
+            lastTwoPart: processedText.substring(lastWordPos).trim()
+          };
+        }
+        
+        return { firstPart: processedText, lastTwoPart: '' };
+      }
+      
+      // If found, return parts split at the last two words
+      return {
+        firstPart: processedText.substring(0, lastOccurrence).trim(),
+        lastTwoPart: processedText.substring(lastOccurrence).trim()
+      };
     } catch (error) {
       console.error('Error in getLastTwoWords:', error);
-      return { firstPart: customText, lastTwoPart: '' };
+      return { firstPart: getFormattedText(), lastTwoPart: '' };
     }
   };
   
@@ -778,6 +788,22 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               </div>
             </div>
             
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSingleLine(!singleLine); }}
+                  className="flex items-center cursor-pointer bg-transparent border-none p-0 m-0 focus:outline-none"
+                >
+                  <div className={`relative w-9 h-5 ${singleLine ? 'bg-[#1c2838]' : 'bg-gray-200'} rounded-full transition-colors`}>
+                    <div className={`absolute top-[2px] ${singleLine ? 'right-[2px] translate-x-0' : 'left-[2px] translate-x-0'} bg-white border rounded-full h-4 w-4 transition-all`}></div>
+                  </div>
+                  <span className="ml-2 text-sm text-gray-600">Einzeilig</span>
+                </button>
+                <HelpTooltip text="Zeigt den Text in einer Zeile an und kürzt zu langen Text mit '...' ab." />
+              </div>
+            </div>
+            
           </div>
           
           {/* Font Size Controls */}
@@ -1011,31 +1037,34 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           </div>
         )}
         <div 
-          className="user-text-proof" 
+          className={`user-text-proof${singleLine ? ' single-line' : ''}`} 
           style={{
             marginLeft: avatarCount > 0 ? '12px' : '0',
             lineHeight: '1.3',
             display: 'flex',
+            flexDirection: 'row',
             flexWrap: 'wrap',
             alignItems: 'center',
             width: '100%'
           }}
         >
-          {/* Whole text with names embedded */}
+          {/* Layout container to keep names and text in a row */}
           <div 
             style={{ 
-              fontWeight: '400',
               display: 'flex',
-              flexWrap: 'wrap',
+              flexDirection: 'row',
+              flexWrap: singleLine ? 'nowrap' : 'wrap',
               alignItems: 'center',
-              whiteSpace: 'normal'
+              width: '100%'
             }}
           >
+            {/* Names with verified badge - stays on the same line with text */}
             <span style={{ 
               display: 'inline-flex', 
               alignItems: 'center', 
               marginRight: '4px', 
-              flexShrink: 0
+              flexShrink: 0,
+              whiteSpace: 'nowrap' // Prevent names from wrapping
             }}>
               <strong style={{ fontWeight: '600', flexShrink: 0 }}>{getDisplayNames()}</strong>
               <img 
@@ -1052,43 +1081,50 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 }}
               />
             </span>
+            
             {showBreakOnLarge ? (
               // When line break is enabled, split text to move the last two words to next line
               (() => {
                 // Get parts with last two words separated
                 const { firstPart, lastTwoPart } = getLastTwoWords();
                 
-                // Show the full formatted text with last two words on next line
-                const processedText = getFormattedText();
-                
                 return (
                   <>
-                    {/* Main part of text */}
-                    <span style={{ display: 'inline', alignItems: 'center' }} dangerouslySetInnerHTML={{ 
-                      __html: processedText.substring(0, processedText.lastIndexOf(lastTwoPart))
+                    {/* Main part of text - stays on same line with names */}
+                    <span style={{ 
+                      display: 'inline-flex', 
+                      alignItems: 'center',
+                      fontWeight: '400',
+                      flexShrink: 1
+                    }} dangerouslySetInnerHTML={{ 
+                      __html: firstPart
                     }} />
                     
                     {/* Last two words with line break */}
-                    <div style={{ width: '100%', display: 'block', marginTop: '2px' }}>
-                      <span dangerouslySetInnerHTML={{ 
-                        __html: processedText.substring(processedText.lastIndexOf(lastTwoPart))
-                          .replace(
+                    {lastTwoPart && (
+                      <div style={{ width: '100%', display: 'block', marginTop: '2px' }}>
+                        <span style={{ fontWeight: '400' }} dangerouslySetInnerHTML={{ 
+                          __html: lastTwoPart.replace(
                             brandName, 
                             `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`
                           )
-                      }} />
-                    </div>
+                        }} />
+                      </div>
+                    )}
                   </>
                 );
               })()
             ) : (
-              // Regular view without line break
+              // Regular view without line break - stays on same line with names
               <span 
                 style={{ 
                   fontWeight: '400',
-                  display: 'inline',
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  whiteSpace: 'normal'
+                  flexShrink: 1,
+                  whiteSpace: singleLine ? 'nowrap' : 'normal',
+                  overflow: singleLine ? 'hidden' : 'visible',
+                  textOverflow: singleLine ? 'ellipsis' : 'clip'
                 }}
                 dangerouslySetInnerHTML={{ 
                   __html: getFormattedText().replace(
