@@ -91,7 +91,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   const [avatarBorderColor, setAvatarBorderColor] = useState(safeInitialData.avatarBorderColor || styleTemplates[0].avatarBorderColor)
   const [textColor, setTextColor] = useState(safeInitialData.textColor || '#000000')
   const [showBreakOnLarge, setShowBreakOnLarge] = useState(safeInitialData.showBreakOnLarge !== undefined ? safeInitialData.showBreakOnLarge : true)
-  const [singleLine, setSingleLine] = useState(safeInitialData.singleLine !== undefined ? safeInitialData.singleLine : false)
   const [avatarSize, setAvatarSize] = useState(safeInitialData.avatarSize || '32px')
   const [borderRadius, setBorderRadius] = useState(safeInitialData.borderRadius || styleTemplates[0].borderRadius)
   const [fontSizeDesktop, setFontSizeDesktop] = useState(safeInitialData.fontSizeDesktop || '14px')
@@ -161,7 +160,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
         avatarBorderColor,
         textColor,
         showBreakOnLarge,
-        singleLine,
         avatarSize,
         borderRadius,
         padding: getEffectivePadding(),
@@ -183,7 +181,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   }, [
     firstName1, firstName2, firstName3, userCount, brandName, customText,
     backgroundColor, avatarImage1, avatarImage2, avatarImage3, verifiedImage,
-    avatarBorderColor, textColor, showBreakOnLarge, singleLine,
+    avatarBorderColor, textColor, showBreakOnLarge,
     avatarSize, borderRadius, padding, paddingTop, paddingRight,
     paddingBottom, paddingLeft, avatarCount, selectedStyle, 
     fontSizeDesktop, fontSizeMobile, brandNameBold, onDataChange
@@ -227,35 +225,58 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   
   // Function to get the last two words for line breaking
   const getLastTwoWords = () => {
-    // First process HTML tags - keep the existing HTML formatting
-    let processedText = customText;
-    
-    // Remove HTML tags to get plain text for splitting
-    let plainText = processedText.replace(/<[^>]*>/g, '');
-    
-    // Force-add spaces around userCount and brandName
-    plainText = plainText
-      .replace(/\{userCount\}/g, ' {userCount} ')
-      .replace(/\{brandName\}/g, ' {brandName} ');
-    
-    // Normalize spaces (remove duplicates)
-    plainText = plainText.replace(/\s+/g, ' ').trim();
-    
-    // Replace with actual values 
-    plainText = plainText
-      .replace(/\{userCount\}/g, userCount)
-      .replace(/\{brandName\}/g, brandName);
-    
-    // More robust word splitting that handles different whitespace
-    const words = plainText.split(/\s+/).filter(word => word.length > 0);
+    try {
+      // First process HTML tags - keep the existing HTML formatting
+      let processedText = customText;
       
-    if (words.length <= 2) {
-      return { firstPart: '', lastTwoPart: words.join(' ') };
+      // Process HTML tags - preserve them
+      const htmlTags = [];
+      let plainText = processedText.replace(/<[^>]*>|<\/[^>]*>/g, (match) => {
+        htmlTags.push(match);
+        return '##HTML##';
+      });
+      
+      // Force-add spaces around userCount and brandName
+      plainText = plainText
+        .replace(/\{userCount\}/g, ' {userCount} ')
+        .replace(/\{brandName\}/g, ' {brandName} ');
+      
+      // Normalize spaces (remove duplicates)
+      plainText = plainText.replace(/\s+/g, ' ').trim();
+      
+      // Replace with actual values 
+      plainText = plainText
+        .replace(/\{userCount\}/g, userCount)
+        .replace(/\{brandName\}/g, brandName);
+      
+      // More robust word splitting that handles different whitespace
+      const words = plainText.split(/\s+/).filter(word => word.length > 0);
+        
+      if (words.length <= 2) {
+        return { firstPart: '', lastTwoPart: processedText };
+      }
+      
+      // Get the last two words - this is correct, we want the LAST two words to move to next line
+      const lastTwo = words.slice(-2).join(' ');
+      const firstPart = words.slice(0, -2).join(' ');
+      
+      // Get formatted HTML
+      const formattedText = getFormattedText();
+      const lastIndex = formattedText.lastIndexOf(lastTwo);
+      
+      if (lastIndex === -1) {
+        // If we can't find the last two words, just return the formatted text
+        return { firstPart: formattedText, lastTwoPart: '' };
+      }
+      
+      const htmlFirstPart = formattedText.substring(0, lastIndex);
+      const htmlLastPart = formattedText.substring(lastIndex);
+      
+      return { firstPart: htmlFirstPart, lastTwoPart: htmlLastPart };
+    } catch (error) {
+      console.error('Error in getLastTwoWords:', error);
+      return { firstPart: customText, lastTwoPart: '' };
     }
-    
-    const lastTwo = words.slice(-2).join(' ');
-    const firstPart = words.slice(0, -2).join(' ');
-    return { firstPart, lastTwoPart: lastTwo };
   };
   
   // Format the text for Shopify Liquid (used in code export)
@@ -396,61 +417,119 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           
           <div className="grid grid-cols-1 gap-3">
             <label className="block text-sm text-[#1c2838]">
-              <div className="flex items-center mb-1">
-                Variablen für Text
-              </div>
-              <div className="flex items-center space-x-2 mb-3">
-                <label className="flex items-center">
-                  <span className="text-xs mr-2">Benutzeranzahl:</span>
-                  <input
-                    type="text"
-                    value={userCount}
-                    onChange={(e) => setUserCount(e.target.value)}
-                    className="border px-2 py-1 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition w-24"
-                  />
-                </label>
-                
-                <label className="flex items-center">
-                  <span className="text-xs mr-2">Markenname:</span>
-                  <input
-                    type="text"
-                    value={brandName}
-                    onChange={(e) => setBrandName(e.target.value)}
-                    className="border px-2 py-1 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition w-24"
-                  />
-                </label>
-              </div>
-            </label>
-          </div>
-          
-          <div className="grid grid-cols-1 gap-3">
-            <label className="block text-sm text-[#1c2838]">
-              <div className="flex items-center">
-                Text mit {'{userCount}'} und {'{brandName}'} als Platzhalter:
-                <HelpTooltip text="Verwende {userCount} und {brandName} als Platzhalter für die entsprechenden Werte." />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <span>Text mit Formatierung</span>
+                  <HelpTooltip text="Wähle Text aus und nutze die Buttons unten für die Formatierung." />
+                </div>
+                <div>
+                  <label className="flex items-center mr-2 text-xs">
+                    <span className="mr-1">Anzahl:</span>
+                    <input
+                      type="text"
+                      value={userCount}
+                      onChange={(e) => setUserCount(e.target.value)}
+                      className="border px-2 py-1 rounded-md text-sm border-gray-300 focus:border-[#1c2838] w-20"
+                    />
+                  </label>
+                </div>
               </div>
               <textarea
                 value={customText}
                 onChange={(e) => setCustomText(e.target.value)}
                 className="mt-1 w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                placeholder=" und {userCount} andere sind begeistert von {brandName}"
+                placeholder="Steffi, Daniela und {userCount} andere sind begeistert von {brandName}"
                 rows={3}
               />
-              <div className="flex justify-end mt-1">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const selection = window.getSelection()?.toString();
-                    if (selection && customText.includes(selection)) {
-                      const newText = customText.replace(selection, `<strong>${selection}</strong>`);
-                      setCustomText(newText);
-                    }
-                  }}
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded mr-1"
-                >
-                  <strong>B</strong>
-                </button>
+              <div className="flex justify-between mt-1">
+                <div className="text-xs text-gray-600">
+                  <span>Platzhalter: </span>
+                  <span className="bg-gray-100 px-1 rounded mr-1 cursor-pointer" 
+                        onClick={() => {
+                          const area = document.querySelector('textarea');
+                          if (area) {
+                            const start = area.selectionStart;
+                            const end = area.selectionEnd;
+                            setCustomText(
+                              customText.substring(0, start) + 
+                              '{userCount}' + 
+                              customText.substring(end)
+                            );
+                          }
+                        }}>
+                    {"{userCount}"}
+                  </span>
+                  <span className="bg-gray-100 px-1 rounded cursor-pointer" 
+                        onClick={() => {
+                          const area = document.querySelector('textarea');
+                          if (area) {
+                            const start = area.selectionStart;
+                            const end = area.selectionEnd;
+                            setCustomText(
+                              customText.substring(0, start) + 
+                              '{brandName}' + 
+                              customText.substring(end)
+                            );
+                          }
+                          
+                        }}>
+                    {"{brandName}"}
+                  </span>
+                  <span className="ml-3">Markenname: </span>
+                  <input
+                    type="text"
+                    value={brandName}
+                    onChange={(e) => setBrandName(e.target.value)}
+                    className="border px-2 py-0 rounded-md text-xs border-gray-300 focus:border-[#1c2838] w-24 inline-block"
+                  />
+                </div>
+                <div className="flex">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const selection = window.getSelection()?.toString();
+                      if (selection && customText.includes(selection)) {
+                        const newText = customText.replace(selection, `<strong>${selection}</strong>`);
+                        setCustomText(newText);
+                      }
+                    }}
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded mr-1"
+                    title="Fett"
+                  >
+                    <strong>B</strong>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const selection = window.getSelection()?.toString();
+                      if (selection && customText.includes(selection)) {
+                        const newText = customText.replace(selection, `<em>${selection}</em>`);
+                        setCustomText(newText);
+                      }
+                    }}
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded mr-1"
+                    title="Kursiv"
+                  >
+                    <em>I</em>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const selection = window.getSelection()?.toString();
+                      if (selection && customText.includes(selection)) {
+                        const newText = customText.replace(selection, `<u>${selection}</u>`);
+                        setCustomText(newText);
+                      }
+                    }}
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded"
+                    title="Unterstrichen"
+                  >
+                    <u>U</u>
+                  </button>
+                </div>
               </div>
             </label>
           </div>
@@ -842,8 +921,17 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
 
   const preview = (
     <div className="min-h-full flex items-center justify-center p-4">
+      <style>
+        {`
+          @media (max-width: 767px) {
+            .social-proof-mobile-view {
+              font-size: ${fontSizeMobile} !important;
+            }
+          }
+        `}
+      </style>
       <div 
-        className="social-proof-box-proof" 
+        className="social-proof-box-proof social-proof-mobile-view" 
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -851,12 +939,13 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           padding: getEffectivePadding(),
           borderRadius: borderRadius,
           fontFamily: 'Arial, sans-serif',
-          fontSize: fontSizeDesktop,
+          fontSize: fontSizeDesktop, // This will be overridden by media query for mobile
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
           marginBottom: '12px',
           color: textColor,
           maxWidth: '100%',
-          fontWeight: '500'
+          fontWeight: '500',
+          transition: 'font-size 0.3s ease'
         }}
       >
         {avatarCount > 0 && (
@@ -927,7 +1016,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
             marginLeft: avatarCount > 0 ? '12px' : '0',
             lineHeight: '1.3',
             display: 'flex',
-            flexWrap: singleLine ? 'nowrap' : 'wrap',
+            flexWrap: 'wrap',
             alignItems: 'center',
             width: '100%'
           }}
@@ -939,15 +1028,14 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               display: 'flex',
               flexWrap: 'wrap',
               alignItems: 'center',
-              whiteSpace: singleLine ? 'nowrap' : 'normal'
+              whiteSpace: 'normal'
             }}
           >
             <span style={{ 
               display: 'inline-flex', 
               alignItems: 'center', 
               marginRight: '4px', 
-              flexShrink: 0,
-              whiteSpace: 'nowrap'
+              flexShrink: 0
             }}>
               <strong style={{ fontWeight: '600', flexShrink: 0 }}>{getDisplayNames()}</strong>
               <img 
@@ -976,7 +1064,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 return (
                   <>
                     {/* Main part of text */}
-                    <span style={{ display: 'inline-flex', alignItems: 'center' }} dangerouslySetInnerHTML={{ 
+                    <span style={{ display: 'inline', alignItems: 'center' }} dangerouslySetInnerHTML={{ 
                       __html: processedText.substring(0, processedText.lastIndexOf(lastTwoPart))
                     }} />
                     
@@ -998,9 +1086,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               <span 
                 style={{ 
                   fontWeight: '400',
-                  display: 'inline-flex',
+                  display: 'inline',
                   alignItems: 'center',
-                  whiteSpace: singleLine ? 'nowrap' : 'normal'
+                  whiteSpace: 'normal'
                 }}
                 dangerouslySetInnerHTML={{ 
                   __html: getFormattedText().replace(
@@ -1057,12 +1145,13 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       
       {% if section.settings.show_break_on_large %}
         {% comment %}For line breaks, split the last two words to next line{% endcomment %}
-        {% assign words = processed_text | split: ' ' %}
+        {% assign html_stripped = processed_text | strip_html %}
+        {% assign words = html_stripped | split: ' ' %}
         {% assign filtered_words = words | where_exp: "word", "word != ''" %}
         {% assign word_count = filtered_words | size %}
         
         {% if word_count > 2 %}
-          {% comment %}Get all but last two words{% endcomment %}
+          {% comment %}Get all but the last two words{% endcomment %}
           {% assign main_text = '' %}
           {% for i in (0..word_count | minus: 3) %}
             {% assign main_text = main_text | append: filtered_words[i] | append: ' ' %}
@@ -1071,14 +1160,14 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           {% comment %}Get last two words{% endcomment %}
           {% assign last_words = filtered_words[word_count | minus: 2] | append: ' ' | append: filtered_words[word_count | minus: 1] %}
           
-          {{ main_text }}
+          {% comment %}Find the last two words in the original text{% endcomment %}
+          {% assign last_words_index = processed_text | split: last_words | first | size %}
+          {% assign first_part = processed_text | slice: 0, last_words_index %}
+          {% assign last_part = processed_text | slice: last_words_index, processed_text.size %}
+          
+          {{ first_part }}
           <span class="line-break-desktop"></span>
-          {% if last_words contains section.settings.brand_name %}
-            {% assign last_words_with_brand = last_words | replace: section.settings.brand_name, '<span class="brand-name">' | append: section.settings.brand_name | append: '</span>' %}
-            {{ last_words_with_brand }}
-          {% else %}
-            {{ last_words }}
-          {% endif %}
+          {{ last_part }}
         {% else %}
           {% comment %}Not enough words to split{% endcomment %}
           {% if processed_text contains section.settings.brand_name %}
