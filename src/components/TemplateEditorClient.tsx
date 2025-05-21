@@ -264,21 +264,8 @@ export default function TemplateEditorClient({
         // Reset the global variables directly to ensure navigation works
         (window as Window & typeof globalThis).hasUnsavedChangesGlobal = false;
         
-        // Show a single success notification
-        const notification = document.createElement('div');
-        notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadeIn';
-        notification.textContent = 'Änderungen wurden erfolgreich gespeichert!';
-        document.body.appendChild(notification);
-        
-        // Remove notification after delay with fade animation
-        setTimeout(() => {
-          notification.classList.add('animate-fadeOut');
-          setTimeout(() => {
-            if (document.body.contains(notification)) {
-              document.body.removeChild(notification);
-            }
-          }, 500);
-        }, 2000);
+        // We'll use only the saveMessage state to show notifications
+        // No need to create a separate DOM notification
       } else {
         console.error("⚡ SaveAction: Save operation failed");
         setSaveMessage({ text: 'Fehler beim Speichern', type: 'error' });
@@ -862,9 +849,9 @@ function EditorWrapper({
   const { settings, preview, code } = editorContent();
   
   return (
-    <div className="h-screen flex flex-col">
-      {/* Header with save button */}
-      <div className="bg-white border-b px-6 py-3 flex flex-col md:flex-row md:justify-between md:items-center gap-3 sticky top-0 z-50">
+    <div className="h-screen flex flex-col pt-[68px] md:pt-[60px]">
+      {/* Header with save button - fixed positioned */}
+      <div className="bg-white border-b px-6 py-3 flex flex-col md:flex-row md:justify-between md:items-center gap-3 fixed top-0 left-0 right-0 z-50">
         <div className="flex items-center gap-3">
           <div className="flex-shrink-0 w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
             {template.image_url && (

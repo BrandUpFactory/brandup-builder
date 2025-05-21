@@ -203,8 +203,15 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   
   // Format the text for Shopify Liquid (used in code export)
   const getLiquidFormattedText = () => {
+    // First, ensure there's a space before the variable replacement if needed
+    const ensureSpacedText = customText
+      .replace(/([^\s])\{userCount\}/g, '$1 {userCount}')  // Add space before {userCount} if no space exists
+      .replace(/\{userCount\}([^\s])/g, '{userCount} $1')  // Add space after {userCount} if no space exists
+      .replace(/([^\s])\{brandName\}/g, '$1 {brandName}')  // Add space before {brandName} if no space exists
+      .replace(/\{brandName\}([^\s])/g, '{brandName} $1');  // Add space after {brandName} if no space exists
+    
     // For Liquid output, we need to use proper Liquid variable syntax
-    return customText
+    return ensureSpacedText
       .replace(/\{userCount\}/g, "{{ section.settings.user_count }}")
       .replace(/\{brandName\}/g, "{{ section.settings.brand_name }}");
   };
@@ -238,9 +245,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               className={`border rounded p-3 h-16 flex items-center justify-center text-xs transition
                 ${selectedStyle === index ? 'border-[#1c2838] shadow-sm bg-[#1c2838]/5' : 'border-gray-200 hover:bg-gray-50'}`}
               style={{ 
-                backgroundColor: template.backgroundColor,
-                color: index === 1 ? '#fff' : '#000',
-                borderRadius: template.borderRadius
+                backgroundColor: selectedStyle === index ? backgroundColor : template.backgroundColor,
+                color: selectedStyle === index ? textColor : (index === 1 ? '#fff' : '#000'),
+                borderRadius: selectedStyle === index ? borderRadius : template.borderRadius
               }}
             >
               Style {index + 1}
@@ -812,19 +819,46 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               }}
             />
           </div>
-          <span 
-            style={{ 
-              fontWeight: '400',
-              display: 'flex',
-              flexWrap: singleLine ? 'nowrap' : 'wrap',
-              alignItems: 'center'
-            }}
-            dangerouslySetInnerHTML={{ 
-              __html: showBreakOnLarge ? 
-                getFormattedText().replace(brandName, `<span class="brand-name" style="display: inline;"><span class="line-break-desktop" style="display: block !important; width: 100%; height: 0;"></span>${brandName}</span>`) :
-                getFormattedText()
-            }}
-          />
+          {showBreakOnLarge ? (
+            // When line break is enabled, we need to split the text at the brand name
+            <div
+              style={{ 
+                fontWeight: '400',
+                display: 'flex',
+                flexWrap: singleLine ? 'nowrap' : 'wrap',
+                alignItems: 'center',
+                width: '100%'
+              }}
+            >
+              {/* First part of text before brand name */}
+              <div dangerouslySetInnerHTML={{ 
+                __html: getFormattedText().split(brandName)[0]
+              }} />
+              
+              {/* Brand name with break before it */}
+              <div style={{ width: '100%', display: 'block' }}>
+                <div style={{ display: 'block', width: '100%', height: '4px' }}></div>
+                <strong style={{ fontWeight: '600' }}>{brandName}</strong>
+                {/* Second part of text after brand name */}
+                <span dangerouslySetInnerHTML={{ 
+                  __html: getFormattedText().split(brandName)[1] || ''
+                }} />
+              </div>
+            </div>
+          ) : (
+            // Regular view without line break
+            <span 
+              style={{ 
+                fontWeight: '400',
+                display: 'flex',
+                flexWrap: singleLine ? 'nowrap' : 'wrap',
+                alignItems: 'center'
+              }}
+              dangerouslySetInnerHTML={{ 
+                __html: getFormattedText()
+              }}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -863,7 +897,23 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       </strong>
       <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
     </div>
-    <span class="user-count-text">{{ section.settings.custom_text | replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | replace: '{brandName}', section.settings.brand_name }}</span>
+    <span class="user-count-text">
+      {% assign text_parts = section.settings.custom_text | split: '{brandName}' %}
+      {% if text_parts.size > 1 %}
+        {% assign first_part = text_parts[0] | replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | replace: '  ', ' ' %}
+        {% assign second_part = text_parts[1] | replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | replace: '  ', ' ' %}
+        
+        {{ first_part }}
+        {% if section.settings.show_break_on_large %}
+          <span class="line-break-desktop"></span>
+          <span class="brand-name">{{ section.settings.brand_name }}</span>{{ second_part }}
+        {% else %}
+          <span class="brand-name">{{ section.settings.brand_name }}</span>{{ second_part }}
+        {% endif %}
+      {% else %}
+        {{ section.settings.custom_text | replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | replace: '  ', ' ' }}
+      {% endif %}
+    </span>
   </div>
 </div>
 
@@ -942,15 +992,33 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     flex-shrink: 0;
   }
   @media (min-width: 1300px) {
+    {% if section.settings.show_break_on_large %}
+    .user-count-text {
+      display: block;
+      width: 100%;
+    }
     .line-break-desktop {
-      display: ${showBreakOnLarge ? 'block !important' : 'inline-block !important'};
+      display: block !important;
       content: '';
-      height: ${showBreakOnLarge ? '4px' : '0'};
+      height: 4px;
       width: 100%;
     }
     .brand-name {
       font-weight: 600;
+      display: block;
     }
+    {% else %}
+    .line-break-desktop {
+      display: inline-block !important;
+      content: '';
+      height: 0;
+      width: 0;
+    }
+    .brand-name {
+      font-weight: 600;
+      display: inline;
+    }
+    {% endif %}
   }
 </style>
 
