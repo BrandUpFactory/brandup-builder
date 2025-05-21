@@ -21,6 +21,7 @@ interface EditorLayoutProps {
   exportData?: object
   onImportData?: (data: any) => void
   hasUnsavedChanges?: boolean
+  onDeviceChange?: (device: 'desktop' | 'tablet' | 'mobile') => void
 }
 
 export default function EditorLayout({ 
@@ -38,7 +39,8 @@ export default function EditorLayout({
   currentVersionId,
   exportData = {},
   onImportData,
-  hasUnsavedChanges = false
+  hasUnsavedChanges = false,
+  onDeviceChange
 }: EditorLayoutProps) {
   // Check if we have a version create function
   const hasVersionCreate = !!onVersionCreate;
@@ -160,7 +162,7 @@ export default function EditorLayout({
       
       {activeTab === 'preview' && (
         <div className="border rounded-xl mb-4 h-96">
-          <DevicePreview>
+          <DevicePreview onDeviceChange={onDeviceChange}>
             {preview}
           </DevicePreview>
         </div>
@@ -235,7 +237,7 @@ export default function EditorLayout({
           <div className="grid grid-cols-2 gap-4 h-full">
             {/* Preview */}
             <div className="border rounded-xl bg-white overflow-auto">
-              <DevicePreview>
+              <DevicePreview onDeviceChange={onDeviceChange}>
                 {preview}
               </DevicePreview>
             </div>

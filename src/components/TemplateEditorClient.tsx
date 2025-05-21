@@ -811,6 +811,14 @@ function EditorWrapper({
   onVersionCreate?: () => void;
   hasUnsavedChanges?: boolean;
 }) {
+  // Device change handler for the preview component
+  const handleDeviceChange = (device: 'desktop' | 'tablet' | 'mobile') => {
+    // If our component uses SocialProofSection, pass the device to its handler if available
+    const socialProofComponent = document.getElementById('social-proof-component');
+    if (socialProofComponent && (socialProofComponent as any).handleDeviceChange) {
+      (socialProofComponent as any).handleDeviceChange(device);
+    }
+  };
   // Check if we have a version create function
   const hasVersionCreate = !!onVersionCreate;
   // Create the section component based on template type
@@ -924,6 +932,7 @@ function EditorWrapper({
           onVersionCreate={onVersionCreate}
           onSave={onSave}
           hasUnsavedChanges={hasUnsavedChanges}
+          onDeviceChange={handleDeviceChange}
         />
       </div>
     </div>

@@ -58,15 +58,7 @@ export default function DevicePreview({ children, onDeviceChange }: DevicePrevie
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
           </button>
-          <button
-            onClick={() => handleDeviceChange('tablet')}
-            className={`p-1.5 rounded ${device === 'tablet' ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-200'}`}
-            title="Tablet Ansicht"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
-          </button>
+          {/* Tablet button removed as requested */}
           <button
             onClick={() => handleDeviceChange('desktop')}
             className={`p-1.5 rounded ${device === 'desktop' ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-200'}`}

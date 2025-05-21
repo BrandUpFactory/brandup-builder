@@ -970,45 +970,32 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     </div>
   )
 
-  // Always set to mobile for preview to show mobile version
-  useEffect(() => {
-    // Only set if it's not already set to mobile
-    if (previewDevice !== 'mobile') {
-      setPreviewDevice('mobile');
-    }
-  }, [previewDevice]);
+  // Update preview on device change
+  const handleDeviceChange = (device: 'desktop' | 'tablet' | 'mobile') => {
+    setPreviewDevice(device);
+  };
   
   const preview = (
-    <div className="min-h-full flex flex-col items-center justify-center p-4">
-      {/* Mobile view indicator */}
-      <div className="flex justify-center mb-4">
-        <div className="px-4 py-2 text-xs font-medium bg-gray-100 rounded-lg flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-          </svg>
-          <span>Mobile Vorschau ({fontSizeMobile})</span>
-        </div>
-      </div>
-      
-      {/* Preview container with mobile width */}
-      <div className="flex items-center justify-center max-w-[375px]">
-            <div 
-              className="social-proof-box-proof" 
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                background: backgroundColor,
-                padding: getEffectivePadding(),
-                borderRadius: borderRadius,
-                fontFamily: 'Arial, sans-serif',
-                fontSize: getCurrentFontSize(),
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                marginBottom: '12px',
-                color: textColor,
-                maxWidth: '100%',
-                fontWeight: '500',
-                transition: 'font-size 0.3s ease'
-              }}
+    <div className="w-full h-full flex items-center justify-center">
+      <div 
+        id="social-proof-component"
+        className="social-proof-box-proof" 
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          background: backgroundColor,
+          padding: getEffectivePadding(),
+          borderRadius: borderRadius,
+          fontFamily: 'Arial, sans-serif',
+          fontSize: previewDevice === 'mobile' ? fontSizeMobile : fontSizeDesktop,
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+          marginBottom: '12px',
+          color: textColor,
+          width: 'fit-content',
+          maxWidth: '100%',
+          fontWeight: '500',
+          transition: 'font-size 0.3s ease'
+        }}
             >
         {avatarCount > 0 && (
           <div 
