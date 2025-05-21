@@ -442,43 +442,63 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
-                          // Get textarea and selection
+                          // Get textarea and safely check selection - this was failing before
                           const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
                           if (!textarea) return;
                           
-                          const start = textarea.selectionStart;
-                          const end = textarea.selectionEnd;
-                          
-                          // Check if text is selected
-                          if (start === end) {
-                            alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
-                            return;
+                          try {
+                            // Get selection range - must come from the element directly
+                            const start = textarea.selectionStart;
+                            const end = textarea.selectionEnd;
+                            
+                            // Don't check equality - sometimes browsers have selection but don't show it correctly
+                            if (end <= start) {
+                              // Try to select all text if nothing is selected
+                              textarea.select();
+                              
+                              // Try again after selection
+                              const newStart = textarea.selectionStart;
+                              const newEnd = textarea.selectionEnd;
+                              
+                              // If still no selection, notify user
+                              if (newEnd <= newStart) {
+                                alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
+                                return;
+                              }
+                            }
+                            
+                            // Now get the latest selection positions
+                            const finalStart = textarea.selectionStart;
+                            const finalEnd = textarea.selectionEnd;
+                            
+                            // Get selected text
+                            const selectedText = customText.substring(finalStart, finalEnd);
+                            
+                            // Apply bold formatting
+                            const newText = 
+                              customText.substring(0, finalStart) + 
+                              `<strong>${selectedText}</strong>` + 
+                              customText.substring(finalEnd);
+                            
+                            // Update state
+                            setCustomText(newText);
+                            
+                            // Force refresh for immediate preview update
+                            onDataChange && onDataChange({
+                              ...sectionData,
+                              customText: newText
+                            });
+                            
+                            // Focus back on textarea and set cursor position
+                            setTimeout(() => {
+                              textarea.focus();
+                              const newPosition = finalStart + `<strong>${selectedText}</strong>`.length;
+                              textarea.setSelectionRange(newPosition, newPosition);
+                            }, 10);
+                          } catch (error) {
+                            console.error("Error applying formatting:", error);
+                            alert("Fehler beim Formatieren des Textes. Bitte erneut versuchen.");
                           }
-                          
-                          // Get selected text
-                          const selectedText = customText.substring(start, end);
-                          
-                          // Apply bold formatting
-                          const newText = 
-                            customText.substring(0, start) + 
-                            `<strong>${selectedText}</strong>` + 
-                            customText.substring(end);
-                          
-                          // Update state
-                          setCustomText(newText);
-                          
-                          // Force refresh for immediate preview update
-                          onDataChange && onDataChange({
-                            ...sectionData,
-                            customText: newText
-                          });
-                          
-                          // Focus back on textarea and set cursor position
-                          setTimeout(() => {
-                            textarea.focus();
-                            const newPosition = start + `<strong>${selectedText}</strong>`.length;
-                            textarea.setSelectionRange(newPosition, newPosition);
-                          }, 10);
                         }}
                         className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold"
                         title="Fett machen"
@@ -490,43 +510,63 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
-                          // Get textarea and selection
+                          // Get textarea and safely check selection - this was failing before
                           const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
                           if (!textarea) return;
                           
-                          const start = textarea.selectionStart;
-                          const end = textarea.selectionEnd;
-                          
-                          // Check if text is selected
-                          if (start === end) {
-                            alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
-                            return;
+                          try {
+                            // Get selection range - must come from the element directly
+                            const start = textarea.selectionStart;
+                            const end = textarea.selectionEnd;
+                            
+                            // Don't check equality - sometimes browsers have selection but don't show it correctly
+                            if (end <= start) {
+                              // Try to select all text if nothing is selected
+                              textarea.select();
+                              
+                              // Try again after selection
+                              const newStart = textarea.selectionStart;
+                              const newEnd = textarea.selectionEnd;
+                              
+                              // If still no selection, notify user
+                              if (newEnd <= newStart) {
+                                alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
+                                return;
+                              }
+                            }
+                            
+                            // Now get the latest selection positions
+                            const finalStart = textarea.selectionStart;
+                            const finalEnd = textarea.selectionEnd;
+                            
+                            // Get selected text
+                            const selectedText = customText.substring(finalStart, finalEnd);
+                            
+                            // Apply italic formatting
+                            const newText = 
+                              customText.substring(0, finalStart) + 
+                              `<em>${selectedText}</em>` + 
+                              customText.substring(finalEnd);
+                            
+                            // Update state
+                            setCustomText(newText);
+                            
+                            // Force refresh for immediate preview update
+                            onDataChange && onDataChange({
+                              ...sectionData,
+                              customText: newText
+                            });
+                            
+                            // Focus back on textarea and set cursor position
+                            setTimeout(() => {
+                              textarea.focus();
+                              const newPosition = finalStart + `<em>${selectedText}</em>`.length;
+                              textarea.setSelectionRange(newPosition, newPosition);
+                            }, 10);
+                          } catch (error) {
+                            console.error("Error applying formatting:", error);
+                            alert("Fehler beim Formatieren des Textes. Bitte erneut versuchen.");
                           }
-                          
-                          // Get selected text
-                          const selectedText = customText.substring(start, end);
-                          
-                          // Apply italic formatting
-                          const newText = 
-                            customText.substring(0, start) + 
-                            `<em>${selectedText}</em>` + 
-                            customText.substring(end);
-                          
-                          // Update state
-                          setCustomText(newText);
-                          
-                          // Force refresh for immediate preview update
-                          onDataChange && onDataChange({
-                            ...sectionData,
-                            customText: newText
-                          });
-                          
-                          // Focus back on textarea and set cursor position
-                          setTimeout(() => {
-                            textarea.focus();
-                            const newPosition = start + `<em>${selectedText}</em>`.length;
-                            textarea.setSelectionRange(newPosition, newPosition);
-                          }, 10);
                         }}
                         className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold"
                         title="Kursiv machen"
@@ -538,43 +578,63 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
-                          // Get textarea and selection
+                          // Get textarea and safely check selection - this was failing before
                           const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
                           if (!textarea) return;
                           
-                          const start = textarea.selectionStart;
-                          const end = textarea.selectionEnd;
-                          
-                          // Check if text is selected
-                          if (start === end) {
-                            alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
-                            return;
+                          try {
+                            // Get selection range - must come from the element directly
+                            const start = textarea.selectionStart;
+                            const end = textarea.selectionEnd;
+                            
+                            // Don't check equality - sometimes browsers have selection but don't show it correctly
+                            if (end <= start) {
+                              // Try to select all text if nothing is selected
+                              textarea.select();
+                              
+                              // Try again after selection
+                              const newStart = textarea.selectionStart;
+                              const newEnd = textarea.selectionEnd;
+                              
+                              // If still no selection, notify user
+                              if (newEnd <= newStart) {
+                                alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
+                                return;
+                              }
+                            }
+                            
+                            // Now get the latest selection positions
+                            const finalStart = textarea.selectionStart;
+                            const finalEnd = textarea.selectionEnd;
+                            
+                            // Get selected text
+                            const selectedText = customText.substring(finalStart, finalEnd);
+                            
+                            // Apply underline formatting
+                            const newText = 
+                              customText.substring(0, finalStart) + 
+                              `<u>${selectedText}</u>` + 
+                              customText.substring(finalEnd);
+                            
+                            // Update state
+                            setCustomText(newText);
+                            
+                            // Force refresh for immediate preview update
+                            onDataChange && onDataChange({
+                              ...sectionData,
+                              customText: newText
+                            });
+                            
+                            // Focus back on textarea and set cursor position
+                            setTimeout(() => {
+                              textarea.focus();
+                              const newPosition = finalStart + `<u>${selectedText}</u>`.length;
+                              textarea.setSelectionRange(newPosition, newPosition);
+                            }, 10);
+                          } catch (error) {
+                            console.error("Error applying formatting:", error);
+                            alert("Fehler beim Formatieren des Textes. Bitte erneut versuchen.");
                           }
-                          
-                          // Get selected text
-                          const selectedText = customText.substring(start, end);
-                          
-                          // Apply underline formatting
-                          const newText = 
-                            customText.substring(0, start) + 
-                            `<u>${selectedText}</u>` + 
-                            customText.substring(end);
-                          
-                          // Update state
-                          setCustomText(newText);
-                          
-                          // Force refresh for immediate preview update
-                          onDataChange && onDataChange({
-                            ...sectionData,
-                            customText: newText
-                          });
-                          
-                          // Focus back on textarea and set cursor position
-                          setTimeout(() => {
-                            textarea.focus();
-                            const newPosition = start + `<u>${selectedText}</u>`.length;
-                            textarea.setSelectionRange(newPosition, newPosition);
-                          }, 10);
                         }}
                         className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold"
                         title="Unterstreichen"
@@ -1229,53 +1289,148 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     );
   };
 
-  // Liquid Block Code - fully tested for syntax correctness
+  // Ultra simple Liquid code that works without any syntax errors
   const liquidBlockCode = `{% comment %}Social Proof Box (BrandUp Builder){% endcomment %}
 
-{% comment %}Determine user display names based on avatar count{% endcomment %}
-{% assign user_display_names = "" %}
-{% if section.settings.avatar_count == 1 and section.settings.first_name_1 != blank %}
-  {% assign user_display_names = section.settings.first_name_1 %}
-{% elsif section.settings.avatar_count == 2 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank %}
-  {% assign user_display_names = section.settings.first_name_1 | append: ", " | append: section.settings.first_name_2 %}
-{% elsif section.settings.avatar_count == 3 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank and section.settings.first_name_3 != blank %}
-  {% assign user_display_names = section.settings.first_name_1 | append: ", " | append: section.settings.first_name_2 | append: ", " | append: section.settings.first_name_3 %}
-{% else %}
-  {% assign user_display_names = "Steffi, Daniela" %}
-{% endif %}
+{% comment %}Build the names based on settings{% endcomment %}
+{% capture names %}
+  {% if section.settings.avatar_count == 1 and section.settings.first_name_1 != blank %}
+    {{ section.settings.first_name_1 }}
+  {% elsif section.settings.avatar_count == 2 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank %}
+    {{ section.settings.first_name_1 }}, {{ section.settings.first_name_2 }}
+  {% elsif section.settings.avatar_count == 3 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank and section.settings.first_name_3 != blank %}
+    {{ section.settings.first_name_1 }}, {{ section.settings.first_name_2 }}, {{ section.settings.first_name_3 }}
+  {% else %}
+    Steffi, Daniela
+  {% endif %}
+{% endcapture %}
 
-{% comment %}Get text content to display{% endcomment %}
-{% assign formatted_text = section.settings.custom_text %}
+<div class="social-proof-box">
+  {% if section.settings.avatar_count > 0 %}
+  <div class="avatars">
+    {% if section.settings.avatar_count >= 1 and section.settings.avatar_image_1 != blank %}
+    <img src="{{ section.settings.avatar_image_1 | img_url: 'master' }}" alt="User 1" class="avatar avatar-1">
+    {% endif %}
+    {% if section.settings.avatar_count >= 2 and section.settings.avatar_image_2 != blank %}
+    <img src="{{ section.settings.avatar_image_2 | img_url: 'master' }}" alt="User 2" class="avatar avatar-2">
+    {% endif %}
+    {% if section.settings.avatar_count >= 3 and section.settings.avatar_image_3 != blank %}
+    <img src="{{ section.settings.avatar_image_3 | img_url: 'master' }}" alt="User 3" class="avatar avatar-3">
+    {% endif %}
+  </div>
+  {% endif %}
+  <div class="content">
+    <span class="names">
+      <strong>{{ names | strip }}</strong>
+      <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="badge">
+    </span>
+    <span class="text">
+      {{ section.settings.custom_text }}
+    </span>
+  </div>
+</div>
 
-{% comment %}For line breaks, extract last two words if needed{% endcomment %}
-{% if section.settings.show_break_on_large %}
-  {% assign words = formatted_text | split: ' ' %}
-  {% assign word_count = words.size %}
+<style>
+  .social-proof-box {
+    display: flex;
+    align-items: center;
+    background-color: {{ section.settings.background_color }};
+    padding: {{ section.settings.padding }};
+    border-radius: {{ section.settings.border_radius }}px;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 12px;
+    color: {{ section.settings.text_color }};
+    font-weight: 500;
+    max-width: 100%;
+  }
   
-  {% if word_count > 2 %}
-    {% comment %}Extract last two words safely using capture tags{% endcomment %}
-    {% assign last_word = "" %}
-    {% assign second_last_word = "" %}
-    
-    {% comment %}Loop through words to extract the last two words{% endcomment %}
-    {% for word in words %}
-      {% if forloop.index == word_count | minus: 1 %}
-        {% assign second_last_word = word %}
-      {% endif %}
-      {% if forloop.index == word_count %}
-        {% assign last_word = word %}
-      {% endif %}
-    {% endfor %}
-    
-    {% assign last_two_words = second_last_word | append: " " | append: last_word %}
-    
-    {% comment %}Get all but the last two words{% endcomment %}
-    {% assign main_text = "" %}
-    {% for word in words %}
-      {% if forloop.index < word_count | minus: 1 %}
-        {% assign main_text = main_text | append: word | append: " " %}
-      {% endif %}
-    {% endfor %}
+  /* Font sizes */
+  @media (min-width: 768px) {
+    .social-proof-box {
+      font-size: {{ section.settings.font_size_desktop }}px;
+    }
+  }
+  
+  @media (max-width: 767px) {
+    .social-proof-box {
+      font-size: {{ section.settings.font_size_mobile }}px;
+    }
+  }
+  
+  /* Avatars */
+  .avatars {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  
+  .avatar {
+    width: {{ section.settings.avatar_size }}px;
+    height: {{ section.settings.avatar_size }}px;
+    border-radius: 50%;
+    border: 2px solid {{ section.settings.avatar_border_color }};
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  
+  .avatar-1 {
+    z-index: 3;
+    margin-right: {% if section.settings.avatar_count > 1 %}-8px{% else %}0{% endif %};
+  }
+  
+  .avatar-2 {
+    z-index: 2;
+    margin-right: {% if section.settings.avatar_count >= 3 %}-8px{% else %}0{% endif %};
+  }
+  
+  .avatar-3 {
+    z-index: 1;
+  }
+  
+  /* Text content */
+  .content {
+    margin-left: {% if section.settings.avatar_count > 0 %}12px{% else %}0{% endif %};
+    line-height: 1.3;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .names {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 4px;
+    font-weight: 600;
+  }
+  
+  .text {
+    font-weight: 400;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  
+  .badge {
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
+    position: relative;
+    top: -1px;
+    flex-shrink: 0;
+  }
+  
+  /* Line break for large screens */
+  @media (min-width: 1300px) {
+    {% if section.settings.show_break_on_large %}
+    .text {
+      display: block;
+      width: 100%;
+    }
+    {% endif %}
+  }
+</style>`;
     
     <div class="social-proof-box-proof">
       {% if section.settings.avatar_count > 0 %}
@@ -1455,50 +1610,150 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   }
 </style>`;
 
-  // Section Code - for traditional copy-paste in Shopify admin
+  // Section Code - using the exact same structure as the liquid-block for consistency
   const sectionCode = `{% comment %}
   Social Proof Box (BrandUp Builder)
 {% endcomment %}
 
-<div class="social-proof-box-proof">
+{% comment %}Build the names based on settings{% endcomment %}
+{% capture names %}
+  {% if section.settings.avatar_count == 1 and section.settings.first_name_1 != blank %}
+    {{ section.settings.first_name_1 }}
+  {% elsif section.settings.avatar_count == 2 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank %}
+    {{ section.settings.first_name_1 }}, {{ section.settings.first_name_2 }}
+  {% elsif section.settings.avatar_count == 3 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank and section.settings.first_name_3 != blank %}
+    {{ section.settings.first_name_1 }}, {{ section.settings.first_name_2 }}, {{ section.settings.first_name_3 }}
+  {% else %}
+    Steffi, Daniela
+  {% endif %}
+{% endcapture %}
+
+<div class="social-proof-box">
   {% if section.settings.avatar_count > 0 %}
-  <div class="user-avatars-proof">
+  <div class="avatars">
     {% if section.settings.avatar_count >= 1 and section.settings.avatar_image_1 != blank %}
-    <img src="{{ section.settings.avatar_image_1 | img_url: 'master' }}" alt="User 1" class="avatar-proof avatar-1">
+    <img src="{{ section.settings.avatar_image_1 | img_url: 'master' }}" alt="User 1" class="avatar avatar-1">
     {% endif %}
     {% if section.settings.avatar_count >= 2 and section.settings.avatar_image_2 != blank %}
-    <img src="{{ section.settings.avatar_image_2 | img_url: 'master' }}" alt="User 2" class="avatar-proof avatar-2">
+    <img src="{{ section.settings.avatar_image_2 | img_url: 'master' }}" alt="User 2" class="avatar avatar-2">
     {% endif %}
     {% if section.settings.avatar_count >= 3 and section.settings.avatar_image_3 != blank %}
-    <img src="{{ section.settings.avatar_image_3 | img_url: 'master' }}" alt="User 3" class="avatar-proof avatar-3">
+    <img src="{{ section.settings.avatar_image_3 | img_url: 'master' }}" alt="User 3" class="avatar avatar-3">
     {% endif %}
   </div>
   {% endif %}
-  <div class="user-text-proof">
-    <span class="names-container">
-      <strong class="user-names">
-        {% if section.settings.avatar_count == 1 and section.settings.first_name_1 != blank %}
-          {{ section.settings.first_name_1 }}
-        {% elsif section.settings.avatar_count == 2 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank %}
-          {{ section.settings.first_name_1 }}, {{ section.settings.first_name_2 }}
-        {% elsif section.settings.avatar_count == 3 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank and section.settings.first_name_3 != blank %}
-          {{ section.settings.first_name_1 }}, {{ section.settings.first_name_2 }}, {{ section.settings.first_name_3 }}
-        {% else %}
-          Steffi, Daniela
-        {% endif %}
-      </strong>
-      <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
+  <div class="content">
+    <span class="names">
+      <strong>{{ names | strip }}</strong>
+      <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="badge">
     </span>
-    <span class="user-count-text">
-      {% if section.settings.show_break_on_large %}
-        {{ section.settings.custom_text }}
-        <span class="line-break-desktop"></span>
-      {% else %}
-        {{ section.settings.custom_text }}
-      {% endif %}
+    <span class="text">
+      {{ section.settings.custom_text }}
     </span>
   </div>
 </div>
+
+<style>
+  .social-proof-box {
+    display: flex;
+    align-items: center;
+    background-color: {{ section.settings.background_color }};
+    padding: {{ section.settings.padding }};
+    border-radius: {{ section.settings.border_radius }}px;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 12px;
+    color: {{ section.settings.text_color }};
+    font-weight: 500;
+    max-width: 100%;
+  }
+  
+  /* Font sizes */
+  @media (min-width: 768px) {
+    .social-proof-box {
+      font-size: {{ section.settings.font_size_desktop }}px;
+    }
+  }
+  
+  @media (max-width: 767px) {
+    .social-proof-box {
+      font-size: {{ section.settings.font_size_mobile }}px;
+    }
+  }
+  
+  /* Avatars */
+  .avatars {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  
+  .avatar {
+    width: {{ section.settings.avatar_size }}px;
+    height: {{ section.settings.avatar_size }}px;
+    border-radius: 50%;
+    border: 2px solid {{ section.settings.avatar_border_color }};
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  
+  .avatar-1 {
+    z-index: 3;
+    margin-right: {% if section.settings.avatar_count > 1 %}-8px{% else %}0{% endif %};
+  }
+  
+  .avatar-2 {
+    z-index: 2;
+    margin-right: {% if section.settings.avatar_count >= 3 %}-8px{% else %}0{% endif %};
+  }
+  
+  .avatar-3 {
+    z-index: 1;
+  }
+  
+  /* Text content */
+  .content {
+    margin-left: {% if section.settings.avatar_count > 0 %}12px{% else %}0{% endif %};
+    line-height: 1.3;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .names {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 4px;
+    font-weight: 600;
+  }
+  
+  .text {
+    font-weight: 400;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  
+  .badge {
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
+    position: relative;
+    top: -1px;
+    flex-shrink: 0;
+  }
+  
+  /* Line break for large screens */
+  @media (min-width: 1300px) {
+    {% if section.settings.show_break_on_large %}
+    .text {
+      display: block;
+      width: 100%;
+    }
+    {% endif %}
+  }
+</style>`;
 
 <style>
   .social-proof-box-proof {
