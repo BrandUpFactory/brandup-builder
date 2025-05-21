@@ -65,6 +65,12 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   // Ensure initialData is an object
   const safeInitialData = initialData || {};
   
+  // Prevent page jumping for range sliders and other interactive elements
+  const preventJump = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+  
   // Style template selection
   const [selectedStyle, setSelectedStyle] = useState<number>(safeInitialData.selectedStyle !== undefined ? safeInitialData.selectedStyle : 0);
   
@@ -127,12 +133,16 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     setBorderRadius(template.borderRadius);
     setPadding(template.padding);
     
-    // If single padding is active, update the individual padding values too
+    // Always update both single padding and individual padding values
     // This ensures consistent state across all padding-related variables
-    setPaddingTop(template.padding.replace('px', ''));
-    setPaddingRight(template.padding.replace('px', ''));
-    setPaddingBottom(template.padding.replace('px', ''));
-    setPaddingLeft(template.padding.replace('px', ''));
+    const paddingValue = template.padding.replace('px', '');
+    setPaddingTop(paddingValue);
+    setPaddingRight(paddingValue);
+    setPaddingBottom(paddingValue);
+    setPaddingLeft(paddingValue);
+    
+    // Set single padding mode to ensure UI is consistent with selection
+    setUseSinglePadding(true);
   };
   
   // Update parent component when data changes
@@ -203,12 +213,33 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       .replace(/([^\s])\{brandName\}/g, '$1 {brandName}')  // Add space before {brandName} if no space exists
       .replace(/\{brandName\}([^\s])/g, '{brandName} $1');  // Add space after {brandName} if no space exists
       
-    // Then, replace variables with properly formatted values
+    // Replace variables with properly formatted values
+    // Make sure there's proper spacing around the userCount
     let formattedText = ensureSpacedText
       .replace(/\{userCount\}/g, `<strong>${userCount}</strong>`)
-      .replace(/\{brandName\}/g, brandName);
+      .replace(/\{brandName\}/g, brandName)
+      .replace(/\s{2,}/g, ' '); // Prevent multiple spaces
     
-    return formattedText;
+    return formattedText.trim();
+  };
+  
+  // Function to get the last two words for line breaking
+  const getLastTwoWords = () => {
+    const processedText = customText
+      .replace(/\{userCount\}/g, userCount)
+      .replace(/\{brandName\}/g, brandName)
+      .trim();
+    
+    // More robust word splitting that handles different whitespace
+    const words = processedText.split(/\s+/).filter(word => word.length > 0);
+      
+    if (words.length <= 2) {
+      return { firstPart: '', lastTwoPart: words.join(' ') };
+    }
+    
+    const lastTwo = words.slice(-2).join(' ');
+    const firstPart = words.slice(0, -2).join(' ');
+    return { firstPart, lastTwoPart: lastTwo };
   };
   
   // Format the text for Shopify Liquid (used in code export)
@@ -251,7 +282,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           {styleTemplates.map((template, index) => (
             <button
               key={index}
-              onClick={(e) => applyStyleTemplate(e, index)}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); applyStyleTemplate(e, index); }}
               className={`border rounded p-3 h-16 flex items-center justify-center text-xs transition
                 ${selectedStyle === index ? 'border-[#1c2838] shadow-sm bg-[#1c2838]/5' : 'border-gray-200 hover:bg-gray-50'}`}
               style={{ 
@@ -273,25 +304,25 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
         <div className="space-y-2">
           <div className="flex gap-2 mt-1">
             <button
-              onClick={(e) => { e.preventDefault(); setAvatarCount(1); }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAvatarCount(1); }}
               className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 1 ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
               1 Avatar
             </button>
             <button
-              onClick={(e) => { e.preventDefault(); setAvatarCount(2); }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAvatarCount(2); }}
               className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 2 ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
               2 Avatare
             </button>
             <button
-              onClick={(e) => { e.preventDefault(); setAvatarCount(3); }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAvatarCount(3); }}
               className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 3 ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
               3 Avatare
             </button>
             <button
-              onClick={(e) => { e.preventDefault(); setAvatarCount(0); }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAvatarCount(0); }}
               className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 0 ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
               Keine
@@ -566,6 +597,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 step="2"
                 value={avatarSize.replace('px', '')}
                 onChange={(e) => setAvatarSize(`${e.target.value}px`)}
+                onMouseDown={preventJump}
                 className="w-full accent-[#1c2838]"
               />
               <span className="ml-2 text-xs text-gray-500 w-12">{avatarSize}</span>
@@ -582,6 +614,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 step="1"
                 value={borderRadius.replace('px', '')}
                 onChange={(e) => setBorderRadius(`${e.target.value}px`)}
+                onMouseDown={preventJump}
                 className="w-full accent-[#1c2838]"
               />
               <span className="ml-2 text-xs text-gray-500 w-12">{borderRadius}</span>
@@ -591,57 +624,48 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           <div className="space-y-2 pt-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={showBreakOnLarge}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setShowBreakOnLarge(e.target.checked);
-                    }}
-                    className="sr-only peer"
-                  />
-                  <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#1c2838]/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#1c2838]"></div>
-                  <span className="ml-2 text-sm text-gray-600">Markenname umbrechen</span>
-                </label>
-                <HelpTooltip text="Bricht den Markennamen auf großen Bildschirmen in eine neue Zeile um." />
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowBreakOnLarge(!showBreakOnLarge); }}
+                  className="flex items-center cursor-pointer bg-transparent border-none p-0 m-0 focus:outline-none"
+                >
+                  <div className={`relative w-9 h-5 ${showBreakOnLarge ? 'bg-[#1c2838]' : 'bg-gray-200'} rounded-full transition-colors`}>
+                    <div className={`absolute top-[2px] ${showBreakOnLarge ? 'right-[2px] translate-x-0' : 'left-[2px] translate-x-0'} bg-white border rounded-full h-4 w-4 transition-all`}></div>
+                  </div>
+                  <span className="ml-2 text-sm text-gray-600">Umbrechen</span>
+                </button>
+                <HelpTooltip text="Bricht auf großen Bildschirmen die letzten zwei Wörter in eine neue Zeile um." />
               </div>
             </div>
             
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={brandNameBold}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setBrandNameBold(e.target.checked);
-                    }}
-                    className="sr-only peer"
-                  />
-                  <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#1c2838]/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#1c2838]"></div>
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setBrandNameBold(!brandNameBold); }}
+                  className="flex items-center cursor-pointer bg-transparent border-none p-0 m-0 focus:outline-none"
+                >
+                  <div className={`relative w-9 h-5 ${brandNameBold ? 'bg-[#1c2838]' : 'bg-gray-200'} rounded-full transition-colors`}>
+                    <div className={`absolute top-[2px] ${brandNameBold ? 'right-[2px] translate-x-0' : 'left-[2px] translate-x-0'} bg-white border rounded-full h-4 w-4 transition-all`}></div>
+                  </div>
                   <span className="ml-2 text-sm text-gray-600">Markenname fett</span>
-                </label>
+                </button>
                 <HelpTooltip text="Stellt den Markennamen fett dar." />
               </div>
             </div>
             
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={singleLine}
-                    onChange={(e) => {
-                      e.preventDefault();
-                      setSingleLine(e.target.checked);
-                    }}
-                    className="sr-only peer"
-                  />
-                  <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#1c2838]/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#1c2838]"></div>
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSingleLine(!singleLine); }}
+                  className="flex items-center cursor-pointer bg-transparent border-none p-0 m-0 focus:outline-none"
+                >
+                  <div className={`relative w-9 h-5 ${singleLine ? 'bg-[#1c2838]' : 'bg-gray-200'} rounded-full transition-colors`}>
+                    <div className={`absolute top-[2px] ${singleLine ? 'right-[2px] translate-x-0' : 'left-[2px] translate-x-0'} bg-white border rounded-full h-4 w-4 transition-all`}></div>
+                  </div>
                   <span className="ml-2 text-sm text-gray-600">Einzeilig anzeigen</span>
-                </label>
+                </button>
                 <HelpTooltip text="Zeigt den gesamten Text in einer Zeile an, statt umzubrechen." />
               </div>
             </div>
@@ -659,6 +683,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   step="1"
                   value={fontSizeDesktop.replace('px', '')}
                   onChange={(e) => setFontSizeDesktop(`${e.target.value}px`)}
+                  onMouseDown={preventJump}
                   className="w-full accent-[#1c2838]"
                 />
                 <span className="ml-2 text-xs text-gray-500 w-12">{fontSizeDesktop}</span>
@@ -675,6 +700,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   step="1"
                   value={fontSizeMobile.replace('px', '')}
                   onChange={(e) => setFontSizeMobile(`${e.target.value}px`)}
+                  onMouseDown={preventJump}
                   className="w-full accent-[#1c2838]"
                 />
                 <span className="ml-2 text-xs text-gray-500 w-12">{fontSizeMobile}</span>
@@ -690,13 +716,13 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
         
         <div className="flex gap-3 mb-3">
           <button
-            onClick={(e) => { e.preventDefault(); setUseSinglePadding(true); }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setUseSinglePadding(true); }}
             className={`px-3 py-1.5 rounded text-xs flex-1 ${useSinglePadding ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
           >
             Einfach
           </button>
           <button
-            onClick={(e) => { e.preventDefault(); setUseSinglePadding(false); }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setUseSinglePadding(false); }}
             className={`px-3 py-1.5 rounded text-xs flex-1 ${!useSinglePadding ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
           >
             Individuell
@@ -874,57 +900,75 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
             width: '100%'
           }}
         >
-          {/* User names and verification badge - inline with text */}
-          <div style={{ display: 'flex', alignItems: 'center', marginRight: '4px', flexShrink: 0 }}>
-            <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
-            <img 
-              src={verifiedImage}
-              alt="Verifiziert" 
-              className="verified-badge-proof" 
-              style={{
-                width: '16px',
-                height: '16px',
-                marginLeft: '4px',
-                position: 'relative',
-                top: '-1px',
-                flexShrink: 0
-              }}
-            />
-          </div>
-          
-          {/* Text content with conditional line break */}
-          <div
+          {/* Whole text with names embedded */}
+          <div 
             style={{ 
               fontWeight: '400',
-              display: 'inline',
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
               whiteSpace: singleLine ? 'nowrap' : 'normal'
             }}
           >
+            <span style={{ 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              marginRight: '4px', 
+              flexShrink: 0,
+              whiteSpace: 'nowrap'
+            }}>
+              <strong style={{ fontWeight: '600', flexShrink: 0 }}>{getDisplayNames()}</strong>
+              <img 
+                src={verifiedImage}
+                alt="Verifiziert" 
+                className="verified-badge-proof" 
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  marginLeft: '4px',
+                  position: 'relative',
+                  top: '-1px',
+                  flexShrink: 0
+                }}
+              />
+            </span>
             {showBreakOnLarge ? (
-              // When line break is enabled, split text at brand name
-              <>
-                {/* First part of text before brand name */}
-                <div style={{ display: 'inline' }} dangerouslySetInnerHTML={{ 
-                  __html: getFormattedText().split(brandName)[0]
-                }} />
+              // When line break is enabled, split text to move the last two words to next line
+              (() => {
+                // Get parts with last two words separated
+                const { firstPart, lastTwoPart } = getLastTwoWords();
                 
-                {/* Brand name with break before it */}
-                <div style={{ width: '100%', display: 'block' }}>
-                  <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>{brandName}</span>
-                  {/* Second part of text after brand name */}
-                  <span dangerouslySetInnerHTML={{ 
-                    __html: getFormattedText().split(brandName)[1] || ''
-                  }} />
-                </div>
-              </>
+                // Show the full formatted text with last two words on next line
+                const processedText = getFormattedText();
+                
+                return (
+                  <>
+                    {/* Main part of text */}
+                    <span style={{ display: 'inline-flex', alignItems: 'center' }} dangerouslySetInnerHTML={{ 
+                      __html: processedText.substring(0, processedText.lastIndexOf(lastTwoPart))
+                    }} />
+                    
+                    {/* Last two words with line break */}
+                    <div style={{ width: '100%', display: 'block', marginTop: '2px' }}>
+                      <span dangerouslySetInnerHTML={{ 
+                        __html: processedText.substring(processedText.lastIndexOf(lastTwoPart))
+                          .replace(
+                            brandName, 
+                            `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`
+                          )
+                      }} />
+                    </div>
+                  </>
+                );
+              })()
             ) : (
               // Regular view without line break
               <span 
                 style={{ 
                   fontWeight: '400',
-                  display: 'flex',
-                  flexWrap: singleLine ? 'nowrap' : 'wrap',
-                  alignItems: 'center'
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  whiteSpace: singleLine ? 'nowrap' : 'normal'
                 }}
                 dangerouslySetInnerHTML={{ 
                   __html: getFormattedText().replace(
@@ -959,7 +1003,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   </div>
   {% endif %}
   <div class="user-text-proof{% if section.settings.single_line %} single-line{% endif %}">
-    <div class="names-container">
+    <span class="names-container">
       <strong class="user-names">
         {% if section.settings.avatar_count == 1 %}
           {{ section.settings.first_name_1 }}
@@ -972,22 +1016,50 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
         {% endif %}
       </strong>
       <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
-    </div>
+    </span>
     <span class="user-count-text">
-      {% assign text_parts = section.settings.custom_text | split: '{brandName}' %}
-      {% if text_parts.size > 1 %}
-        {% assign first_part = text_parts[0] | replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | replace: '  ', ' ' %}
-        {% assign second_part = text_parts[1] | replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | replace: '  ', ' ' %}
+      {% comment %}Process placeholders first{% endcomment %}
+      {% assign processed_text = section.settings.custom_text | replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | replace: '{brandName}', section.settings.brand_name | replace: '  ', ' ' %}
+      
+      {% if section.settings.show_break_on_large %}
+        {% comment %}For line breaks, split the last two words to next line{% endcomment %}
+        {% assign words = processed_text | split: ' ' %}
+        {% assign filtered_words = words | where_exp: "word", "word != ''" %}
+        {% assign word_count = filtered_words | size %}
         
-        {{ first_part }}
-        {% if section.settings.show_break_on_large %}
+        {% if word_count > 2 %}
+          {% comment %}Get all but last two words{% endcomment %}
+          {% assign main_text = '' %}
+          {% for i in (0..word_count | minus: 3) %}
+            {% assign main_text = main_text | append: filtered_words[i] | append: ' ' %}
+          {% endfor %}
+          
+          {% comment %}Get last two words{% endcomment %}
+          {% assign last_words = filtered_words[word_count | minus: 2] | append: ' ' | append: filtered_words[word_count | minus: 1] %}
+          
+          {{ main_text }}
           <span class="line-break-desktop"></span>
-          <span class="brand-name">{{ section.settings.brand_name }}</span>{{ second_part }}
+          {% if last_words contains section.settings.brand_name %}
+            {% assign last_words_with_brand = last_words | replace: section.settings.brand_name, '<span class="brand-name">' | append: section.settings.brand_name | append: '</span>' %}
+            {{ last_words_with_brand }}
+          {% else %}
+            {{ last_words }}
+          {% endif %}
         {% else %}
-          <span class="brand-name">{{ section.settings.brand_name }}</span>{{ second_part }}
+          {% comment %}Not enough words to split{% endcomment %}
+          {% if processed_text contains section.settings.brand_name %}
+            {{ processed_text | replace: section.settings.brand_name, '<span class="brand-name">' | append: section.settings.brand_name | append: '</span>' }}
+          {% else %}
+            {{ processed_text }}
+          {% endif %}
         {% endif %}
       {% else %}
-        {{ section.settings.custom_text | replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | replace: '  ', ' ' }}
+        {% comment %}Regular display without line break{% endcomment %}
+        {% if processed_text contains section.settings.brand_name %}
+          {{ processed_text | replace: section.settings.brand_name, '<span class="brand-name">' | append: section.settings.brand_name | append: '</span>' }}
+        {% else %}
+          {{ processed_text }}
+        {% endif %}
       {% endif %}
     </span>
   </div>
@@ -1057,10 +1129,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     text-overflow: ellipsis;
   }
   .names-container {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     margin-right: 4px;
-    flex-shrink: 0;
   }
   .user-names {
     font-weight: 600;

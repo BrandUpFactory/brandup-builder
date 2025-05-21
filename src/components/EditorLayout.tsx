@@ -130,21 +130,21 @@ export default function EditorLayout({
   // On small screens, show tabs for navigation
   const mobileView = (
     <div className="md:hidden">
-      <div className="flex border-b mb-4 overflow-x-auto">
+      <div className="flex border-b mb-4">
         <button 
-          onClick={() => setActiveTab('settings')}
+          onClick={(e) => { e.preventDefault(); setActiveTab('settings'); }}
           className={`px-4 py-2 text-sm whitespace-nowrap ${activeTab === 'settings' ? 'border-b-2 border-[#1c2838] font-medium' : 'text-gray-600'}`}
         >
           Einstellungen
         </button>
         <button 
-          onClick={() => setActiveTab('preview')}
+          onClick={(e) => { e.preventDefault(); setActiveTab('preview'); }}
           className={`px-4 py-2 text-sm whitespace-nowrap ${activeTab === 'preview' ? 'border-b-2 border-[#1c2838] font-medium' : 'text-gray-600'}`}
         >
           Vorschau
         </button>
         <button 
-          onClick={() => setActiveTab('code')}
+          onClick={(e) => { e.preventDefault(); setActiveTab('code'); }}
           className={`px-4 py-2 text-sm whitespace-nowrap ${activeTab === 'code' ? 'border-b-2 border-[#1c2838] font-medium' : 'text-gray-600'}`}
         >
           Code
@@ -152,14 +152,14 @@ export default function EditorLayout({
       </div>
       
       {activeTab === 'settings' && (
-        <div className="border rounded-xl p-4 overflow-auto mb-4">
+        <div className="border rounded-xl p-4 mb-4">
           <h2 className="text-lg font-semibold mb-2">Einstellungen</h2>
           {settings}
         </div>
       )}
       
       {activeTab === 'preview' && (
-        <div className="border rounded-xl overflow-auto mb-4 h-96">
+        <div className="border rounded-xl mb-4 h-96">
           <DevicePreview>
             {preview}
           </DevicePreview>
@@ -167,7 +167,7 @@ export default function EditorLayout({
       )}
       
       {activeTab === 'code' && (
-        <div className="border rounded-xl p-4 overflow-auto bg-[#f9f9f9] mb-4">
+        <div className="border rounded-xl p-4 bg-[#f9f9f9] mb-4">
           <h2 className="text-lg font-semibold mb-2">Liquid Code</h2>
           <div className="text-sm whitespace-pre-wrap">
             {code}
@@ -183,7 +183,7 @@ export default function EditorLayout({
       <div className="grid grid-cols-12 gap-4">
         {/* Settings Sidebar */}
         <div className={`${showSettings ? 'col-span-3' : 'col-span-1'} transition-all duration-300`}>
-          <div className="border rounded-xl overflow-hidden bg-white h-[calc(100vh-200px)] flex flex-col">
+          <div className="border rounded-xl bg-white h-[calc(100vh-200px)] flex flex-col">
             <div className="p-2 bg-gray-50 border-b flex items-center justify-between">
               <h2 className={`text-sm font-semibold text-gray-700 ${!showSettings && 'hidden'}`}>Einstellungen</h2>
               <button 
@@ -200,13 +200,13 @@ export default function EditorLayout({
                 </svg>
               </button>
             </div>
-            <div className={`flex-1 overflow-auto ${showSettings ? 'p-4' : 'p-0'}`}>
+            <div className={`flex-1 ${showSettings ? 'p-4' : 'p-0'}`} style={{ overflowY: showSettings ? 'auto' : 'hidden' }}>
               {showSettings ? (
                 settings
               ) : (
                 <div className="h-full flex flex-col items-center justify-center">
                   <button
-                    onClick={() => setShowSettings(true)}
+                    onClick={(e) => { e.preventDefault(); setShowSettings(true); }}
                     className="transform -rotate-90 whitespace-nowrap text-sm text-gray-500 hover:text-[#1c2838] transition"
                   >
                     Einstellungen anzeigen
@@ -234,14 +234,14 @@ export default function EditorLayout({
         <div className={`${showSettings ? 'col-span-9' : 'col-span-11'} flex flex-col h-[calc(100vh-200px)]`}>
           <div className="grid grid-cols-2 gap-4 h-full">
             {/* Preview */}
-            <div className="border rounded-xl overflow-hidden bg-white">
+            <div className="border rounded-xl bg-white">
               <DevicePreview>
                 {preview}
               </DevicePreview>
             </div>
 
             {/* Code Output */}
-            <div className="border rounded-xl p-4 overflow-auto bg-[#f9f9f9]">
+            <div className="border rounded-xl p-4 bg-[#f9f9f9]">
               <h2 className="text-lg font-semibold mb-2">Liquid Code</h2>
               <div className="text-sm whitespace-pre-wrap">
                 {code}
@@ -325,7 +325,7 @@ export default function EditorLayout({
         </div>
         
         <div className="flex items-center gap-2">
-            <div className="bg-gray-50 rounded-lg flex overflow-hidden shadow-sm">
+            <div className="bg-gray-50 rounded-lg flex shadow-sm">
               <button 
                 onClick={() => {
                   navigator.clipboard.writeText(code?.toString() || '');
