@@ -214,6 +214,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   
   // Format the custom text for the preview
   const getFormattedText = () => {
+    // Return HTML directly since we're now using contentEditable that produces HTML
     return customText;
   };
   
@@ -414,23 +415,148 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 <span>Text:</span>
               </div>
               
-              {/* Simplified text editor */}
-              <div className="mt-1">
-                <textarea
-                  id="text-editor"
-                  value={customText}
-                  onChange={(e) => {
-                    setCustomText(e.target.value);
-                    // Force refresh for immediate preview update
-                    onDataChange && onDataChange({
-                      ...sectionData,
-                      customText: e.target.value
-                    });
-                  }}
-                  className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                  placeholder="und 12.752 andere sind begeistert von Regenliebe"
-                  rows={3}
-                />
+              {/* Rich text editor with formatting controls */}
+              <div className="mt-1 space-y-3">
+                {/* Text editor with contentEditable */}
+                <div className="relative">
+                  <div
+                    id="text-editor"
+                    contentEditable={true}
+                    onInput={(e) => {
+                      // Get the HTML content from the contentEditable div
+                      const html = e.currentTarget.innerHTML;
+                      setCustomText(html);
+                      
+                      // Force refresh for immediate preview update
+                      onDataChange && onDataChange({
+                        ...sectionData,
+                        customText: html
+                      });
+                    }}
+                    onPaste={(e) => {
+                      // Prevent default paste to handle plain text
+                      e.preventDefault();
+                      // Get plain text from clipboard
+                      const text = e.clipboardData.getData('text/plain');
+                      // Insert at cursor position
+                      document.execCommand('insertText', false, text);
+                    }}
+                    className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition min-h-[70px] overflow-auto"
+                    placeholder="und 12.752 andere sind begeistert von Regenliebe"
+                    dangerouslySetInnerHTML={{ __html: customText }}
+                  ></div>
+                  
+                  {/* Text formatting toolbar */}
+                  <div className="flex mt-2 border-t pt-2">
+                    <div className="flex space-x-1">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          document.execCommand('bold', false);
+                          
+                          // Get the updated HTML content
+                          const editor = document.getElementById('text-editor');
+                          if (editor) {
+                            setCustomText(editor.innerHTML);
+                            
+                            // Force refresh for immediate preview update
+                            onDataChange && onDataChange({
+                              ...sectionData,
+                              customText: editor.innerHTML
+                            });
+                          }
+                        }}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold"
+                        title="Fett machen"
+                      >
+                        <strong>B</strong>
+                      </button>
+                      
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          document.execCommand('italic', false);
+                          
+                          // Get the updated HTML content
+                          const editor = document.getElementById('text-editor');
+                          if (editor) {
+                            setCustomText(editor.innerHTML);
+                            
+                            // Force refresh for immediate preview update
+                            onDataChange && onDataChange({
+                              ...sectionData,
+                              customText: editor.innerHTML
+                            });
+                          }
+                        }}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold"
+                        title="Kursiv machen"
+                      >
+                        <em>I</em>
+                      </button>
+                      
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          document.execCommand('underline', false);
+                          
+                          // Get the updated HTML content
+                          const editor = document.getElementById('text-editor');
+                          if (editor) {
+                            setCustomText(editor.innerHTML);
+                            
+                            // Force refresh for immediate preview update
+                            onDataChange && onDataChange({
+                              ...sectionData,
+                              customText: editor.innerHTML
+                            });
+                          }
+                        }}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold"
+                        title="Unterstreichen"
+                      >
+                        <u>U</u>
+                      </button>
+                    </div>
+                    
+                    <div className="ml-auto">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          // Clear formatting but keep text
+                          const editor = document.getElementById('text-editor');
+                          if (editor) {
+                            // Get plain text
+                            const plainText = editor.innerText;
+                            // Reset editor with plain text
+                            editor.innerHTML = plainText;
+                            setCustomText(plainText);
+                            
+                            // Force refresh
+                            onDataChange && onDataChange({
+                              ...sectionData,
+                              customText: plainText
+                            });
+                          }
+                        }}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded"
+                        title="Formatierung entfernen"
+                      >
+                        Formatierung löschen
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Live preview */}
+                <div className="border border-gray-200 bg-gray-50 rounded-md p-3">
+                  <h3 className="text-xs font-medium text-gray-500 mb-2">Live-Vorschau:</h3>
+                  <div className="text-sm" dangerouslySetInnerHTML={{ __html: customText }}></div>
+                </div>
               </div>
             </label>
           </div>
@@ -1073,8 +1199,12 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   
   {% if word_count > 2 %}
     {% comment %}Extract last two words safely{% endcomment %}
-    {% assign last_word = words[word_count | minus: 1] %}
-    {% assign second_last_word = words[word_count | minus: 2] %}
+    {% assign last_index = word_count | minus: 1 %}
+    {% assign prev_index = word_count | minus: 2 %}
+    
+    {% comment %}Get the last two words using the 'at' filter{% endcomment %}
+    {% assign last_word = words | at: last_index %}
+    {% assign second_last_word = words | at: prev_index %}
     {% assign last_two_words = second_last_word | append: " " | append: last_word %}
     
     {% comment %}Get all but the last two words{% endcomment %}
