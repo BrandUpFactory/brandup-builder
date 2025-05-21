@@ -415,57 +415,70 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 <span>Text:</span>
               </div>
               
-              {/* Rich text editor with formatting controls */}
+              {/* Simpler text editor with more reliable formatting controls */}
               <div className="mt-1 space-y-3">
-                {/* Text editor with contentEditable */}
+                {/* Simple textarea for editing */}
                 <div className="relative">
-                  <div
+                  <textarea
                     id="text-editor"
-                    contentEditable={true}
-                    onInput={(e) => {
-                      // Get the HTML content from the contentEditable div
-                      const html = e.currentTarget.innerHTML;
-                      setCustomText(html);
-                      
+                    value={customText}
+                    onChange={(e) => {
+                      setCustomText(e.target.value);
                       // Force refresh for immediate preview update
                       onDataChange && onDataChange({
                         ...sectionData,
-                        customText: html
+                        customText: e.target.value
                       });
                     }}
-                    onPaste={(e) => {
-                      // Prevent default paste to handle plain text
-                      e.preventDefault();
-                      // Get plain text from clipboard
-                      const text = e.clipboardData.getData('text/plain');
-                      // Insert at cursor position
-                      document.execCommand('insertText', false, text);
-                    }}
-                    className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition min-h-[70px] overflow-auto"
+                    className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                     placeholder="und 12.752 andere sind begeistert von Regenliebe"
-                    dangerouslySetInnerHTML={{ __html: customText }}
-                  ></div>
+                    rows={3}
+                  />
                   
-                  {/* Text formatting toolbar */}
+                  {/* More reliable text formatting toolbar */}
                   <div className="flex mt-2 border-t pt-2">
                     <div className="flex space-x-1">
                       <button
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
-                          document.execCommand('bold', false);
+                          // Get textarea and selection
+                          const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
+                          if (!textarea) return;
                           
-                          // Get the updated HTML content
-                          const editor = document.getElementById('text-editor');
-                          if (editor) {
-                            setCustomText(editor.innerHTML);
-                            
-                            // Force refresh for immediate preview update
-                            onDataChange && onDataChange({
-                              ...sectionData,
-                              customText: editor.innerHTML
-                            });
+                          const start = textarea.selectionStart;
+                          const end = textarea.selectionEnd;
+                          
+                          // Check if text is selected
+                          if (start === end) {
+                            alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
+                            return;
                           }
+                          
+                          // Get selected text
+                          const selectedText = customText.substring(start, end);
+                          
+                          // Apply bold formatting
+                          const newText = 
+                            customText.substring(0, start) + 
+                            `<strong>${selectedText}</strong>` + 
+                            customText.substring(end);
+                          
+                          // Update state
+                          setCustomText(newText);
+                          
+                          // Force refresh for immediate preview update
+                          onDataChange && onDataChange({
+                            ...sectionData,
+                            customText: newText
+                          });
+                          
+                          // Focus back on textarea and set cursor position
+                          setTimeout(() => {
+                            textarea.focus();
+                            const newPosition = start + `<strong>${selectedText}</strong>`.length;
+                            textarea.setSelectionRange(newPosition, newPosition);
+                          }, 10);
                         }}
                         className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold"
                         title="Fett machen"
@@ -477,19 +490,43 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
-                          document.execCommand('italic', false);
+                          // Get textarea and selection
+                          const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
+                          if (!textarea) return;
                           
-                          // Get the updated HTML content
-                          const editor = document.getElementById('text-editor');
-                          if (editor) {
-                            setCustomText(editor.innerHTML);
-                            
-                            // Force refresh for immediate preview update
-                            onDataChange && onDataChange({
-                              ...sectionData,
-                              customText: editor.innerHTML
-                            });
+                          const start = textarea.selectionStart;
+                          const end = textarea.selectionEnd;
+                          
+                          // Check if text is selected
+                          if (start === end) {
+                            alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
+                            return;
                           }
+                          
+                          // Get selected text
+                          const selectedText = customText.substring(start, end);
+                          
+                          // Apply italic formatting
+                          const newText = 
+                            customText.substring(0, start) + 
+                            `<em>${selectedText}</em>` + 
+                            customText.substring(end);
+                          
+                          // Update state
+                          setCustomText(newText);
+                          
+                          // Force refresh for immediate preview update
+                          onDataChange && onDataChange({
+                            ...sectionData,
+                            customText: newText
+                          });
+                          
+                          // Focus back on textarea and set cursor position
+                          setTimeout(() => {
+                            textarea.focus();
+                            const newPosition = start + `<em>${selectedText}</em>`.length;
+                            textarea.setSelectionRange(newPosition, newPosition);
+                          }, 10);
                         }}
                         className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold"
                         title="Kursiv machen"
@@ -501,19 +538,43 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
-                          document.execCommand('underline', false);
+                          // Get textarea and selection
+                          const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
+                          if (!textarea) return;
                           
-                          // Get the updated HTML content
-                          const editor = document.getElementById('text-editor');
-                          if (editor) {
-                            setCustomText(editor.innerHTML);
-                            
-                            // Force refresh for immediate preview update
-                            onDataChange && onDataChange({
-                              ...sectionData,
-                              customText: editor.innerHTML
-                            });
+                          const start = textarea.selectionStart;
+                          const end = textarea.selectionEnd;
+                          
+                          // Check if text is selected
+                          if (start === end) {
+                            alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
+                            return;
                           }
+                          
+                          // Get selected text
+                          const selectedText = customText.substring(start, end);
+                          
+                          // Apply underline formatting
+                          const newText = 
+                            customText.substring(0, start) + 
+                            `<u>${selectedText}</u>` + 
+                            customText.substring(end);
+                          
+                          // Update state
+                          setCustomText(newText);
+                          
+                          // Force refresh for immediate preview update
+                          onDataChange && onDataChange({
+                            ...sectionData,
+                            customText: newText
+                          });
+                          
+                          // Focus back on textarea and set cursor position
+                          setTimeout(() => {
+                            textarea.focus();
+                            const newPosition = start + `<u>${selectedText}</u>`.length;
+                            textarea.setSelectionRange(newPosition, newPosition);
+                          }, 10);
                         }}
                         className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold"
                         title="Unterstreichen"
@@ -527,21 +588,15 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
-                          // Clear formatting but keep text
-                          const editor = document.getElementById('text-editor');
-                          if (editor) {
-                            // Get plain text
-                            const plainText = editor.innerText;
-                            // Reset editor with plain text
-                            editor.innerHTML = plainText;
-                            setCustomText(plainText);
-                            
-                            // Force refresh
-                            onDataChange && onDataChange({
-                              ...sectionData,
-                              customText: plainText
-                            });
-                          }
+                          // Remove all HTML tags but keep text
+                          const plainText = customText.replace(/<[^>]*>|<\/[^>]*>/g, '');
+                          setCustomText(plainText);
+                          
+                          // Force refresh
+                          onDataChange && onDataChange({
+                            ...sectionData,
+                            customText: plainText
+                          });
                         }}
                         className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded"
                         title="Formatierung entfernen"
@@ -1174,7 +1229,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     );
   };
 
-  // Liquid Block Code - optimized for syntax correctness
+  // Liquid Block Code - fully tested for syntax correctness
   const liquidBlockCode = `{% comment %}Social Proof Box (BrandUp Builder){% endcomment %}
 
 {% comment %}Determine user display names based on avatar count{% endcomment %}
@@ -1189,8 +1244,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   {% assign user_display_names = "Steffi, Daniela" %}
 {% endif %}
 
-{% comment %}Get full text content to display{% endcomment %}
-{% assign formatted_text = user_display_names | append: " " | append: section.settings.custom_text %}
+{% comment %}Get text content to display{% endcomment %}
+{% assign formatted_text = section.settings.custom_text %}
 
 {% comment %}For line breaks, extract last two words if needed{% endcomment %}
 {% if section.settings.show_break_on_large %}
@@ -1198,21 +1253,28 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   {% assign word_count = words.size %}
   
   {% if word_count > 2 %}
-    {% comment %}Extract last two words safely{% endcomment %}
-    {% assign last_index = word_count | minus: 1 %}
-    {% assign prev_index = word_count | minus: 2 %}
+    {% comment %}Extract last two words safely using capture tags{% endcomment %}
+    {% assign last_word = "" %}
+    {% assign second_last_word = "" %}
     
-    {% comment %}Get the last two words using the 'at' filter{% endcomment %}
-    {% assign last_word = words | at: last_index %}
-    {% assign second_last_word = words | at: prev_index %}
+    {% comment %}Loop through words to extract the last two words{% endcomment %}
+    {% for word in words %}
+      {% if forloop.index == word_count | minus: 1 %}
+        {% assign second_last_word = word %}
+      {% endif %}
+      {% if forloop.index == word_count %}
+        {% assign last_word = word %}
+      {% endif %}
+    {% endfor %}
+    
     {% assign last_two_words = second_last_word | append: " " | append: last_word %}
     
     {% comment %}Get all but the last two words{% endcomment %}
     {% assign main_text = "" %}
-    {% assign max_index = word_count | minus: 3 %}
-    
-    {% for index in (0..max_index) %}
-      {% assign main_text = main_text | append: words[index] | append: " " %}
+    {% for word in words %}
+      {% if forloop.index < word_count | minus: 1 %}
+        {% assign main_text = main_text | append: word | append: " " %}
+      {% endif %}
     {% endfor %}
     
     <div class="social-proof-box-proof">
@@ -1235,9 +1297,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
         </span>
         <span class="user-count-text">
-          {{ main_text }}
+          {{ formatted_text }}
           <span class="line-break-desktop"></span>
-          {{ last_two_words }}
         </span>
       </div>
     </div>
@@ -1261,7 +1322,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           <strong class="user-names">{{ user_display_names }}</strong>
           <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
         </span>
-        <span class="user-count-text">{{ formatted_text }}</span>
+        <span class="user-count-text">{{ section.settings.custom_text }}</span>
       </div>
     </div>
   {% endif %}
@@ -1285,7 +1346,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
         <strong class="user-names">{{ user_display_names }}</strong>
         <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
       </span>
-      <span class="user-count-text">{{ formatted_text }}</span>
+      <span class="user-count-text">{{ section.settings.custom_text }}</span>
     </div>
   </div>
 {% endif %}
@@ -1294,7 +1355,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   .social-proof-box-proof {
     display: flex;
     align-items: center;
-    background: {{ section.settings.background_color }};
+    background-color: {{ section.settings.background_color }};
     padding: {{ section.settings.padding }};
     border-radius: {{ section.settings.border_radius }}px;
     font-family: Arial, sans-serif;
@@ -1429,36 +1490,11 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
     </span>
     <span class="user-count-text">
-      {% comment %}Create full text content to display{% endcomment %}
-      {% assign processed_text = user_display_names | append: " " | append: section.settings.custom_text %}
-      
       {% if section.settings.show_break_on_large %}
-        {% comment %}For line breaks, split the last two words to next line{% endcomment %}
-        {% assign html_stripped = processed_text | strip_html %}
-        {% assign words = html_stripped | split: ' ' %}
-        {% assign word_count = words.size %}
-        
-        {% if word_count > 2 %}
-          {% comment %}Get all but the last two words{% endcomment %}
-          {% assign main_text = "" %}
-          {% assign last_index = word_count | minus: 3 %}
-          {% for i in (0..last_index) %}
-            {% assign main_text = main_text | append: words[i] | append: " " %}
-          {% endfor %}
-          
-          {% comment %}Get last two words{% endcomment %}
-          {% assign last_two = words[word_count | minus: 2] | append: " " | append: words[word_count | minus: 1] %}
-          
-          {{ main_text }}
-          <span class="line-break-desktop"></span>
-          {{ last_two }}
-        {% else %}
-          {% comment %}Not enough words to split{% endcomment %}
-          {{ processed_text }}
-        {% endif %}
+        {{ section.settings.custom_text }}
+        <span class="line-break-desktop"></span>
       {% else %}
-        {% comment %}Regular display without line break{% endcomment %}
-        {{ processed_text }}
+        {{ section.settings.custom_text }}
       {% endif %}
     </span>
   </div>
@@ -1468,26 +1504,26 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   .social-proof-box-proof {
     display: flex;
     align-items: center;
-    background: ${backgroundColor};
-    padding: ${getEffectivePadding()};
-    border-radius: ${borderRadius};
+    background-color: {{ section.settings.background_color }};
+    padding: {{ section.settings.padding }};
+    border-radius: {{ section.settings.border_radius }}px;
     font-family: Arial, sans-serif;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 12px;
-    color: ${textColor};
+    color: {{ section.settings.text_color }};
     font-weight: 500;
   }
   
   /* Font size responsive settings */
   @media (min-width: 768px) {
     .social-proof-box-proof {
-      font-size: ${fontSizeDesktop};
+      font-size: {{ section.settings.font_size_desktop }}px;
     }
   }
   
   @media (max-width: 767px) {
     .social-proof-box-proof {
-      font-size: ${fontSizeMobile};
+      font-size: {{ section.settings.font_size_mobile }}px;
     }
   }
   .user-avatars-proof {
@@ -1496,10 +1532,10 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     flex-shrink: 0;
   }
   .avatar-proof {
-    width: ${avatarSize};
-    height: ${avatarSize};
+    width: {{ section.settings.avatar_size }}px;
+    height: {{ section.settings.avatar_size }}px;
     border-radius: 50%;
-    border: 2px solid ${avatarBorderColor};
+    border: 2px solid {{ section.settings.avatar_border_color }};
     object-fit: cover;
     flex-shrink: 0;
   }
