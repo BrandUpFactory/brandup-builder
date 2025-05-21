@@ -112,7 +112,10 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   };
   
   // Apply style template
-  const applyStyleTemplate = (index: number) => {
+  const applyStyleTemplate = (e: React.MouseEvent, index: number) => {
+    // Prevent default to avoid scrolling
+    e.preventDefault();
+    
     // Always update the style index
     setSelectedStyle(index);
     
@@ -248,7 +251,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           {styleTemplates.map((template, index) => (
             <button
               key={index}
-              onClick={() => applyStyleTemplate(index)}
+              onClick={(e) => applyStyleTemplate(e, index)}
               className={`border rounded p-3 h-16 flex items-center justify-center text-xs transition
                 ${selectedStyle === index ? 'border-[#1c2838] shadow-sm bg-[#1c2838]/5' : 'border-gray-200 hover:bg-gray-50'}`}
               style={{ 
@@ -270,25 +273,25 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
         <div className="space-y-2">
           <div className="flex gap-2 mt-1">
             <button
-              onClick={() => setAvatarCount(1)}
+              onClick={(e) => { e.preventDefault(); setAvatarCount(1); }}
               className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 1 ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
               1 Avatar
             </button>
             <button
-              onClick={() => setAvatarCount(2)}
+              onClick={(e) => { e.preventDefault(); setAvatarCount(2); }}
               className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 2 ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
               2 Avatare
             </button>
             <button
-              onClick={() => setAvatarCount(3)}
+              onClick={(e) => { e.preventDefault(); setAvatarCount(3); }}
               className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 3 ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
               3 Avatare
             </button>
             <button
-              onClick={() => setAvatarCount(0)}
+              onClick={(e) => { e.preventDefault(); setAvatarCount(0); }}
               className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 0 ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
               Keine
@@ -592,7 +595,10 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   <input
                     type="checkbox"
                     checked={showBreakOnLarge}
-                    onChange={(e) => setShowBreakOnLarge(e.target.checked)}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setShowBreakOnLarge(e.target.checked);
+                    }}
                     className="sr-only peer"
                   />
                   <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#1c2838]/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#1c2838]"></div>
@@ -608,7 +614,10 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   <input
                     type="checkbox"
                     checked={brandNameBold}
-                    onChange={(e) => setBrandNameBold(e.target.checked)}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setBrandNameBold(e.target.checked);
+                    }}
                     className="sr-only peer"
                   />
                   <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#1c2838]/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#1c2838]"></div>
@@ -624,7 +633,10 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   <input
                     type="checkbox"
                     checked={singleLine}
-                    onChange={(e) => setSingleLine(e.target.checked)}
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setSingleLine(e.target.checked);
+                    }}
                     className="sr-only peer"
                   />
                   <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#1c2838]/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#1c2838]"></div>
@@ -678,13 +690,13 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
         
         <div className="flex gap-3 mb-3">
           <button
-            onClick={() => setUseSinglePadding(true)}
+            onClick={(e) => { e.preventDefault(); setUseSinglePadding(true); }}
             className={`px-3 py-1.5 rounded text-xs flex-1 ${useSinglePadding ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
           >
             Einfach
           </button>
           <button
-            onClick={() => setUseSinglePadding(false)}
+            onClick={(e) => { e.preventDefault(); setUseSinglePadding(false); }}
             className={`px-3 py-1.5 rounded text-xs flex-1 ${!useSinglePadding ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
           >
             Individuell
@@ -857,11 +869,12 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
             marginLeft: avatarCount > 0 ? '12px' : '0',
             lineHeight: '1.3',
             display: 'flex',
-            flexDirection: 'column',
+            flexWrap: singleLine ? 'nowrap' : 'wrap',
+            alignItems: 'center',
             width: '100%'
           }}
         >
-          {/* User names and verification badge - always on the first line */}
+          {/* User names and verification badge - inline with text */}
           <div style={{ display: 'flex', alignItems: 'center', marginRight: '4px', flexShrink: 0 }}>
             <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
             <img 
@@ -883,10 +896,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           <div
             style={{ 
               fontWeight: '400',
-              display: 'flex',
-              flexWrap: singleLine ? 'nowrap' : 'wrap',
-              alignItems: 'center',
-              width: '100%',
+              display: 'inline',
               whiteSpace: singleLine ? 'nowrap' : 'normal'
             }}
           >
@@ -924,26 +934,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 }}
               />
             )}
-          </div>
-        </div>
-      </div>
-      <div className="mt-4 text-center text-xs text-gray-500">
-        <p>Desktop: {fontSizeDesktop} / Mobil: {fontSizeMobile}</p>
-        <div className="mt-2 p-2 border rounded bg-gray-50">
-          <p className="mb-1">Responsive Preview:</p>
-          <div 
-            style={{
-              background: backgroundColor,
-              padding: getEffectivePadding(),
-              borderRadius: borderRadius,
-              fontFamily: 'Arial, sans-serif',
-              fontSize: fontSizeMobile,
-              color: textColor,
-              maxWidth: '100%',
-              fontWeight: '500'
-            }}
-          >
-            Mobile Ansicht
           </div>
         </div>
       </div>
@@ -1057,10 +1047,11 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     margin-left: {% if section.settings.avatar_count > 0 %}12px{% else %}0{% endif %};
     line-height: 1.3;
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
     width: 100%;
   }
-  .user-text-proof.single-line .user-count-text {
+  .user-text-proof.single-line {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
