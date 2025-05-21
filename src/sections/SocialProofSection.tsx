@@ -206,29 +206,43 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   
   // Format the custom text with variables
   const getFormattedText = () => {
-    // First, ensure there's a space before the variable replacement if needed
-    const ensureSpacedText = customText
-      .replace(/([^\s])\{userCount\}/g, '$1 {userCount}')  // Add space before {userCount} if no space exists
-      .replace(/\{userCount\}([^\s])/g, '{userCount} $1')  // Add space after {userCount} if no space exists
-      .replace(/([^\s])\{brandName\}/g, '$1 {brandName}')  // Add space before {brandName} if no space exists
-      .replace(/\{brandName\}([^\s])/g, '{brandName} $1');  // Add space after {brandName} if no space exists
-      
-    // Replace variables with properly formatted values
-    // Always ensure spaces around userCount by adding a non-breaking space within the strong tag
-    let formattedText = ensureSpacedText
-      .replace(/\{userCount\}/g, ` <strong>${userCount}</strong> `)
-      .replace(/\{brandName\}/g, brandName)
-      .replace(/\s{2,}/g, ' '); // Prevent multiple spaces
+    // First, ensure there's a space before and after variables
+    let processedText = customText;
     
-    return formattedText.trim();
+    // Force-add spaces around userCount
+    processedText = processedText.replace(/\{userCount\}/g, ' {userCount} ');
+    
+    // Force-add spaces around brandName
+    processedText = processedText.replace(/\{brandName\}/g, ' {brandName} ');
+    
+    // Normalize spaces (remove duplicates)
+    processedText = processedText.replace(/\s+/g, ' ').trim();
+    
+    // Now replace the variables with actual values
+    let formattedText = processedText
+      .replace(/\{userCount\}/g, `<strong>${userCount}</strong>`)
+      .replace(/\{brandName\}/g, brandName);
+    
+    return formattedText;
   };
   
   // Function to get the last two words for line breaking
   const getLastTwoWords = () => {
-    const processedText = customText
+    // Process the text in the same way as getFormattedText for consistency
+    let processedText = customText;
+    
+    // Force-add spaces around userCount and brandName
+    processedText = processedText
+      .replace(/\{userCount\}/g, ' {userCount} ')
+      .replace(/\{brandName\}/g, ' {brandName} ');
+    
+    // Normalize spaces (remove duplicates)
+    processedText = processedText.replace(/\s+/g, ' ').trim();
+    
+    // Replace with actual values
+    processedText = processedText
       .replace(/\{userCount\}/g, userCount)
-      .replace(/\{brandName\}/g, brandName)
-      .trim();
+      .replace(/\{brandName\}/g, brandName);
     
     // More robust word splitting that handles different whitespace
     const words = processedText.split(/\s+/).filter(word => word.length > 0);
@@ -244,15 +258,19 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   
   // Format the text for Shopify Liquid (used in code export)
   const getLiquidFormattedText = () => {
-    // First, ensure there's a space before the variable replacement if needed
-    const ensureSpacedText = customText
-      .replace(/([^\s])\{userCount\}/g, '$1 {userCount}')  // Add space before {userCount} if no space exists
-      .replace(/\{userCount\}([^\s])/g, '{userCount} $1')  // Add space after {userCount} if no space exists
-      .replace(/([^\s])\{brandName\}/g, '$1 {brandName}')  // Add space before {brandName} if no space exists
-      .replace(/\{brandName\}([^\s])/g, '{brandName} $1');  // Add space after {brandName} if no space exists
+    // Process text in the same way as the other functions for consistency
+    let processedText = customText;
+    
+    // Force-add spaces around userCount and brandName
+    processedText = processedText
+      .replace(/\{userCount\}/g, ' {userCount} ')
+      .replace(/\{brandName\}/g, ' {brandName} ');
+    
+    // Normalize spaces (remove duplicates)
+    processedText = processedText.replace(/\s+/g, ' ').trim();
     
     // For Liquid output, we need to use proper Liquid variable syntax
-    return ensureSpacedText
+    return processedText
       .replace(/\{userCount\}/g, "{{ section.settings.user_count }}")
       .replace(/\{brandName\}/g, "{{ section.settings.brand_name }}");
   };
@@ -1018,8 +1036,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="verified-badge-proof">
     </span>
     <span class="user-count-text">
-      {% comment %}Process placeholders first{% endcomment %}
-      {% assign processed_text = section.settings.custom_text | replace: '{userCount}', ' <strong>' | append: section.settings.user_count | append: '</strong> ' | replace: '{brandName}', section.settings.brand_name | replace: '  ', ' ' %}
+      {% comment %}Process placeholders first - ensure spaces around variables{% endcomment %}
+      {% assign spaced_text = section.settings.custom_text | replace: '{userCount}', ' {userCount} ' | replace: '{brandName}', ' {brandName} ' | replace: '  ', ' ' | strip %}
+      {% assign processed_text = spaced_text | replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | replace: '{brandName}', section.settings.brand_name %}
       
       {% if section.settings.show_break_on_large %}
         {% comment %}For line breaks, split the last two words to next line{% endcomment %}

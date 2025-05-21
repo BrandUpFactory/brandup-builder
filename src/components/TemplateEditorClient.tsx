@@ -850,8 +850,8 @@ function EditorWrapper({
   
   return (
     <div className="h-screen flex flex-col pt-[60px] md:pt-[60px]">
-      {/* Header with save button - fixed positioned right below navbar*/}
-      <div className="bg-white border-b px-6 py-3 flex flex-col md:flex-row md:justify-between md:items-center gap-3 fixed left-0 md:left-64 right-0 top-16 z-40">
+      {/* Header with save button - fixed positioned at the very top*/}
+      <div className="bg-white border-b px-6 py-3 flex flex-col md:flex-row md:justify-between md:items-center gap-3 fixed left-0 md:left-64 right-0 top-0 z-50">
         <div className="flex items-center gap-3">
           <div className="flex-shrink-0 w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
             {template.image_url && (
