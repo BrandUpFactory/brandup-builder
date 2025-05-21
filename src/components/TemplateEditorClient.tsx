@@ -864,7 +864,7 @@ function EditorWrapper({
   return (
     <div className="h-screen flex flex-col">
       {/* Header with save button */}
-      <div className="bg-white border-b px-6 py-3 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
+      <div className="bg-white border-b px-6 py-3 flex flex-col md:flex-row md:justify-between md:items-center gap-3 sticky top-0 z-50">
         <div className="flex items-center gap-3">
           <div className="flex-shrink-0 w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
             {template.image_url && (

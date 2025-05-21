@@ -190,8 +190,8 @@ function SocialProofEditor() {
       // Wait a moment to show the saving state
       setTimeout(() => {
         setIsSaving(false)
-        // Show success message
-        alert('Änderungen erfolgreich gespeichert!')
+        // Don't show alert message, we'll use the notification UI in the editor layout only
+        // The EditorLayout component will show the success notification
       }, 500)
       
     } catch (error) {

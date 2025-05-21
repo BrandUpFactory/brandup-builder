@@ -110,37 +110,23 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   
   // Apply style template
   const applyStyleTemplate = (index: number) => {
-    // Only update the style index without overriding user changes
-    // This ensures user customizations are preserved
+    // Always update the style index
     setSelectedStyle(index);
     
-    // Check if this is the initial application (from default) or a user just clicked a template
-    const isFirstTimeSelection = 
-      (backgroundColor === styleTemplates[0].backgroundColor && 
-       textColor === '#000000' && 
-       avatarBorderColor === styleTemplates[0].avatarBorderColor &&
-       borderRadius === styleTemplates[0].borderRadius &&
-       padding === styleTemplates[0].padding) ||
-      (backgroundColor === styleTemplates[1].backgroundColor && 
-       textColor === '#ffffff' && 
-       avatarBorderColor === styleTemplates[1].avatarBorderColor &&
-       borderRadius === styleTemplates[1].borderRadius &&
-       padding === styleTemplates[1].padding) ||
-      (backgroundColor === styleTemplates[2].backgroundColor && 
-       textColor === '#0c4a6e' && 
-       avatarBorderColor === styleTemplates[2].avatarBorderColor &&
-       borderRadius === styleTemplates[2].borderRadius &&
-       padding === styleTemplates[2].padding);
+    // Always apply the template styles when a style is selected
+    const template = styleTemplates[index];
+    setBackgroundColor(template.backgroundColor);
+    setTextColor(index === 1 ? '#ffffff' : index === 2 ? '#0c4a6e' : '#000000');
+    setAvatarBorderColor(template.avatarBorderColor);
+    setBorderRadius(template.borderRadius);
+    setPadding(template.padding);
     
-    // Only apply template styles if it's the first time or user hasn't made custom changes
-    if (isFirstTimeSelection) {
-      const template = styleTemplates[index];
-      setBackgroundColor(template.backgroundColor);
-      setTextColor(index === 1 ? '#ffffff' : index === 2 ? '#0c4a6e' : '#000000');
-      setAvatarBorderColor(template.avatarBorderColor);
-      setBorderRadius(template.borderRadius);
-      setPadding(template.padding);
-    }
+    // If single padding is active, update the individual padding values too
+    // This ensures consistent state across all padding-related variables
+    setPaddingTop(template.padding.replace('px', ''));
+    setPaddingRight(template.padding.replace('px', ''));
+    setPaddingBottom(template.padding.replace('px', ''));
+    setPaddingLeft(template.padding.replace('px', ''));
   };
   
   // Update parent component when data changes
@@ -200,8 +186,15 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   
   // Format the custom text with variables
   const getFormattedText = () => {
-    // First, escape any curly braces by doubling them for the preview
-    let formattedText = customText
+    // First, ensure there's a space before the variable replacement if needed
+    const ensureSpacedText = customText
+      .replace(/([^\s])\{userCount\}/g, '$1 {userCount}')  // Add space before {userCount} if no space exists
+      .replace(/\{userCount\}([^\s])/g, '{userCount} $1')  // Add space after {userCount} if no space exists
+      .replace(/([^\s])\{brandName\}/g, '$1 {brandName}')  // Add space before {brandName} if no space exists
+      .replace(/\{brandName\}([^\s])/g, '{brandName} $1');  // Add space after {brandName} if no space exists
+      
+    // Then, replace variables with properly formatted values
+    let formattedText = ensureSpacedText
       .replace(/\{userCount\}/g, `<strong>${userCount}</strong>`)
       .replace(/\{brandName\}/g, brandName);
     
@@ -828,7 +821,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
             }}
             dangerouslySetInnerHTML={{ 
               __html: showBreakOnLarge ? 
-                getFormattedText().replace(brandName, `<span class="brand-name" style="display: inline;"><span class="line-break-desktop" style="display: inline-block;"></span>${brandName}</span>`) :
+                getFormattedText().replace(brandName, `<span class="brand-name" style="display: inline;"><span class="line-break-desktop" style="display: block !important; width: 100%; height: 0;"></span>${brandName}</span>`) :
                 getFormattedText()
             }}
           />
@@ -952,8 +945,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     .line-break-desktop {
       display: ${showBreakOnLarge ? 'block !important' : 'inline-block !important'};
       content: '';
-      height: 0;
-      width: 0;
+      height: ${showBreakOnLarge ? '4px' : '0'};
+      width: 100%;
     }
     .brand-name {
       font-weight: 600;
