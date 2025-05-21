@@ -89,6 +89,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   const [singleLine, setSingleLine] = useState(safeInitialData.singleLine !== undefined ? safeInitialData.singleLine : false)
   const [avatarSize, setAvatarSize] = useState(safeInitialData.avatarSize || '32px')
   const [borderRadius, setBorderRadius] = useState(safeInitialData.borderRadius || styleTemplates[0].borderRadius)
+  const [fontSizeDesktop, setFontSizeDesktop] = useState(safeInitialData.fontSizeDesktop || '14px')
+  const [fontSizeMobile, setFontSizeMobile] = useState(safeInitialData.fontSizeMobile || '13px')
+  const [brandNameBold, setBrandNameBold] = useState(safeInitialData.brandNameBold !== undefined ? safeInitialData.brandNameBold : true)
   
   // Padding settings
   const [useSinglePadding, setUseSinglePadding] = useState(true)
@@ -156,7 +159,10 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
         paddingLeft,
         avatarCount,
         customText,
-        selectedStyle
+        selectedStyle,
+        fontSizeDesktop,
+        fontSizeMobile,
+        brandNameBold
       };
       
       // Always notify parent to handle the data
@@ -167,7 +173,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     backgroundColor, avatarImage1, avatarImage2, avatarImage3, verifiedImage,
     avatarBorderColor, textColor, showBreakOnLarge, singleLine,
     avatarSize, borderRadius, padding, paddingTop, paddingRight,
-    paddingBottom, paddingLeft, avatarCount, selectedStyle, onDataChange
+    paddingBottom, paddingLeft, avatarCount, selectedStyle, 
+    fontSizeDesktop, fontSizeMobile, brandNameBold, onDataChange
   ])
 
   // Handle avatar display names based on avatar count
@@ -600,6 +607,22 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 <label className="flex items-center cursor-pointer">
                   <input
                     type="checkbox"
+                    checked={brandNameBold}
+                    onChange={(e) => setBrandNameBold(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#1c2838]/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#1c2838]"></div>
+                  <span className="ml-2 text-sm text-gray-600">Markenname fett</span>
+                </label>
+                <HelpTooltip text="Stellt den Markennamen fett dar." />
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
                     checked={singleLine}
                     onChange={(e) => setSingleLine(e.target.checked)}
                     className="sr-only peer"
@@ -610,6 +633,41 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 <HelpTooltip text="Zeigt den gesamten Text in einer Zeile an, statt umzubrechen." />
               </div>
             </div>
+          </div>
+          
+          {/* Font Size Controls */}
+          <div className="space-y-3 mt-4">
+            <label className="block text-sm text-[#1c2838]">
+              Schriftgröße (Desktop):
+              <div className="flex items-center mt-1">
+                <input
+                  type="range"
+                  min="12"
+                  max="24"
+                  step="1"
+                  value={fontSizeDesktop.replace('px', '')}
+                  onChange={(e) => setFontSizeDesktop(`${e.target.value}px`)}
+                  className="w-full accent-[#1c2838]"
+                />
+                <span className="ml-2 text-xs text-gray-500 w-12">{fontSizeDesktop}</span>
+              </div>
+            </label>
+            
+            <label className="block text-sm text-[#1c2838]">
+              Schriftgröße (Mobil):
+              <div className="flex items-center mt-1">
+                <input
+                  type="range"
+                  min="10"
+                  max="20"
+                  step="1"
+                  value={fontSizeMobile.replace('px', '')}
+                  onChange={(e) => setFontSizeMobile(`${e.target.value}px`)}
+                  className="w-full accent-[#1c2838]"
+                />
+                <span className="ml-2 text-xs text-gray-500 w-12">{fontSizeMobile}</span>
+              </div>
+            </label>
           </div>
         </div>
       </div>
@@ -723,7 +781,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           padding: getEffectivePadding(),
           borderRadius: borderRadius,
           fontFamily: 'Arial, sans-serif',
-          fontSize: '14px',
+          fontSize: fontSizeDesktop,
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
           marginBottom: '12px',
           color: textColor,
@@ -736,7 +794,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
             className="user-avatars-proof" 
             style={{
               display: 'flex',
-              alignItems: 'center'
+              alignItems: 'center',
+              flexShrink: 0 // Ensure this doesn't shrink when brand name breaks
             }}
           >
             {avatarCount >= 1 && (
@@ -798,11 +857,11 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
             marginLeft: avatarCount > 0 ? '12px' : '0',
             lineHeight: '1.3',
             display: 'flex',
-            flexWrap: singleLine ? 'nowrap' : 'wrap',
-            alignItems: 'center',
-            whiteSpace: singleLine ? 'nowrap' : 'normal'
+            flexDirection: 'column',
+            width: '100%'
           }}
         >
+          {/* User names and verification badge - always on the first line */}
           <div style={{ display: 'flex', alignItems: 'center', marginRight: '4px', flexShrink: 0 }}>
             <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
             <img 
@@ -819,46 +878,73 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               }}
             />
           </div>
-          {showBreakOnLarge ? (
-            // When line break is enabled, we need to split the text at the brand name
-            <div
-              style={{ 
-                fontWeight: '400',
-                display: 'flex',
-                flexWrap: singleLine ? 'nowrap' : 'wrap',
-                alignItems: 'center',
-                width: '100%'
-              }}
-            >
-              {/* First part of text before brand name */}
-              <div dangerouslySetInnerHTML={{ 
-                __html: getFormattedText().split(brandName)[0]
-              }} />
-              
-              {/* Brand name with break before it */}
-              <div style={{ width: '100%', display: 'block' }}>
-                <div style={{ display: 'block', width: '100%', height: '4px' }}></div>
-                <strong style={{ fontWeight: '600' }}>{brandName}</strong>
-                {/* Second part of text after brand name */}
-                <span dangerouslySetInnerHTML={{ 
-                  __html: getFormattedText().split(brandName)[1] || ''
+          
+          {/* Text content with conditional line break */}
+          <div
+            style={{ 
+              fontWeight: '400',
+              display: 'flex',
+              flexWrap: singleLine ? 'nowrap' : 'wrap',
+              alignItems: 'center',
+              width: '100%',
+              whiteSpace: singleLine ? 'nowrap' : 'normal'
+            }}
+          >
+            {showBreakOnLarge ? (
+              // When line break is enabled, split text at brand name
+              <>
+                {/* First part of text before brand name */}
+                <div style={{ display: 'inline' }} dangerouslySetInnerHTML={{ 
+                  __html: getFormattedText().split(brandName)[0]
                 }} />
-              </div>
-            </div>
-          ) : (
-            // Regular view without line break
-            <span 
-              style={{ 
-                fontWeight: '400',
-                display: 'flex',
-                flexWrap: singleLine ? 'nowrap' : 'wrap',
-                alignItems: 'center'
-              }}
-              dangerouslySetInnerHTML={{ 
-                __html: getFormattedText()
-              }}
-            />
-          )}
+                
+                {/* Brand name with break before it */}
+                <div style={{ width: '100%', display: 'block' }}>
+                  <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>{brandName}</span>
+                  {/* Second part of text after brand name */}
+                  <span dangerouslySetInnerHTML={{ 
+                    __html: getFormattedText().split(brandName)[1] || ''
+                  }} />
+                </div>
+              </>
+            ) : (
+              // Regular view without line break
+              <span 
+                style={{ 
+                  fontWeight: '400',
+                  display: 'flex',
+                  flexWrap: singleLine ? 'nowrap' : 'wrap',
+                  alignItems: 'center'
+                }}
+                dangerouslySetInnerHTML={{ 
+                  __html: getFormattedText().replace(
+                    brandName, 
+                    `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`
+                  )
+                }}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="mt-4 text-center text-xs text-gray-500">
+        <p>Desktop: {fontSizeDesktop} / Mobil: {fontSizeMobile}</p>
+        <div className="mt-2 p-2 border rounded bg-gray-50">
+          <p className="mb-1">Responsive Preview:</p>
+          <div 
+            style={{
+              background: backgroundColor,
+              padding: getEffectivePadding(),
+              borderRadius: borderRadius,
+              fontFamily: 'Arial, sans-serif',
+              fontSize: fontSizeMobile,
+              color: textColor,
+              maxWidth: '100%',
+              fontWeight: '500'
+            }}
+          >
+            Mobile Ansicht
+          </div>
         </div>
       </div>
     </div>
@@ -925,11 +1011,23 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     padding: ${getEffectivePadding()};
     border-radius: ${borderRadius};
     font-family: Arial, sans-serif;
-    font-size: 14px;
-    font-weight: 500;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 12px;
     color: ${textColor};
+    font-weight: 500;
+  }
+  
+  /* Font size responsive settings */
+  @media (min-width: 768px) {
+    .social-proof-box-proof {
+      font-size: ${fontSizeDesktop};
+    }
+  }
+  
+  @media (max-width: 767px) {
+    .social-proof-box-proof {
+      font-size: ${fontSizeMobile};
+    }
   }
   .user-avatars-proof {
     display: flex;
@@ -959,11 +1057,10 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     margin-left: {% if section.settings.avatar_count > 0 %}12px{% else %}0{% endif %};
     line-height: 1.3;
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+    flex-direction: column;
+    width: 100%;
   }
-  .user-text-proof.single-line {
-    flex-wrap: nowrap;
+  .user-text-proof.single-line .user-count-text {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -979,9 +1076,15 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   }
   .user-count-text {
     font-weight: 400;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
   }
   .user-count-text strong {
     font-weight: 600;
+  }
+  .brand-name {
+    font-weight: {% if section.settings.brand_name_bold %}600{% else %}400{% endif %};
   }
   .verified-badge-proof {
     width: 16px;
@@ -1153,6 +1256,30 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       "id": "single_line",
       "label": "Einzeilig anzeigen",
       "default": ${singleLine}
+    },
+    {
+      "type": "checkbox",
+      "id": "brand_name_bold",
+      "label": "Markenname fett",
+      "default": ${brandNameBold}
+    },
+    {
+      "type": "range",
+      "id": "font_size_desktop",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "label": "Schriftgröße (Desktop)",
+      "default": ${fontSizeDesktop.replace('px', '')}
+    },
+    {
+      "type": "range",
+      "id": "font_size_mobile",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "label": "Schriftgröße (Mobil)",
+      "default": ${fontSizeMobile.replace('px', '')}
     },
     {
       "type": "text",

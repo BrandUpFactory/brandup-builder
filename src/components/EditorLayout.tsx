@@ -282,8 +282,8 @@ export default function EditorLayout({
         </div>
       )}
       
-      {/* Editor Header with Version Control only */}
-      <div className="mb-6 flex flex-col md:flex-row justify-between gap-3">
+      {/* Editor Header with Version Control only - Fixed position */}
+      <div className="mb-6 flex flex-col md:flex-row justify-between gap-3 sticky top-0 bg-white z-10 py-3 border-b">
         <div>
           <div className="flex items-center mt-1">
             {editing ? (

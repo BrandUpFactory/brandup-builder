@@ -850,8 +850,8 @@ function EditorWrapper({
   
   return (
     <div className="h-screen flex flex-col pt-[68px] md:pt-[60px]">
-      {/* Header with save button - fixed positioned */}
-      <div className="bg-white border-b px-6 py-3 flex flex-col md:flex-row md:justify-between md:items-center gap-3 fixed top-0 left-0 right-0 z-50">
+      {/* Header with save button - fixed positioned with margin for navbar*/}
+      <div className="bg-white border-b px-6 py-3 flex flex-col md:flex-row md:justify-between md:items-center gap-3 fixed top-[60px] left-0 right-0 z-40">
         <div className="flex items-center gap-3">
           <div className="flex-shrink-0 w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
             {template.image_url && (
@@ -914,7 +914,7 @@ function EditorWrapper({
       </div>
       
       {/* Editor Layout */}
-      <div className="flex-grow overflow-auto">
+      <div className="flex-grow overflow-auto pt-[60px]">
         <EditorLayout
           settings={settings}
           preview={preview}
