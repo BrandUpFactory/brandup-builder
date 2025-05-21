@@ -214,9 +214,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       .replace(/\{brandName\}([^\s])/g, '{brandName} $1');  // Add space after {brandName} if no space exists
       
     // Replace variables with properly formatted values
-    // Make sure there's proper spacing around the userCount
+    // Always ensure spaces around userCount by adding a non-breaking space within the strong tag
     let formattedText = ensureSpacedText
-      .replace(/\{userCount\}/g, `<strong>${userCount}</strong>`)
+      .replace(/\{userCount\}/g, ` <strong>${userCount}</strong> `)
       .replace(/\{brandName\}/g, brandName)
       .replace(/\s{2,}/g, ' '); // Prevent multiple spaces
     
@@ -1019,7 +1019,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     </span>
     <span class="user-count-text">
       {% comment %}Process placeholders first{% endcomment %}
-      {% assign processed_text = section.settings.custom_text | replace: '{userCount}', '<strong>' | append: section.settings.user_count | append: '</strong>' | replace: '{brandName}', section.settings.brand_name | replace: '  ', ' ' %}
+      {% assign processed_text = section.settings.custom_text | replace: '{userCount}', ' <strong>' | append: section.settings.user_count | append: '</strong> ' | replace: '{brandName}', section.settings.brand_name | replace: '  ', ' ' %}
       
       {% if section.settings.show_break_on_large %}
         {% comment %}For line breaks, split the last two words to next line{% endcomment %}

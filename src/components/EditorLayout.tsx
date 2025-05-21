@@ -234,14 +234,14 @@ export default function EditorLayout({
         <div className={`${showSettings ? 'col-span-9' : 'col-span-11'} flex flex-col h-[calc(100vh-200px)]`}>
           <div className="grid grid-cols-2 gap-4 h-full">
             {/* Preview */}
-            <div className="border rounded-xl bg-white">
+            <div className="border rounded-xl bg-white overflow-auto">
               <DevicePreview>
                 {preview}
               </DevicePreview>
             </div>
 
             {/* Code Output */}
-            <div className="border rounded-xl p-4 bg-[#f9f9f9]">
+            <div className="border rounded-xl p-4 bg-[#f9f9f9] overflow-auto">
               <h2 className="text-lg font-semibold mb-2">Liquid Code</h2>
               <div className="text-sm whitespace-pre-wrap">
                 {code}
