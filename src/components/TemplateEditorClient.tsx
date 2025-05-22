@@ -55,6 +55,7 @@ export default function TemplateEditorClient({
   const [saveMessage, setSaveMessage] = useState<{text: string, type: 'success' | 'error'} | null>(null)
   const [sectionTitle, setSectionTitle] = useState<string>('')
   const [user, setUser] = useState<any>(null)
+  const [originalSectionData, setOriginalSectionData] = useState<any>({})
   
   // Update currentSectionData when sectionData changes
   useEffect(() => {
@@ -349,7 +350,7 @@ export default function TemplateEditorClient({
         color: "#f5f7fa",
         buttonText: "Jetzt entdecken",
         buttonLink: "#",
-        imageUrl: fixImagePath(defaultData?.imageUrl || "/BG_Card_55.jpg"),
+        imageUrl: "/BG_Card_55.jpg",
         alignment: "center",
         textColor: "#ffffff",
         padding: "80px",
@@ -494,6 +495,7 @@ export default function TemplateEditorClient({
             : (sectionData.data || {});
           setSectionData(parsedData)
           setCurrentSectionData(parsedData)
+          setOriginalSectionData(parsedData)
           setSectionTitle(sectionData.title || template.name || '')
         } else {
           // If no section ID is provided, find the first section for this template
@@ -512,6 +514,7 @@ export default function TemplateEditorClient({
               : (sections[0].data || {});
             setSectionData(parsedData)
             setCurrentSectionData(parsedData)
+            setOriginalSectionData(parsedData)
             setSectionTitle(sections[0].title || template.name || '')
             
             // Update URL to include section ID for better navigation
@@ -527,7 +530,7 @@ export default function TemplateEditorClient({
               color: "#f5f7fa",
               buttonText: "Jetzt entdecken",
               buttonLink: "#",
-              imageUrl: fixImagePath(newData.imageUrl),
+              imageUrl: "/BG_Card_55.jpg",
               alignment: "center",
               textColor: "#ffffff",
               padding: "80px",
@@ -573,6 +576,7 @@ export default function TemplateEditorClient({
               setSection(newSection[0]);
               setSectionData(defaultData);
               setCurrentSectionData(defaultData);
+              setOriginalSectionData(defaultData);
               setSectionTitle(newSection[0].title || templateData.name || '');
               
               // Update URL to include section ID

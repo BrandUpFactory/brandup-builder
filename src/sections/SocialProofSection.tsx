@@ -30,6 +30,7 @@ interface SocialProofSectionProps {
     fontSizeDesktop?: string;
     fontSizeMobile?: string;
     brandNameBold?: boolean;
+    useFullWidth?: boolean;
   };
   onDataChange?: (data: any) => void;
   previewDevice?: 'desktop' | 'tablet' | 'mobile';
