@@ -33,6 +33,7 @@ interface SocialProofSectionProps {
     brandNameBold?: boolean;
   };
   onDataChange?: (data: any) => void;
+  previewDevice?: 'desktop' | 'tablet' | 'mobile';
 }
 
 // Predefined style templates
@@ -63,7 +64,7 @@ const styleTemplates = [
   }
 ];
 
-export default function SocialProofSection({ initialData, onDataChange }: SocialProofSectionProps) {
+export default function SocialProofSection({ initialData, onDataChange, previewDevice: externalPreviewDevice }: SocialProofSectionProps) {
   // Ensure initialData is an object
   const safeInitialData = initialData || {};
   
@@ -108,8 +109,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   const [paddingBottom, setPaddingBottom] = useState(safeInitialData.paddingBottom || '15')
   const [paddingLeft, setPaddingLeft] = useState(safeInitialData.paddingLeft || '15')
   
-  // Preview device state - to handle responsive font sizing
-  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
+  // Preview device state - use external device if provided, otherwise internal state
+  const [internalPreviewDevice, setInternalPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
+  const previewDevice = externalPreviewDevice || internalPreviewDevice
   
   // Helper function to get effective padding
   const getEffectivePadding = () => {
@@ -197,7 +199,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     avatarBorderColor, textColor, showBreakOnLarge,
     avatarSize, borderRadius, padding, paddingTop, paddingRight,
     paddingBottom, paddingLeft, avatarCount, selectedStyle, 
-    fontSizeDesktop, fontSizeMobile, brandNameBold, useFullWidth, onDataChange
+    fontSizeDesktop, fontSizeMobile, brandNameBold, useFullWidth, onDataChange,
+    previewDevice
   ])
 
   // Handle avatar display names based on avatar count
@@ -1038,9 +1041,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
 
   // Remove all formatting functions since we're not using them anymore
   
-  // Update preview on device change
+  // Update preview on device change (only used when no external device is provided)
   const handleDeviceChange = (device: 'desktop' | 'tablet' | 'mobile') => {
-    setPreviewDevice(device);
+    setInternalPreviewDevice(device);
   };
   
   const preview = (
@@ -1170,7 +1173,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                       alt="Verifiziert" 
                       className="verified-badge-proof" 
                       style={{
-                        height: '14px',
+                        height: previewDevice === 'mobile' ? '13px' : '14px',
                         maxWidth: 'none',
                         marginLeft: '4px',
                         marginRight: '4px',
@@ -1319,7 +1322,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       <div class="mobile-layout">
         <div style="display: block; width: 100%; margin-bottom: 2px;">
           <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-          <img src="${verifiedImage}" alt="Verifiziert" style="height: 14px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
+          <img src="${verifiedImage}" alt="Verifiziert" style="height: 13px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
           <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${(() => {
             // Mobile: 3 words on second line
             const text = customText;

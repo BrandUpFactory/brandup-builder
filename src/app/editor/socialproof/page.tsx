@@ -221,11 +221,20 @@ function SocialProofEditor() {
     }));
   };
   
+  // Device state for preview
+  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
+
+  // Handle device change from EditorLayout
+  const handleDeviceChange = (device: 'desktop' | 'tablet' | 'mobile') => {
+    setPreviewDevice(device)
+  }
+
   // Create a wrapper component to handle the SocialProofSection format
   const SocialProofSectionWrapper = () => {
     const { settings, preview, code } = SocialProofSection({
       initialData: sectionData,
-      onDataChange: handleDataChange
+      onDataChange: handleDataChange,
+      previewDevice: previewDevice
     });
     
     return (
@@ -241,6 +250,7 @@ function SocialProofEditor() {
         exportData={sectionData}
         onImportData={handleImportData}
         hasUnsavedChanges={hasUnsavedChanges}
+        onDeviceChange={handleDeviceChange}
       />
     );
   };
