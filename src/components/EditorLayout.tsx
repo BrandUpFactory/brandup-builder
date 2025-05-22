@@ -40,7 +40,11 @@ export default function EditorLayout({
   exportData = {},
   onImportData,
   hasUnsavedChanges = false,
-  onDeviceChange
+  onDeviceChange,
+  previewMode,
+  onPreviewModeChange,
+  productUrl,
+  onProductUrlChange
 }: EditorLayoutProps) {
   // Check if we have a version create function
   const hasVersionCreate = !!onVersionCreate;
