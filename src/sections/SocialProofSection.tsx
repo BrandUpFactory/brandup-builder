@@ -288,7 +288,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   };
   
   // Different code output types
-  const [codeOutputType, setCodeOutputType] = useState<'liquid-block' | 'section'>('liquid-block');
+  const [codeOutputType, setCodeOutputType] = useState<'standalone' | 'liquid-block' | 'section'>('standalone');
 
   // Help tooltip component
   const HelpTooltip = ({ text }: { text: string }) => {
@@ -447,38 +447,30 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                           if (!textarea) return;
                           
                           try {
-                            // Get selection range - must come from the element directly
+                            // Get current selection range
                             const start = textarea.selectionStart;
                             const end = textarea.selectionEnd;
                             
-                            // Don't check equality - sometimes browsers have selection but don't show it correctly
-                            if (end <= start) {
-                              // Try to select all text if nothing is selected
-                              textarea.select();
-                              
-                              // Try again after selection
-                              const newStart = textarea.selectionStart;
-                              const newEnd = textarea.selectionEnd;
-                              
-                              // If still no selection, notify user
-                              if (newEnd <= newStart) {
-                                alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
-                                return;
-                              }
+                            // Check if anything is selected
+                            if (start === end) {
+                              alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
+                              return;
                             }
                             
-                            // Now get the latest selection positions
-                            const finalStart = textarea.selectionStart;
-                            const finalEnd = textarea.selectionEnd;
-                            
                             // Get selected text
-                            const selectedText = customText.substring(finalStart, finalEnd);
+                            const selectedText = customText.substring(start, end);
+                            
+                            // Check if selected text is already bold
+                            if (selectedText.includes('<strong>') || selectedText.includes('</strong>')) {
+                              alert("Der ausgewählte Text enthält bereits Formatierung. Bitte wähle unformatierten Text aus.");
+                              return;
+                            }
                             
                             // Apply bold formatting
                             const newText = 
-                              customText.substring(0, finalStart) + 
+                              customText.substring(0, start) + 
                               `<strong>${selectedText}</strong>` + 
-                              customText.substring(finalEnd);
+                              customText.substring(end);
                             
                             // Update state
                             setCustomText(newText);
@@ -489,10 +481,10 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                               customText: newText
                             });
                             
-                            // Focus back on textarea and set cursor position
+                            // Focus back on textarea and set cursor position after the inserted tags
                             setTimeout(() => {
                               textarea.focus();
-                              const newPosition = finalStart + `<strong>${selectedText}</strong>`.length;
+                              const newPosition = start + `<strong>${selectedText}</strong>`.length;
                               textarea.setSelectionRange(newPosition, newPosition);
                             }, 10);
                           } catch (error) {
@@ -515,38 +507,30 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                           if (!textarea) return;
                           
                           try {
-                            // Get selection range - must come from the element directly
+                            // Get current selection range
                             const start = textarea.selectionStart;
                             const end = textarea.selectionEnd;
                             
-                            // Don't check equality - sometimes browsers have selection but don't show it correctly
-                            if (end <= start) {
-                              // Try to select all text if nothing is selected
-                              textarea.select();
-                              
-                              // Try again after selection
-                              const newStart = textarea.selectionStart;
-                              const newEnd = textarea.selectionEnd;
-                              
-                              // If still no selection, notify user
-                              if (newEnd <= newStart) {
-                                alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
-                                return;
-                              }
+                            // Check if anything is selected
+                            if (start === end) {
+                              alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
+                              return;
                             }
                             
-                            // Now get the latest selection positions
-                            const finalStart = textarea.selectionStart;
-                            const finalEnd = textarea.selectionEnd;
-                            
                             // Get selected text
-                            const selectedText = customText.substring(finalStart, finalEnd);
+                            const selectedText = customText.substring(start, end);
+                            
+                            // Check if selected text is already italic
+                            if (selectedText.includes('<em>') || selectedText.includes('</em>')) {
+                              alert("Der ausgewählte Text enthält bereits Formatierung. Bitte wähle unformatierten Text aus.");
+                              return;
+                            }
                             
                             // Apply italic formatting
                             const newText = 
-                              customText.substring(0, finalStart) + 
+                              customText.substring(0, start) + 
                               `<em>${selectedText}</em>` + 
-                              customText.substring(finalEnd);
+                              customText.substring(end);
                             
                             // Update state
                             setCustomText(newText);
@@ -557,10 +541,10 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                               customText: newText
                             });
                             
-                            // Focus back on textarea and set cursor position
+                            // Focus back on textarea and set cursor position after the inserted tags
                             setTimeout(() => {
                               textarea.focus();
-                              const newPosition = finalStart + `<em>${selectedText}</em>`.length;
+                              const newPosition = start + `<em>${selectedText}</em>`.length;
                               textarea.setSelectionRange(newPosition, newPosition);
                             }, 10);
                           } catch (error) {
@@ -583,38 +567,30 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                           if (!textarea) return;
                           
                           try {
-                            // Get selection range - must come from the element directly
+                            // Get current selection range
                             const start = textarea.selectionStart;
                             const end = textarea.selectionEnd;
                             
-                            // Don't check equality - sometimes browsers have selection but don't show it correctly
-                            if (end <= start) {
-                              // Try to select all text if nothing is selected
-                              textarea.select();
-                              
-                              // Try again after selection
-                              const newStart = textarea.selectionStart;
-                              const newEnd = textarea.selectionEnd;
-                              
-                              // If still no selection, notify user
-                              if (newEnd <= newStart) {
-                                alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
-                                return;
-                              }
+                            // Check if anything is selected
+                            if (start === end) {
+                              alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
+                              return;
                             }
                             
-                            // Now get the latest selection positions
-                            const finalStart = textarea.selectionStart;
-                            const finalEnd = textarea.selectionEnd;
-                            
                             // Get selected text
-                            const selectedText = customText.substring(finalStart, finalEnd);
+                            const selectedText = customText.substring(start, end);
+                            
+                            // Check if selected text is already underlined
+                            if (selectedText.includes('<u>') || selectedText.includes('</u>')) {
+                              alert("Der ausgewählte Text enthält bereits Formatierung. Bitte wähle unformatierten Text aus.");
+                              return;
+                            }
                             
                             // Apply underline formatting
                             const newText = 
-                              customText.substring(0, finalStart) + 
+                              customText.substring(0, start) + 
                               `<u>${selectedText}</u>` + 
-                              customText.substring(finalEnd);
+                              customText.substring(end);
                             
                             // Update state
                             setCustomText(newText);
@@ -625,10 +601,10 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                               customText: newText
                             });
                             
-                            // Focus back on textarea and set cursor position
+                            // Focus back on textarea and set cursor position after the inserted tags
                             setTimeout(() => {
                               textarea.focus();
-                              const newPosition = finalStart + `<u>${selectedText}</u>`.length;
+                              const newPosition = start + `<u>${selectedText}</u>`.length;
                               textarea.setSelectionRange(newPosition, newPosition);
                             }, 10);
                           } catch (error) {
@@ -1258,8 +1234,22 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     return (
       <div className="flex border-b mb-4 pb-2">
         <button 
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCodeOutputType('standalone'); }}
+          className={`flex items-center px-3 py-1.5 text-xs rounded-l-md ${codeOutputType === 'standalone' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+        >
+          <span>Standalone HTML</span>
+          <div className="relative ml-1 group">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+              <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM8.94 6.94a.75.75 0 1 1-1.06-1.06 2.5 2.5 0 0 1 3.536 0A.75.75 0 0 1 10.354 6.94 1 1 0 0 0 9.75 6.75a1 1 0 0 0-.81.31Zm-3.24 7.9a.75.75 0 1 0 1.06 1.06l4.25-4.25a.75.75 0 1 0-1.06-1.06L6.33 14.44 5.56 13.7a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l1.2 1.2a.75.75 0 0 0 1.06 0Z" clipRule="evenodd" />
+            </svg>
+            <div className="absolute left-0 bottom-full mb-2 p-2 bg-gray-800 text-white text-xs rounded w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity z-10">
+              Kompletter HTML-Code mit CSS - funktioniert überall ohne externe Abhängigkeiten.
+            </div>
+          </div>
+        </button>
+        <button 
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCodeOutputType('liquid-block'); }}
-          className={`flex items-center px-3 py-1.5 text-xs rounded-l-md ${codeOutputType === 'liquid-block' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
+          className={`flex items-center px-3 py-1.5 text-xs ${codeOutputType === 'liquid-block' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
         >
           <span>Liquid Block</span>
           <div className="relative ml-1 group">
@@ -1288,6 +1278,138 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       </div>
     );
   };
+
+  // Self-contained HTML code that works standalone without Shopify
+  const standaloneCode = `<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Social Proof Box</title>
+  <style>
+    .social-proof-box {
+      display: flex;
+      align-items: center;
+      background-color: ${backgroundColor};
+      padding: ${getEffectivePadding()};
+      border-radius: ${borderRadius};
+      font-family: Arial, sans-serif;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 12px;
+      color: ${textColor};
+      font-weight: 500;
+      max-width: 100%;
+      width: fit-content;
+    }
+    
+    /* Font sizes */
+    @media (min-width: 768px) {
+      .social-proof-box {
+        font-size: ${fontSizeDesktop};
+      }
+    }
+    
+    @media (max-width: 767px) {
+      .social-proof-box {
+        font-size: ${fontSizeMobile};
+      }
+    }
+    
+    /* Avatars */
+    .avatars {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    
+    .avatar {
+      width: ${avatarSize};
+      height: ${avatarSize};
+      border-radius: 50%;
+      border: 2px solid ${avatarBorderColor};
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    
+    .avatar-1 {
+      z-index: 3;
+      margin-right: ${avatarCount > 1 ? '-8px' : '0'};
+    }
+    
+    .avatar-2 {
+      z-index: 2;
+      margin-right: ${avatarCount >= 3 ? '-8px' : '0'};
+    }
+    
+    .avatar-3 {
+      z-index: 1;
+    }
+    
+    /* Text content */
+    .content {
+      margin-left: ${avatarCount > 0 ? '12px' : '0'};
+      line-height: 1.3;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      width: 100%;
+    }
+    
+    .names {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 4px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    
+    .text {
+      font-weight: 400;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .badge {
+      width: 16px;
+      height: 16px;
+      margin-left: 4px;
+      position: relative;
+      top: -1px;
+      flex-shrink: 0;
+    }
+    
+    /* Line break for large screens */
+    @media (min-width: 1300px) {
+      ${showBreakOnLarge ? '.text { display: block; width: 100%; margin-top: 2px; }' : ''}
+    }
+  </style>
+</head>
+<body>
+  <div class="social-proof-box">
+    ${avatarCount > 0 ? `
+    <div class="avatars">
+      ${avatarCount >= 1 ? `<img src="${avatarImage1}" alt="User 1" class="avatar avatar-1" onerror="this.style.display='none'">` : ''}
+      ${avatarCount >= 2 ? `<img src="${avatarImage2}" alt="User 2" class="avatar avatar-2" onerror="this.style.display='none'">` : ''}
+      ${avatarCount >= 3 ? `<img src="${avatarImage3}" alt="User 3" class="avatar avatar-3" onerror="this.style.display='none'">` : ''}
+    </div>` : ''}
+    <div class="content">
+      <span class="names">
+        <strong>${getDisplayNames()}</strong>
+        <img src="${verifiedImage}" alt="Verifiziert" class="badge" onerror="this.style.display='none'">
+      </span>
+      ${showBreakOnLarge ? 
+        (() => {
+          const { firstPart, lastTwoPart } = getLastTwoWords();
+          return `<span class="text">${firstPart}</span>${lastTwoPart ? `<div class="text">${lastTwoPart.replace(brandName, `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`)}</div>` : ''}`;
+        })()
+        : 
+        `<span class="text">${getFormattedText().replace(brandName, `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`)}</span>`
+      }
+    </div>
+  </div>
+</body>
+</html>`;
 
   // Ultra simple Liquid code that works without any syntax errors
   const liquidBlockCode = `{% comment %}Social Proof Box (BrandUp Builder){% endcomment %}
@@ -1578,7 +1700,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
 </style>`;
 
   // Select the code to display based on selected type
-  const code = codeOutputType === 'liquid-block' ? liquidBlockCode : sectionCode;
+  const code = codeOutputType === 'standalone' ? standaloneCode : (codeOutputType === 'liquid-block' ? liquidBlockCode : sectionCode);
   
   // Complete code display with the switcher
   const codeDisplay = (
