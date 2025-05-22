@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useMediaQuery } from 'react-responsive'
 
 interface SocialProofSectionProps {
   initialData?: {
@@ -1222,7 +1221,7 @@ export default function SocialProofSection({
     `;
   };
 
-  // Enhanced Preview with Product Integration and Real Mobile Simulation
+  // Enhanced Preview with Product Integration and Simple Mobile Simulation
   const preview = (
     <div className="w-full h-full flex flex-col p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '200px' }}>
       {currentPreviewMode === 'product' && (
@@ -1239,28 +1238,151 @@ export default function SocialProofSection({
       )}
 
       {currentPreviewMode === 'builder' ? (
-        // Enhanced Builder Preview with Proper Mobile Simulation using react-responsive
+        // Simple Builder Preview with Working Mobile Simulation
         <div className="flex-1">
-          <MobileSimulationContainer 
-            previewDevice={previewDevice}
-            fontSizeDesktop={fontSizeDesktop}
-            fontSizeMobile={fontSizeMobile}
-            backgroundColor={backgroundColor}
-            textColor={textColor}
-            borderRadius={borderRadius}
-            useFullWidth={useFullWidth}
-            getEffectivePadding={getEffectivePadding}
-            avatarCount={avatarCount}
-            avatarSize={avatarSize}
-            avatarBorderColor={avatarBorderColor}
-            getDisplayNames={getDisplayNames}
-            verifiedImage={verifiedImage}
-            brandName={brandName}
-            brandNameBold={brandNameBold}
-            avatarImage1={avatarImage1}
-            avatarImage2={avatarImage2}
-            avatarImage3={avatarImage3}
-          />
+          <div 
+            className="social-proof-preview-container"
+            style={{
+              width: '100%',
+              transition: 'all 0.3s ease',
+              maxWidth: previewDevice === 'mobile' ? '375px' : '100%',
+              margin: previewDevice === 'mobile' ? '0 auto' : '0',
+            }}
+          >
+            <div 
+              className="social-proof-preview"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor,
+                padding: getEffectivePadding(),
+                borderRadius,
+                fontFamily: 'Arial, sans-serif',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                marginBottom: '12px',
+                color: textColor,
+                fontWeight: 500,
+                width: useFullWidth ? '100%' : 'fit-content',
+                maxWidth: '100%',
+                boxSizing: 'border-box',
+                fontSize: previewDevice === 'mobile' ? fontSizeMobile : fontSizeDesktop,
+              }}
+            >
+              {avatarCount > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                  {avatarCount >= 1 && (
+                    <img 
+                      src={avatarImage1} 
+                      alt="User 1" 
+                      style={{
+                        width: avatarSize,
+                        height: avatarSize,
+                        borderRadius: '50%',
+                        border: `2px solid ${avatarBorderColor}`,
+                        objectFit: 'cover',
+                        flexShrink: 0,
+                        zIndex: 3,
+                        marginRight: avatarCount > 1 ? '-8px' : '0'
+                      }}
+                    />
+                  )}
+                  {avatarCount >= 2 && (
+                    <img 
+                      src={avatarImage2} 
+                      alt="User 2" 
+                      style={{
+                        width: avatarSize,
+                        height: avatarSize,
+                        borderRadius: '50%',
+                        border: `2px solid ${avatarBorderColor}`,
+                        objectFit: 'cover',
+                        flexShrink: 0,
+                        zIndex: 2,
+                        marginRight: avatarCount >= 3 ? '-8px' : '0'
+                      }}
+                    />
+                  )}
+                  {avatarCount >= 3 && (
+                    <img 
+                      src={avatarImage3} 
+                      alt="User 3" 
+                      style={{
+                        width: avatarSize,
+                        height: avatarSize,
+                        borderRadius: '50%',
+                        border: `2px solid ${avatarBorderColor}`,
+                        objectFit: 'cover',
+                        flexShrink: 0,
+                        zIndex: 1
+                      }}
+                    />
+                  )}
+                </div>
+              )}
+              
+              <div style={{ marginLeft: avatarCount > 0 ? '12px' : '0', lineHeight: 1.4, width: '100%' }}>
+                {/* Desktop Layout - 2 words on second line */}
+                {previewDevice !== 'mobile' && (
+                  <div>
+                    <div style={{ display: 'block', width: '100%', marginBottom: '2px' }}>
+                      <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
+                      <img 
+                        src={verifiedImage} 
+                        alt="Verifiziert" 
+                        style={{
+                          height: '14px',
+                          maxWidth: 'none',
+                          margin: '0 4px',
+                          verticalAlign: 'baseline',
+                          transform: 'translateY(-1px)',
+                          objectFit: 'contain',
+                          display: 'inline'
+                        }}
+                      />
+                      <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
+                        und <strong>12.752</strong> andere sind begeistert
+                      </span>
+                    </div>
+                    <div style={{ display: 'block', width: '100%' }}>
+                      <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
+                        von <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>{brandName}</span>
+                      </span>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Mobile Layout - 3 words on second line */}
+                {previewDevice === 'mobile' && (
+                  <div>
+                    <div style={{ display: 'block', width: '100%', marginBottom: '2px' }}>
+                      <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
+                      <img 
+                        src={verifiedImage} 
+                        alt="Verifiziert" 
+                        style={{
+                          height: '13px',
+                          maxWidth: 'none',
+                          margin: '0 4px',
+                          verticalAlign: 'baseline',
+                          transform: 'translateY(-1px)',
+                          objectFit: 'contain',
+                          display: 'inline'
+                        }}
+                      />
+                      <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
+                        und <strong>12.752</strong> andere sind
+                      </span>
+                    </div>
+                    <div style={{ display: 'block', width: '100%' }}>
+                      <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
+                        begeistert von <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>{brandName}</span>
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       ) : (
         // Product Page Integration Preview - CORS-friendly approach
@@ -1477,225 +1599,6 @@ export default function SocialProofSection({
       </pre>
     </>
   )
-
-  // Mobile Simulation Container Component using react-responsive
-  const MobileSimulationContainer = ({ 
-    previewDevice, 
-    fontSizeDesktop, 
-    fontSizeMobile, 
-    backgroundColor, 
-    textColor, 
-    borderRadius, 
-    useFullWidth, 
-    getEffectivePadding, 
-    avatarCount, 
-    avatarSize, 
-    avatarBorderColor, 
-    getDisplayNames, 
-    verifiedImage, 
-    brandName, 
-    brandNameBold, 
-    avatarImage1, 
-    avatarImage2, 
-    avatarImage3 
-  }: any) => {
-    // Force mobile context when preview device is mobile
-    const ForcedMediaQueryProvider = ({ children }: { children: React.ReactNode }) => {
-      if (previewDevice === 'mobile') {
-        // Create a mock window object for mobile simulation
-        const mockWindow = {
-          ...window,
-          innerWidth: 375,
-          matchMedia: (query: string) => {
-            // Force mobile media queries to match
-            const isMobileQuery = query.includes('max-width') || query.includes('767px') || query.includes('768px');
-            return {
-              matches: isMobileQuery,
-              media: query,
-              onchange: null,
-              addListener: () => {},
-              removeListener: () => {},
-              addEventListener: () => {},
-              removeEventListener: () => {},
-              dispatchEvent: () => false,
-            };
-          }
-        };
-        
-        // Temporarily override window for the children
-        const originalWindow = global.window;
-        (global as any).window = mockWindow;
-        
-        const result = children;
-        
-        // Restore original window
-        (global as any).window = originalWindow;
-        
-        return result;
-      }
-      
-      return children;
-    };
-    
-    // Use responsive hooks with forced context
-    const ResponsiveContent = () => {
-      const isMobile = previewDevice === 'mobile' || useMediaQuery({ maxWidth: 767 });
-      const currentFontSize = isMobile ? fontSizeMobile : fontSizeDesktop;
-      const currentBadgeSize = isMobile ? '13px' : '14px';
-      
-      return (
-        <div 
-          className="social-proof-preview-container"
-          style={{
-            width: '100%',
-            transition: 'all 0.3s ease',
-            maxWidth: previewDevice === 'mobile' ? '375px' : '100%',
-            margin: previewDevice === 'mobile' ? '0 auto' : '0',
-          }}
-        >
-          <div 
-            className="social-proof-preview"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              backgroundColor,
-              padding: getEffectivePadding(),
-              borderRadius,
-              fontFamily: 'Arial, sans-serif',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-              marginBottom: '12px',
-              color: textColor,
-              fontWeight: 500,
-              width: useFullWidth ? '100%' : 'fit-content',
-              maxWidth: '100%',
-              boxSizing: 'border-box',
-              fontSize: currentFontSize,
-            }}
-          >
-            {avatarCount > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                {avatarCount >= 1 && (
-                  <img 
-                    src={avatarImage1} 
-                    alt="User 1" 
-                    style={{
-                      width: avatarSize,
-                      height: avatarSize,
-                      borderRadius: '50%',
-                      border: `2px solid ${avatarBorderColor}`,
-                      objectFit: 'cover',
-                      flexShrink: 0,
-                      zIndex: 3,
-                      marginRight: avatarCount > 1 ? '-8px' : '0'
-                    }}
-                  />
-                )}
-                {avatarCount >= 2 && (
-                  <img 
-                    src={avatarImage2} 
-                    alt="User 2" 
-                    style={{
-                      width: avatarSize,
-                      height: avatarSize,
-                      borderRadius: '50%',
-                      border: `2px solid ${avatarBorderColor}`,
-                      objectFit: 'cover',
-                      flexShrink: 0,
-                      zIndex: 2,
-                      marginRight: avatarCount >= 3 ? '-8px' : '0'
-                    }}
-                  />
-                )}
-                {avatarCount >= 3 && (
-                  <img 
-                    src={avatarImage3} 
-                    alt="User 3" 
-                    style={{
-                      width: avatarSize,
-                      height: avatarSize,
-                      borderRadius: '50%',
-                      border: `2px solid ${avatarBorderColor}`,
-                      objectFit: 'cover',
-                      flexShrink: 0,
-                      zIndex: 1
-                    }}
-                  />
-                )}
-              </div>
-            )}
-            
-            <div style={{ marginLeft: avatarCount > 0 ? '12px' : '0', lineHeight: 1.4, width: '100%' }}>
-              {/* Desktop Layout - 2 words on second line */}
-              {!isMobile && (
-                <div>
-                  <div style={{ display: 'block', width: '100%', marginBottom: '2px' }}>
-                    <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
-                    <img 
-                      src={verifiedImage} 
-                      alt="Verifiziert" 
-                      style={{
-                        height: currentBadgeSize,
-                        maxWidth: 'none',
-                        margin: '0 4px',
-                        verticalAlign: 'baseline',
-                        transform: 'translateY(-1px)',
-                        objectFit: 'contain',
-                        display: 'inline'
-                      }}
-                    />
-                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
-                      und <strong>12.752</strong> andere sind begeistert
-                    </span>
-                  </div>
-                  <div style={{ display: 'block', width: '100%' }}>
-                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
-                      von <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>{brandName}</span>
-                    </span>
-                  </div>
-                </div>
-              )}
-              
-              {/* Mobile Layout - 3 words on second line */}
-              {isMobile && (
-                <div>
-                  <div style={{ display: 'block', width: '100%', marginBottom: '2px' }}>
-                    <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
-                    <img 
-                      src={verifiedImage} 
-                      alt="Verifiziert" 
-                      style={{
-                        height: currentBadgeSize,
-                        maxWidth: 'none',
-                        margin: '0 4px',
-                        verticalAlign: 'baseline',
-                        transform: 'translateY(-1px)',
-                        objectFit: 'contain',
-                        display: 'inline'
-                      }}
-                    />
-                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
-                      und <strong>12.752</strong> andere sind
-                    </span>
-                  </div>
-                  <div style={{ display: 'block', width: '100%' }}>
-                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
-                      begeistert von <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>{brandName}</span>
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      );
-    };
-    
-    return (
-      <ForcedMediaQueryProvider>
-        <ResponsiveContent />
-      </ForcedMediaQueryProvider>
-    );
-  };
 
   return { 
     settings: (
