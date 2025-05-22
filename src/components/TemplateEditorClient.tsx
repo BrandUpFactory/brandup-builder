@@ -811,13 +811,24 @@ function EditorWrapper({
   onVersionCreate?: () => void;
   hasUnsavedChanges?: boolean;
 }) {
+  // Device and preview mode state
+  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+  const [previewMode, setPreviewMode] = useState<'builder' | 'product'>('builder');
+  const [productUrl, setProductUrl] = useState('');
+  
   // Device change handler for the preview component
   const handleDeviceChange = (device: 'desktop' | 'tablet' | 'mobile') => {
-    // If our component uses SocialProofSection, pass the device to its handler if available
-    const socialProofComponent = document.getElementById('social-proof-component');
-    if (socialProofComponent && (socialProofComponent as any).handleDeviceChange) {
-      (socialProofComponent as any).handleDeviceChange(device);
-    }
+    setPreviewDevice(device);
+  };
+  
+  // Preview mode change handler
+  const handlePreviewModeChange = (mode: 'builder' | 'product') => {
+    setPreviewMode(mode);
+  };
+  
+  // Product URL change handler
+  const handleProductUrlChange = (url: string) => {
+    setProductUrl(url);
   };
   // Check if we have a version create function
   const hasVersionCreate = !!onVersionCreate;
@@ -831,7 +842,12 @@ function EditorWrapper({
       const SocialProofSection = require('@/sections/SocialProofSection').default;
       const { settings, preview, code } = SocialProofSection({
         initialData: sectionData,
-        onDataChange: onDataChange
+        onDataChange: onDataChange,
+        previewDevice: previewDevice,
+        previewMode: previewMode,
+        productUrl: productUrl,
+        onPreviewModeChange: handlePreviewModeChange,
+        onProductUrlChange: handleProductUrlChange
       });
       return { settings, preview, code };
     }
@@ -933,6 +949,10 @@ function EditorWrapper({
           onSave={onSave}
           hasUnsavedChanges={hasUnsavedChanges}
           onDeviceChange={handleDeviceChange}
+          previewMode={previewMode}
+          onPreviewModeChange={handlePreviewModeChange}
+          productUrl={productUrl}
+          onProductUrlChange={handleProductUrlChange}
         />
       </div>
     </div>
