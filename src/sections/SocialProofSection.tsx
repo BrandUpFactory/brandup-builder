@@ -115,6 +115,10 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
   // Help popup state
   const [showImageHelp, setShowImageHelp] = useState(false)
   
+  // Product URL for preview integration
+  const [productUrl, setProductUrl] = useState('')
+  const [previewMode, setPreviewMode] = useState<'builder' | 'product'>('builder')
+  
   
   // Helper function to get effective padding
   const getEffectivePadding = () => {
@@ -321,8 +325,8 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
     if (!showImageHelp) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+      <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto border border-gray-200">
           <div className="p-6">
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-xl font-semibold text-gray-900">
@@ -1205,16 +1209,230 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
     `;
   };
 
+  // Enhanced Preview with Product Integration and Real Mobile Simulation
   const preview = (
-    <div className="w-full h-full flex items-start justify-start p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '200px' }}>
-      <div 
-        key={`preview-${previewDevice}-${getCurrentFontSize()}-${textColor}`}
-        dangerouslySetInnerHTML={{ __html: generatePreviewHTML() }}
-        style={{
-          width: '100%',
-          maxWidth: previewDevice === 'mobile' ? '320px' : '100%'
-        }}
-      />
+    <div className="w-full h-full flex flex-col p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '200px' }}>
+      {/* Preview Mode Toggle */}
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={() => setPreviewMode('builder')}
+          className={`px-3 py-1.5 text-xs rounded ${previewMode === 'builder' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+        >
+          Builder Vorschau
+        </button>
+        <button
+          onClick={() => setPreviewMode('product')}
+          className={`px-3 py-1.5 text-xs rounded ${previewMode === 'product' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+        >
+          Produktseite Integration
+        </button>
+      </div>
+
+      {previewMode === 'product' && (
+        <div className="mb-4">
+          <input
+            type="text"
+            value={productUrl}
+            onChange={(e) => setProductUrl(e.target.value)}
+            placeholder="https://dein-shop.myshopify.com/products/produkt-name"
+            className="w-full border px-3 py-2 rounded-md text-sm border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:outline-none"
+          />
+          <p className="text-xs text-gray-500 mt-1">Gib deine Shopify Produktseiten-URL ein um zu sehen, wie die Section dort aussieht</p>
+        </div>
+      )}
+
+      {previewMode === 'builder' ? (
+        // Enhanced Builder Preview with Real CSS Media Queries
+        <div className="flex-1">
+          <style>{`
+            .social-proof-preview-container {
+              width: 100%;
+              transition: all 0.3s ease;
+            }
+            
+            .social-proof-preview {
+              display: flex;
+              align-items: center;
+              background-color: ${backgroundColor};
+              padding: ${getEffectivePadding()};
+              border-radius: ${borderRadius};
+              font-family: Arial, sans-serif;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+              margin-bottom: 12px;
+              color: ${textColor};
+              font-weight: 500;
+              width: ${useFullWidth ? '100%' : 'fit-content'};
+              max-width: 100%;
+              box-sizing: border-box;
+              font-size: ${fontSizeDesktop};
+            }
+            
+            ${previewDevice === 'mobile' ? `
+              .social-proof-preview-container {
+                max-width: 375px;
+                margin: 0 auto;
+              }
+              
+              .social-proof-preview {
+                font-size: ${fontSizeMobile} !important;
+              }
+              
+              .mobile-only { display: block !important; }
+              .desktop-only { display: none !important; }
+            ` : `
+              .mobile-only { display: none !important; }
+              .desktop-only { display: block !important; }
+            `}
+            
+            .avatar-container {
+              display: flex;
+              align-items: center;
+              flex-shrink: 0;
+            }
+            
+            .avatar {
+              width: ${avatarSize};
+              height: ${avatarSize};
+              border-radius: 50%;
+              border: 2px solid ${avatarBorderColor};
+              object-fit: cover;
+              flex-shrink: 0;
+            }
+            
+            .text-content {
+              margin-left: ${avatarCount > 0 ? '12px' : '0'};
+              line-height: 1.4;
+              width: 100%;
+            }
+            
+            .line {
+              display: block;
+              width: 100%;
+            }
+            
+            .line:first-child {
+              margin-bottom: 2px;
+            }
+            
+            .badge {
+              height: ${previewDevice === 'mobile' ? '13px' : '14px'};
+              max-width: none;
+              margin: 0 4px;
+              vertical-align: baseline;
+              transform: translateY(-1px);
+              object-fit: contain;
+              display: inline;
+            }
+          `}</style>
+          
+          <div className="social-proof-preview-container">
+            <div className="social-proof-preview">
+              {avatarCount > 0 && (
+                <div className="avatar-container">
+                  {avatarCount >= 1 && (
+                    <img 
+                      src={avatarImage1} 
+                      alt="User 1" 
+                      className="avatar"
+                      style={{ 
+                        zIndex: 3, 
+                        marginRight: avatarCount > 1 ? '-8px' : '0' 
+                      }}
+                    />
+                  )}
+                  {avatarCount >= 2 && (
+                    <img 
+                      src={avatarImage2} 
+                      alt="User 2" 
+                      className="avatar"
+                      style={{ 
+                        zIndex: 2, 
+                        marginRight: avatarCount >= 3 ? '-8px' : '0' 
+                      }}
+                    />
+                  )}
+                  {avatarCount >= 3 && (
+                    <img 
+                      src={avatarImage3} 
+                      alt="User 3" 
+                      className="avatar"
+                      style={{ zIndex: 1 }}
+                    />
+                  )}
+                </div>
+              )}
+              
+              <div className="text-content">
+                {/* Desktop Layout */}
+                <div className="desktop-only">
+                  <div className="line">
+                    <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
+                    <img src={verifiedImage} alt="Verifiziert" className="badge" />
+                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
+                      und <strong>12.752</strong> andere sind begeistert
+                    </span>
+                  </div>
+                  <div className="line">
+                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
+                      von <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>{brandName}</span>
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Mobile Layout */}
+                <div className="mobile-only">
+                  <div className="line">
+                    <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
+                    <img src={verifiedImage} alt="Verifiziert" className="badge" />
+                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
+                      und <strong>12.752</strong> andere sind
+                    </span>
+                  </div>
+                  <div className="line">
+                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
+                      begeistert von <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>{brandName}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        // Product Page Integration Preview
+        <div className="flex-1">
+          {productUrl ? (
+            <div className="border border-gray-300 rounded-lg overflow-hidden">
+              <div className="bg-gray-100 px-3 py-2 text-xs text-gray-600 border-b">
+                Produktseite mit integrierter Social Proof Section:
+              </div>
+              <iframe
+                src={productUrl}
+                className="w-full h-96"
+                style={{
+                  transform: previewDevice === 'mobile' ? 'scale(0.6)' : 'scale(1)',
+                  transformOrigin: 'top left',
+                  width: previewDevice === 'mobile' ? '166%' : '100%',
+                  height: previewDevice === 'mobile' ? '160%' : '100%'
+                }}
+              />
+              <div className="bg-yellow-50 p-3 border-t text-xs text-yellow-800">
+                ⚠️ Dies ist nur eine Vorschau. Die Social Proof Section ist noch nicht in diese Seite integriert.
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-48 border border-gray-300 rounded-lg bg-gray-50">
+              <div className="text-center text-gray-500">
+                <svg className="w-12 h-12 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
+                </svg>
+                <p>Gib eine Produktseiten-URL ein</p>
+                <p className="text-xs mt-1">um die Integration zu testen</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 
