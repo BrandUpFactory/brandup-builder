@@ -1135,84 +1135,73 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
           style={{
             marginLeft: avatarCount > 0 ? '12px' : '0',
             lineHeight: '1.4',
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            alignItems: 'center',
+            display: 'block',
             width: '100%'
           }}
         >
-          {/* Layout container to keep names and text in a row */}
-          <div 
-            style={{ 
-              display: 'flex',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              width: '100%'
-            }}
-          >
-            {/* Two-line layout: Line 1 = Names + Badge + Text start, Line 2 = Last words */}
-            {(() => {
-              const { firstPart, lastTwoPart } = getLastTwoWords();
-              
-              return (
-                <>
-                  {/* First line: Names + Badge + First part of text - inline */}
-                  <div style={{ 
-                    display: 'block',
-                    width: '100%',
-                    marginBottom: '2px'
-                  }}>
-                    <strong style={{ 
-                      fontWeight: '600',
+          {/* Two-line layout: Line 1 = Names + Badge + Text start, Line 2 = Last words */}
+          {(() => {
+            const { firstPart, lastTwoPart } = getLastTwoWords();
+            
+            return (
+              <>
+                {/* First line: Names + Badge + First part of text - inline, no wrapping */}
+                <div style={{ 
+                  display: 'block',
+                  width: '100%',
+                  marginBottom: '2px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden'
+                }}>
+                  <strong style={{ 
+                    fontWeight: '600',
+                    display: 'inline'
+                  }}>{getDisplayNames()}</strong>
+                  <img 
+                    src={verifiedImage}
+                    alt="Verifiziert" 
+                    className="verified-badge-proof" 
+                    style={{
+                      height: previewDevice === 'mobile' ? '13px' : '14px',
+                      maxWidth: 'none',
+                      marginLeft: '4px',
+                      marginRight: '4px',
+                      verticalAlign: 'baseline',
+                      transform: 'translateY(-1px)',
+                      objectFit: 'contain',
                       display: 'inline'
-                    }}>{getDisplayNames()}</strong>
-                    <img 
-                      src={verifiedImage}
-                      alt="Verifiziert" 
-                      className="verified-badge-proof" 
-                      style={{
-                        height: previewDevice === 'mobile' ? '13px' : '14px',
-                        maxWidth: 'none',
-                        marginLeft: '4px',
-                        marginRight: '4px',
-                        verticalAlign: 'baseline',
-                        transform: 'translateY(-1px)',
-                        objectFit: 'contain',
-                        display: 'inline'
-                      }}
-                    />
-                    <span style={{ 
-                      fontWeight: '400',
-                      wordSpacing: '0.1em',
-                      letterSpacing: '0.01em',
-                      display: 'inline'
-                    }} dangerouslySetInnerHTML={{ 
-                      __html: firstPart
-                    }} />
-                  </div>
-                  
-                  {/* Second line: Last words only */}
-                  <div style={{ 
-                    display: 'block',
-                    width: '100%'
-                  }}>
-                    <span style={{ 
-                      fontWeight: '400',
-                      wordSpacing: '0.1em',
-                      letterSpacing: '0.01em'
-                    }} dangerouslySetInnerHTML={{ 
-                      __html: lastTwoPart.replace(
-                        brandName, 
-                        `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`
-                      )
-                    }} />
-                  </div>
-                </>
-              );
-            })()}
-          </div>
+                    }}
+                  />
+                  <span style={{ 
+                    fontWeight: '400',
+                    wordSpacing: '0.1em',
+                    letterSpacing: '0.01em',
+                    display: 'inline'
+                  }} dangerouslySetInnerHTML={{ 
+                    __html: firstPart
+                  }} />
+                </div>
+                
+                {/* Second line: Last words only - no wrapping */}
+                <div style={{ 
+                  display: 'block',
+                  width: '100%',
+                  whiteSpace: 'nowrap'
+                }}>
+                  <span style={{ 
+                    fontWeight: '400',
+                    wordSpacing: '0.1em',
+                    letterSpacing: '0.01em'
+                  }} dangerouslySetInnerHTML={{ 
+                    __html: lastTwoPart.replace(
+                      brandName, 
+                      `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`
+                    )
+                  }} />
+                </div>
+              </>
+            );
+          })()}
         </div>
       </div>
     </div>
