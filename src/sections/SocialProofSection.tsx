@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import ImageManager from '@/components/ImageManager'
 
 interface SocialProofSectionProps {
   initialData?: {
@@ -112,6 +111,9 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
   // Preview device state - use external device if provided, otherwise internal state
   const [internalPreviewDevice, setInternalPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
   const previewDevice = externalPreviewDevice || internalPreviewDevice
+  
+  // Help popup state
+  const [showImageHelp, setShowImageHelp] = useState(false)
   
   
   // Helper function to get effective padding
@@ -308,6 +310,96 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
           </svg>
           <div className="absolute -top-1 left-6 w-48 p-2 bg-gray-800 text-white text-xs rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 z-10">
             {text}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Image Upload Help Modal
+  const ImageHelpModal = () => {
+    if (!showImageHelp) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+          <div className="p-6">
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Wie lade ich Bilder in Shopify hoch?
+              </h3>
+              <button
+                onClick={() => setShowImageHelp(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="space-y-4 text-sm text-gray-700">
+              <p className="text-base">
+                So lädst du deine eigenen Bilder in Shopify hoch und erhältst die Links:
+              </p>
+              
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <div className="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">1</div>
+                  <div>
+                    <p className="font-medium">Gehe zu "Inhalte" → "Dateien"</p>
+                    <p className="text-gray-600">Logge dich in dein Shopify Admin ein und navigiere im Hauptmenü zu "Inhalte" und dann zu "Dateien".</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-3">
+                  <div className="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">2</div>
+                  <div>
+                    <p className="font-medium">Lade dein Bild hoch</p>
+                    <p className="text-gray-600">Klicke auf "Dateien hochladen" und wähle dein Bild aus. Warte bis der Upload abgeschlossen ist.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-3">
+                  <div className="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">3</div>
+                  <div>
+                    <p className="font-medium">Kopiere den Link</p>
+                    <p className="text-gray-600">Klicke auf dein hochgeladenes Bild und kopiere die URL aus der Adressleiste oder verwende den "Link kopieren" Button.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-3">
+                  <div className="bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">4</div>
+                  <div>
+                    <p className="font-medium">Füge den Link hier ein</p>
+                    <p className="text-gray-600">Füge die kopierte URL in das entsprechende Eingabefeld hier im Builder ein.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
+                <p className="text-blue-800 font-medium mb-2">💡 Tipp:</p>
+                <p className="text-blue-700 text-sm">
+                  Die URL sollte etwa so aussehen: <code className="bg-blue-100 px-1 rounded text-xs">https://cdn.shopify.com/s/files/1/.../dein-bild.jpg</code>
+                </p>
+              </div>
+              
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-yellow-800 font-medium mb-2">⚠️ Wichtig:</p>
+                <p className="text-yellow-700 text-sm">
+                  Verwende für Avatar-Bilder am besten quadratische Bilder (1:1 Seitenverhältnis) für die beste Darstellung.
+                </p>
+              </div>
+            </div>
+            
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setShowImageHelp(false)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Verstanden
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -664,14 +756,25 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
       
       {/* Images */}
       <div className="border-b pb-4">
-        <h3 className="text-sm font-semibold mb-3 text-[#1c2838]">Bilder</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-[#1c2838]">Bilder</h3>
+          <button
+            onClick={() => setShowImageHelp(true)}
+            className="text-blue-600 hover:text-blue-800 text-xs flex items-center space-x-1 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Wie lade ich Bilder hoch?</span>
+          </button>
+        </div>
         <div className="space-y-4">
           {avatarCount >= 1 && (
             <label className="block text-sm text-[#1c2838]">
               Avatar 1:
               <div className="mt-1 flex items-center space-x-2">
                 {avatarImage1 && (
-                  <div className="w-10 h-10 border rounded-full overflow-hidden bg-white">
+                  <div className="w-10 h-10 border rounded-full overflow-hidden bg-white flex-shrink-0">
                     <img
                       src={avatarImage1}
                       alt="Avatar 1"
@@ -679,18 +782,12 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
                     />
                   </div>
                 )}
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    value={avatarImage1}
-                    onChange={(e) => setAvatarImage1(e.target.value)}
-                    className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                    placeholder="URL des Avatarbildes 1"
-                  />
-                </div>
-                <ImageManager
-                  onSelect={setAvatarImage1}
-                  currentImage={avatarImage1}
+                <input
+                  type="text"
+                  value={avatarImage1}
+                  onChange={(e) => setAvatarImage1(e.target.value)}
+                  className="flex-1 border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+                  placeholder="https://cdn.shopify.com/s/files/1/.../avatar1.jpg"
                 />
               </div>
             </label>
@@ -701,7 +798,7 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
               Avatar 2:
               <div className="mt-1 flex items-center space-x-2">
                 {avatarImage2 && (
-                  <div className="w-10 h-10 border rounded-full overflow-hidden bg-white">
+                  <div className="w-10 h-10 border rounded-full overflow-hidden bg-white flex-shrink-0">
                     <img
                       src={avatarImage2}
                       alt="Avatar 2"
@@ -709,18 +806,12 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
                     />
                   </div>
                 )}
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    value={avatarImage2}
-                    onChange={(e) => setAvatarImage2(e.target.value)}
-                    className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                    placeholder="URL des Avatarbildes 2"
-                  />
-                </div>
-                <ImageManager
-                  onSelect={setAvatarImage2}
-                  currentImage={avatarImage2}
+                <input
+                  type="text"
+                  value={avatarImage2}
+                  onChange={(e) => setAvatarImage2(e.target.value)}
+                  className="flex-1 border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+                  placeholder="https://cdn.shopify.com/s/files/1/.../avatar2.jpg"
                 />
               </div>
             </label>
@@ -731,7 +822,7 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
               Avatar 3:
               <div className="mt-1 flex items-center space-x-2">
                 {avatarImage3 && (
-                  <div className="w-10 h-10 border rounded-full overflow-hidden bg-white">
+                  <div className="w-10 h-10 border rounded-full overflow-hidden bg-white flex-shrink-0">
                     <img
                       src={avatarImage3}
                       alt="Avatar 3"
@@ -739,18 +830,12 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
                     />
                   </div>
                 )}
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    value={avatarImage3}
-                    onChange={(e) => setAvatarImage3(e.target.value)}
-                    className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                    placeholder="URL des Avatarbildes 3"
-                  />
-                </div>
-                <ImageManager
-                  onSelect={setAvatarImage3}
-                  currentImage={avatarImage3}
+                <input
+                  type="text"
+                  value={avatarImage3}
+                  onChange={(e) => setAvatarImage3(e.target.value)}
+                  className="flex-1 border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+                  placeholder="https://cdn.shopify.com/s/files/1/.../avatar3.jpg"
                 />
               </div>
             </label>
@@ -760,7 +845,7 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
             Verifizierungsbadge:
             <div className="mt-1 flex items-center space-x-2">
               {verifiedImage && (
-                <div className="w-6 h-6 border rounded overflow-hidden bg-white">
+                <div className="w-6 h-6 border rounded overflow-hidden bg-white flex-shrink-0">
                   <img
                     src={verifiedImage}
                     alt="Verifizierungsbadge"
@@ -768,18 +853,12 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
                   />
                 </div>
               )}
-              <div className="flex-1">
-                <input
-                  type="text"
-                  value={verifiedImage}
-                  onChange={(e) => setVerifiedImage(e.target.value)}
-                  className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                  placeholder="URL des Verifizierungsbadges"
-                />
-              </div>
-              <ImageManager
-                onSelect={setVerifiedImage}
-                currentImage={verifiedImage}
+              <input
+                type="text"
+                value={verifiedImage}
+                onChange={(e) => setVerifiedImage(e.target.value)}
+                className="flex-1 border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+                placeholder="https://cdn.shopify.com/s/files/1/.../badge.png"
               />
             </div>
           </label>
@@ -1047,10 +1126,13 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
     setInternalPreviewDevice(device);
   };
   
-  // Generate the exact same HTML as the output code for preview
+  // Generate HTML for preview with forced refresh key
   const generatePreviewHTML = () => {
+    const currentFontSize = previewDevice === 'mobile' ? fontSizeMobile : fontSizeDesktop;
+    const currentBadgeSize = previewDevice === 'mobile' ? '13px' : '14px';
+    
     return `
-      <div style="display: flex; align-items: center; background-color: ${backgroundColor}; padding: ${getEffectivePadding()}; border-radius: ${borderRadius}; font-family: Arial, sans-serif; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-bottom: 12px; color: ${textColor}; font-weight: 500; width: ${useFullWidth ? '100%' : 'fit-content'}; max-width: 100%; box-sizing: border-box; font-size: ${getCurrentFontSize()};">
+      <div style="display: flex; align-items: center; background-color: ${backgroundColor}; padding: ${getEffectivePadding()}; border-radius: ${borderRadius}; font-family: Arial, sans-serif; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-bottom: 12px; color: ${textColor}; font-weight: 500; width: ${useFullWidth ? '100%' : 'fit-content'}; max-width: 100%; box-sizing: border-box; font-size: ${currentFontSize};">
         ${avatarCount > 0 ? `
         <div style="display: flex; align-items: center; flex-shrink: 0;">
           ${avatarCount >= 1 ? `<img src="${avatarImage1}" alt="User 1" style="width: ${avatarSize}; height: ${avatarSize}; border-radius: 50%; border: 2px solid ${avatarBorderColor}; object-fit: cover; flex-shrink: 0; z-index: 3; margin-right: ${avatarCount > 1 ? '-8px' : '0'};" onerror="this.style.display='none'">` : ''}
@@ -1059,10 +1141,10 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
         </div>` : ''}
         
         <!-- Mobile layout: 3 words on second line -->
-        <div class="mobile-layout" style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: ${previewDevice === 'mobile' ? 'block' : 'none'}; width: 100%;">
+        <div style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: ${previewDevice === 'mobile' ? 'block' : 'none'}; width: 100%;">
           <div style="display: block; width: 100%; margin-bottom: 2px;">
             <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-            <img src="${verifiedImage}" alt="Verifiziert" style="height: 13px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
+            <img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
             <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${(() => {
               const text = customText;
               const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
@@ -1090,10 +1172,10 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
         </div>
         
         <!-- Desktop layout: 2 words on second line -->
-        <div class="desktop-layout" style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: ${previewDevice === 'desktop' ? 'block' : 'none'}; width: 100%;">
+        <div style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: ${previewDevice === 'desktop' ? 'block' : 'none'}; width: 100%;">
           <div style="display: block; width: 100%; margin-bottom: 2px;">
             <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-            <img src="${verifiedImage}" alt="Verifiziert" style="height: 14px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
+            <img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
             <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${(() => {
               const text = customText;
               const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
@@ -1126,6 +1208,7 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
   const preview = (
     <div className="w-full h-full flex items-start justify-start p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '200px' }}>
       <div 
+        key={`preview-${previewDevice}-${getCurrentFontSize()}-${textColor}`}
         dangerouslySetInnerHTML={{ __html: generatePreviewHTML() }}
         style={{
           width: '100%',
@@ -1271,5 +1354,14 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
     </>
   )
 
-  return { settings, preview, code: codeDisplay }
+  return { 
+    settings: (
+      <>
+        {settings}
+        <ImageHelpModal />
+      </>
+    ), 
+    preview, 
+    code: codeDisplay 
+  }
 }
