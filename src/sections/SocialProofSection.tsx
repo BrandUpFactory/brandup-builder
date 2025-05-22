@@ -98,6 +98,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   const [fontSizeDesktop, setFontSizeDesktop] = useState(safeInitialData.fontSizeDesktop || '11px')
   const [fontSizeMobile, setFontSizeMobile] = useState(safeInitialData.fontSizeMobile || '9px')
   const [brandNameBold, setBrandNameBold] = useState(safeInitialData.brandNameBold !== undefined ? safeInitialData.brandNameBold : true)
+  const [useFullWidth, setUseFullWidth] = useState(safeInitialData.useFullWidth !== undefined ? safeInitialData.useFullWidth : true)
   
   // Padding settings
   const [useSinglePadding, setUseSinglePadding] = useState(true)
@@ -180,7 +181,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     selectedStyle,
     fontSizeDesktop,
     fontSizeMobile,
-    brandNameBold
+    brandNameBold,
+    useFullWidth
   };
 
   // Update parent component when data changes
@@ -195,7 +197,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     avatarBorderColor, textColor, showBreakOnLarge,
     avatarSize, borderRadius, padding, paddingTop, paddingRight,
     paddingBottom, paddingLeft, avatarCount, selectedStyle, 
-    fontSizeDesktop, fontSizeMobile, brandNameBold, onDataChange
+    fontSizeDesktop, fontSizeMobile, brandNameBold, useFullWidth, onDataChange
   ])
 
   // Handle avatar display names based on avatar count
@@ -892,6 +894,22 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               </div>
             </div>
             
+            <div className="flex items-center justify-between mt-3">
+              <div className="flex items-center">
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setUseFullWidth(!useFullWidth); }}
+                  className="flex items-center cursor-pointer bg-transparent border-none p-0 m-0 focus:outline-none"
+                >
+                  <div className={`relative w-9 h-5 ${useFullWidth ? 'bg-[#1c2838]' : 'bg-gray-200'} rounded-full transition-colors`}>
+                    <div className={`absolute top-[2px] ${useFullWidth ? 'right-[2px] translate-x-0' : 'left-[2px] translate-x-0'} bg-white border rounded-full h-4 w-4 transition-all`}></div>
+                  </div>
+                  <span className="ml-2 text-sm text-gray-600">Volle Breite</span>
+                </button>
+                <HelpTooltip text="Nutzt die komplette verfügbare Breite oder passt die Größe an den Inhalt an." />
+              </div>
+            </div>
+            
             
           </div>
           
@@ -1058,7 +1076,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           marginBottom: '12px',
           color: textColor,
           width: '100%',
-          maxWidth: '600px',
+          maxWidth: useFullWidth ? '100%' : '600px',
+          width: useFullWidth ? '100%' : 'fit-content',
           maxWidth: '100%',
           fontWeight: '500',
           transition: 'font-size 0.3s ease'
@@ -1162,7 +1181,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 alt="Verifiziert" 
                 className="verified-badge-proof" 
                 style={{
-                  height: '16px',
+                  width: '16px',
                   marginLeft: '6px',
                   verticalAlign: 'middle',
                   objectFit: 'contain',
@@ -1397,6 +1416,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
 {% assign font_size_desktop = "${fontSizeDesktop.replace('px', '')}" %}
 {% assign font_size_mobile = "${fontSizeMobile.replace('px', '')}" %}
 {% assign show_break_on_large = ${showBreakOnLarge} %}
+{% assign use_full_width = ${useFullWidth} %}
 {% assign avatar_image_1 = "${avatarImage1}" %}
 {% assign avatar_image_2 = "${avatarImage2}" %}
 {% assign avatar_image_3 = "${avatarImage3}" %}
