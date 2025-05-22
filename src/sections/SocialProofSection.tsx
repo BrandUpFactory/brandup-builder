@@ -81,7 +81,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   const [firstName3, setFirstName3] = useState(safeInitialData.firstName3 || 'Maria')
   const [userCount, setUserCount] = useState(safeInitialData.userCount || '12.752')
   const [brandName, setBrandName] = useState(safeInitialData.brandName || 'Regenliebe')
-  const [customText, setCustomText] = useState(safeInitialData.customText || 'und 12.752 andere sind begeistert von Regenliebe')
+  const [customText, setCustomText] = useState(safeInitialData.customText || 'und <strong>12.752</strong> andere sind begeistert von Regenliebe')
   const [avatarImage1, setAvatarImage1] = useState(safeInitialData.avatarImage1 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619')
   const [avatarImage2, setAvatarImage2] = useState(safeInitialData.avatarImage2 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098')
   const [avatarImage3, setAvatarImage3] = useState(safeInitialData.avatarImage3 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-1.jpg?v=1738073619')
@@ -220,7 +220,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     return customText;
   };
   
-  // Function to get the last two words for line breaking
+  // Function to get the last words for line breaking (2 for desktop, 3 for mobile)
   const getLastTwoWords = () => {
     try {
       // Process the HTML text with proper variable replacement
@@ -234,30 +234,32 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       
       // Split into words
       const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
+      
+      // Determine how many words to put on second line based on device
+      const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
         
-      if (words.length <= 2) {
+      if (words.length <= wordsForSecondLine) {
         return { firstPart: processedText, lastTwoPart: '' };
       }
       
-      // Get the last two words - specifically the LAST two words for line breaking
-      const lastTwo = words.slice(-2).join(' ');
+      // Get the last words for second line
+      const lastWords = words.slice(-wordsForSecondLine).join(' ');
       
-      // Find the position of the last two words in the original text
-      const lastIndex = normalizedText.lastIndexOf(lastTwo);
+      // Find the position of the last words in the original text
+      const lastIndex = normalizedText.lastIndexOf(lastWords);
       
       if (lastIndex === -1) {
-        // If we can't find the last two words, just return the formatted text
+        // If we can't find the last words, just return the formatted text
         return { firstPart: processedText, lastTwoPart: '' };
       }
       
       // Find the approximate position in the HTML text
-      // We need to search in the processed text for the last occurrence of lastTwo
-      const lastOccurrence = processedText.lastIndexOf(lastTwo);
+      // We need to search in the processed text for the last occurrence of lastWords
+      const lastOccurrence = processedText.lastIndexOf(lastWords);
       
       if (lastOccurrence === -1) {
         // Try searching for individual words if exact match not found
         const lastWord = words[words.length - 1];
-        const secondLastWord = words[words.length - 2];
         
         // Find the last word position
         const lastWordPos = processedText.lastIndexOf(lastWord);
@@ -273,7 +275,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
         return { firstPart: processedText, lastTwoPart: '' };
       }
       
-      // If found, return parts split at the last two words
+      // If found, return parts split at the last words
       return {
         firstPart: processedText.substring(0, lastOccurrence).trim(),
         lastTwoPart: processedText.substring(lastOccurrence).trim()
@@ -290,7 +292,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   };
   
   // Different code output types
-  const [codeOutputType, setCodeOutputType] = useState<'standalone' | 'liquid-block' | 'section'>('standalone');
+  const [codeOutputType, setCodeOutputType] = useState<'standalone'>('standalone');
 
   // Help tooltip component
   const HelpTooltip = ({ text }: { text: string }) => {
@@ -433,7 +435,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                       });
                     }}
                     className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                    placeholder="und 12.752 andere sind begeistert von Regenliebe"
+                    placeholder="und <strong>12.752</strong> andere sind begeistert von Regenliebe"
                     rows={3}
                   />
                   
@@ -1168,19 +1170,20 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                       alt="Verifiziert" 
                       className="verified-badge-proof" 
                       style={{
-                        height: '16px',
+                        height: '14px',
                         maxWidth: 'none',
-                        marginLeft: '6px',
-                        marginRight: '6px',
-                        verticalAlign: 'middle',
+                        marginLeft: '4px',
+                        marginRight: '4px',
+                        verticalAlign: 'baseline',
+                        transform: 'translateY(-1px)',
                         objectFit: 'contain',
                         display: 'inline'
                       }}
                     />
                     <span style={{ 
                       fontWeight: '400',
-                      wordSpacing: '0.4em',
-                      letterSpacing: '0.03em',
+                      wordSpacing: '0.1em',
+                      letterSpacing: '0.01em',
                       display: 'inline'
                     }} dangerouslySetInnerHTML={{ 
                       __html: firstPart
@@ -1194,8 +1197,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   }}>
                     <span style={{ 
                       fontWeight: '400',
-                      wordSpacing: '0.4em',
-                      letterSpacing: '0.03em'
+                      wordSpacing: '0.1em',
+                      letterSpacing: '0.01em'
                     }} dangerouslySetInnerHTML={{ 
                       __html: lastTwoPart.replace(
                         brandName, 
@@ -1212,52 +1215,21 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     </div>
   )
 
-  // Code Switcher Component
+  // Code Switcher Component - simplified to only show standalone
   const CodeSwitcher = () => {
     return (
       <div className="flex border-b mb-4 pb-2">
-        <button 
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCodeOutputType('standalone'); }}
-          className={`flex items-center px-3 py-1.5 text-xs rounded-l-md ${codeOutputType === 'standalone' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
-        >
+        <div className="flex items-center px-3 py-1.5 text-xs rounded-md bg-[#1c2838] text-white">
           <span>Standalone HTML</span>
           <div className="relative ml-1 group">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
               <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM8.94 6.94a.75.75 0 1 1-1.06-1.06 2.5 2.5 0 0 1 3.536 0A.75.75 0 0 1 10.354 6.94 1 1 0 0 0 9.75 6.75a1 1 0 0 0-.81.31Zm-3.24 7.9a.75.75 0 1 0 1.06 1.06l4.25-4.25a.75.75 0 1 0-1.06-1.06L6.33 14.44 5.56 13.7a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l1.2 1.2a.75.75 0 0 0 1.06 0Z" clipRule="evenodd" />
             </svg>
             <div className="absolute left-0 bottom-full mb-2 p-2 bg-gray-800 text-white text-xs rounded w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity z-10">
-              Kompletter HTML-Code mit CSS - funktioniert überall ohne externe Abhängigkeiten.
+              Kompletter HTML-Code mit CSS - funktioniert überall ohne externe Abhängigkeiten. Desktop: 2 Wörter in zweiter Zeile, Mobil: 3 Wörter in zweiter Zeile.
             </div>
           </div>
-        </button>
-        <button 
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCodeOutputType('liquid-block'); }}
-          className={`flex items-center px-3 py-1.5 text-xs ${codeOutputType === 'liquid-block' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
-        >
-          <span>Liquid Block</span>
-          <div className="relative ml-1 group">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-              <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM8.94 6.94a.75.75 0 1 1-1.06-1.06 2.5 2.5 0 0 1 3.536 0A.75.75 0 0 1 10.354 6.94 1 1 0 0 0 9.75 6.75a1 1 0 0 0-.81.31Zm-3.24 7.9a.75.75 0 1 0 1.06 1.06l4.25-4.25a.75.75 0 1 0-1.06-1.06L6.33 14.44 5.56 13.7a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l1.2 1.2a.75.75 0 0 0 1.06 0Z" clipRule="evenodd" />
-            </svg>
-            <div className="absolute left-0 bottom-full mb-2 p-2 bg-gray-800 text-white text-xs rounded w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity z-10">
-              Optimierter Code für Shopify Liquid Blocks - ohne Syntax-Fehler, ideal für Theme Code Editoren.
-            </div>
-          </div>
-        </button>
-        <button 
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCodeOutputType('section'); }}
-          className={`flex items-center px-3 py-1.5 text-xs rounded-r-md ${codeOutputType === 'section' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}`}
-        >
-          <span>Shopify Theme Code</span>
-          <div className="relative ml-1 group">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-              <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM8.94 6.94a.75.75 0 1 1-1.06-1.06 2.5 2.5 0 0 1 3.536 0A.75.75 0 0 1 10.354 6.94 1 1 0 0 0 9.75 6.75a1 1 0 0 0-.81.31Zm-3.24 7.9a.75.75 0 1 0 1.06 1.06l4.25-4.25a.75.75 0 1 0-1.06-1.06L6.33 14.44 5.56 13.7a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l1.2 1.2a.75.75 0 0 0 1.06 0Z" clipRule="evenodd" />
-            </svg>
-            <div className="absolute right-0 bottom-full mb-2 p-2 bg-gray-800 text-white text-xs rounded w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity z-10">
-              Kompletter Shopify Theme Code zum Kopieren & Einfügen über die Shopify-Oberfläche.
-            </div>
-          </div>
-        </button>
+        </div>
       </div>
     );
   };
@@ -1280,6 +1252,26 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
         font-size: ${fontSizeMobile};
       }
     }
+    
+    /* Mobile responsive text layout - hide desktop layout */
+    @media (max-width: 767px) {
+      .desktop-layout {
+        display: none !important;
+      }
+      .mobile-layout {
+        display: block !important;
+      }
+    }
+    
+    /* Desktop layout - hide mobile layout */
+    @media (min-width: 768px) {
+      .mobile-layout {
+        display: none !important;
+      }
+      .desktop-layout {
+        display: block !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1291,339 +1283,77 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
       ${avatarCount >= 3 ? `<img src="${avatarImage3}" alt="User 3" style="width: ${avatarSize}; height: ${avatarSize}; border-radius: 50%; border: 2px solid ${avatarBorderColor}; object-fit: cover; flex-shrink: 0; z-index: 1;" onerror="this.style.display='none'">` : ''}
     </div>` : ''}
     <div style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: block; width: 100%;">
-      <div style="display: block; width: 100%; margin-bottom: 2px;">
-        <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-        <img src="${verifiedImage}" alt="Verifiziert" style="height: 16px; max-width: none; margin: 0 6px; vertical-align: middle; object-fit: contain; display: inline;" onerror="this.style.display='none'">
-        <span style="font-weight: 400; word-spacing: 0.4em; letter-spacing: 0.03em; display: inline;">${(() => {
-          const { firstPart } = getLastTwoWords();
-          return firstPart;
-        })()}</span>
+      <!-- Desktop layout: 2 words on second line -->
+      <div class="desktop-layout">
+        <div style="display: block; width: 100%; margin-bottom: 2px;">
+          <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
+          <img src="${verifiedImage}" alt="Verifiziert" style="height: 14px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
+          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${(() => {
+            // Desktop: 2 words on second line
+            const text = customText;
+            const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
+            const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
+            if (words.length <= 2) return text;
+            const lastTwo = words.slice(-2).join(' ');
+            const lastOccurrence = text.lastIndexOf(lastTwo);
+            if (lastOccurrence === -1) return text;
+            return text.substring(0, lastOccurrence).trim();
+          })()}</span>
+        </div>
+        <div style="display: block; width: 100%;">
+          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${(() => {
+            const text = customText;
+            const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
+            const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
+            if (words.length <= 2) return '';
+            const lastTwo = words.slice(-2).join(' ');
+            const lastOccurrence = text.lastIndexOf(lastTwo);
+            if (lastOccurrence === -1) return '';
+            const result = text.substring(lastOccurrence).trim();
+            return result.replace(brandName, `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
+          })()}</span>
+        </div>
       </div>
-      <div style="display: block; width: 100%;">
-        <span style="font-weight: 400; word-spacing: 0.4em; letter-spacing: 0.03em;">${(() => {
-          const { lastTwoPart } = getLastTwoWords();
-          return lastTwoPart.replace(brandName, `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
-        })()}</span>
+      
+      <!-- Mobile layout: 3 words on second line -->
+      <div class="mobile-layout">
+        <div style="display: block; width: 100%; margin-bottom: 2px;">
+          <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
+          <img src="${verifiedImage}" alt="Verifiziert" style="height: 14px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
+          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${(() => {
+            // Mobile: 3 words on second line
+            const text = customText;
+            const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
+            const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
+            if (words.length <= 3) return text;
+            const lastThree = words.slice(-3).join(' ');
+            const lastOccurrence = text.lastIndexOf(lastThree);
+            if (lastOccurrence === -1) return text;
+            return text.substring(0, lastOccurrence).trim();
+          })()}</span>
+        </div>
+        <div style="display: block; width: 100%;">
+          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${(() => {
+            const text = customText;
+            const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
+            const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
+            if (words.length <= 3) return '';
+            const lastThree = words.slice(-3).join(' ');
+            const lastOccurrence = text.lastIndexOf(lastThree);
+            if (lastOccurrence === -1) return '';
+            const result = text.substring(lastOccurrence).trim();
+            return result.replace(brandName, `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
+          })()}</span>
+        </div>
       </div>
     </div>
   </div>
 </body>
 </html>`;
 
-  // Standalone Liquid code that works independently
-  const liquidBlockCode = `{% comment %}Social Proof Box (BrandUp Builder) - Fixed{% endcomment %}
 
-{% comment %}Current settings embedded for standalone use{% endcomment %}
-{% assign avatar_count = ${avatarCount} %}
-{% assign first_name_1 = "${firstName1}" %}
-{% assign first_name_2 = "${firstName2}" %}
-{% assign first_name_3 = "${firstName3}" %}
-{% assign custom_text = "${customText.replace(/"/g, '&quot;').replace(/\n/g, ' ')}" %}
-{% assign background_color = "${backgroundColor}" %}
-{% assign text_color = "${textColor}" %}
-{% assign avatar_border_color = "${avatarBorderColor}" %}
-{% assign padding = "${getEffectivePadding()}" %}
-{% assign border_radius = "${borderRadius.replace('px', '')}" %}
-{% assign avatar_size = "${avatarSize.replace('px', '')}" %}
-{% assign font_size_desktop = "${fontSizeDesktop.replace('px', '')}" %}
-{% assign font_size_mobile = "${fontSizeMobile.replace('px', '')}" %}
-{% assign show_break_on_large = ${showBreakOnLarge} %}
-{% assign use_full_width = ${useFullWidth} %}
-{% assign avatar_image_1 = "${avatarImage1}" %}
-{% assign avatar_image_2 = "${avatarImage2}" %}
-{% assign avatar_image_3 = "${avatarImage3}" %}
-{% assign verified_image = "${verifiedImage}" %}
-
-{% comment %}Build the names based on settings{% endcomment %}
-{% capture names %}
-  {% if avatar_count == 1 and first_name_1 != blank %}
-    {{ first_name_1 }}
-  {% elsif avatar_count == 2 and first_name_1 != blank and first_name_2 != blank %}
-    {{ first_name_1 }}, {{ first_name_2 }}
-  {% elsif avatar_count == 3 and first_name_1 != blank and first_name_2 != blank and first_name_3 != blank %}
-    {{ first_name_1 }}, {{ first_name_2 }}, {{ first_name_3 }}
-  {% else %}
-    Steffi, Daniela
-  {% endif %}
-{% endcapture %}
-
-<div class="social-proof-fixed">
-  {% if avatar_count > 0 %}
-  <div class="avatars-fixed">
-    {% if avatar_count >= 1 and avatar_image_1 != blank %}
-    <img src="{{ avatar_image_1 }}" alt="User 1" class="avatar-fixed avatar-1-fixed" loading="lazy">
-    {% endif %}
-    {% if avatar_count >= 2 and avatar_image_2 != blank %}
-    <img src="{{ avatar_image_2 }}" alt="User 2" class="avatar-fixed avatar-2-fixed" loading="lazy">
-    {% endif %}
-    {% if avatar_count >= 3 and avatar_image_3 != blank %}
-    <img src="{{ avatar_image_3 }}" alt="User 3" class="avatar-fixed avatar-3-fixed" loading="lazy">
-    {% endif %}
-  </div>
-  {% endif %}
-  <div class="content-fixed">
-    <div style="display: block; width: 100%; margin-bottom: 2px;">
-      <strong style="display: inline;">{{ names | strip }}</strong>
-      {% if verified_image != blank %}
-      <img src="{{ verified_image }}" alt="Verifiziert" loading="lazy" style="height: 16px; max-width: none; margin: 0 6px; vertical-align: middle; object-fit: contain; display: inline;">
-      {% endif %}
-      <span style="font-weight: 400; word-spacing: 0.4em; letter-spacing: 0.02em; display: inline;">{{ custom_text | split: ' ' | slice: 0, -2 | join: ' ' }}</span>
-    </div>
-    <div style="display: block; width: 100%;">
-      <span style="font-weight: 400; word-spacing: 0.4em; letter-spacing: 0.02em;">{{ custom_text | split: ' ' | slice: -2 | join: ' ' }}</span>
-    </div>
-  </div>
-</div>
-
-<style>
-  .social-proof-fixed {
-    display: flex;
-    align-items: center;
-    background-color: {{ section.settings.background_color }};
-    padding: {{ section.settings.padding }};
-    border-radius: {{ section.settings.border_radius }}px;
-    font-family: Arial, sans-serif;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 12px;
-    color: {{ section.settings.text_color }};
-    font-weight: 500;
-    max-width: 100%;
-  }
-  
-  /* Font sizes */
-  @media (min-width: 768px) {
-    .social-proof-box {
-      font-size: {{ section.settings.font_size_desktop }}px;
-    }
-  }
-  
-  @media (max-width: 767px) {
-    .social-proof-box {
-      font-size: {{ section.settings.font_size_mobile }}px;
-    }
-  }
-  
-  /* Avatars */
-  .avatars {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-  }
-  
-  .avatar {
-    width: {{ section.settings.avatar_size }}px;
-    height: {{ section.settings.avatar_size }}px;
-    border-radius: 50%;
-    border: 2px solid {{ section.settings.avatar_border_color }};
-    object-fit: cover;
-    flex-shrink: 0;
-  }
-  
-  .avatar-1 {
-    z-index: 3;
-    margin-right: {% if section.settings.avatar_count > 1 %}-8px{% else %}0{% endif %};
-  }
-  
-  .avatar-2 {
-    z-index: 2;
-    margin-right: {% if section.settings.avatar_count >= 3 %}-8px{% else %}0{% endif %};
-  }
-  
-  .avatar-3 {
-    z-index: 1;
-  }
-  
-  /* Text content */
-  .content {
-    margin-left: {% if section.settings.avatar_count > 0 %}12px{% else %}0{% endif %};
-    line-height: 1.3;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    width: 100%;
-  }
-  
-  .names {
-    display: inline-flex;
-    align-items: center;
-    margin-right: 4px;
-    font-weight: 600;
-  }
-  
-  .text {
-    font-weight: 400;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  
-  .badge {
-    width: 16px;
-    height: 16px;
-    margin-left: 4px;
-    position: relative;
-    top: -1px;
-    flex-shrink: 0;
-  }
-  
-  /* Line break for large screens */
-  @media (min-width: 1300px) {
-    {% if section.settings.show_break_on_large %}
-    .text {
-      display: block;
-      width: 100%;
-    }
-    {% endif %}
-  }
-</style>`;
-
-  // Section Code - using the exact same structure as the liquid-block for consistency
-  const sectionCode = `{% comment %}
-  Social Proof Box (BrandUp Builder)
-{% endcomment %}
-
-{% comment %}Build the names based on settings{% endcomment %}
-{% capture names %}
-  {% if section.settings.avatar_count == 1 and section.settings.first_name_1 != blank %}
-    {{ section.settings.first_name_1 }}
-  {% elsif section.settings.avatar_count == 2 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank %}
-    {{ section.settings.first_name_1 }}, {{ section.settings.first_name_2 }}
-  {% elsif section.settings.avatar_count == 3 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank and section.settings.first_name_3 != blank %}
-    {{ section.settings.first_name_1 }}, {{ section.settings.first_name_2 }}, {{ section.settings.first_name_3 }}
-  {% else %}
-    Steffi, Daniela
-  {% endif %}
-{% endcapture %}
-
-<div class="social-proof-box">
-  {% if section.settings.avatar_count > 0 %}
-  <div class="avatars">
-    {% if section.settings.avatar_count >= 1 and section.settings.avatar_image_1 != blank %}
-    <img src="{{ section.settings.avatar_image_1 | img_url: 'master' }}" alt="User 1" class="avatar avatar-1">
-    {% endif %}
-    {% if section.settings.avatar_count >= 2 and section.settings.avatar_image_2 != blank %}
-    <img src="{{ section.settings.avatar_image_2 | img_url: 'master' }}" alt="User 2" class="avatar avatar-2">
-    {% endif %}
-    {% if section.settings.avatar_count >= 3 and section.settings.avatar_image_3 != blank %}
-    <img src="{{ section.settings.avatar_image_3 | img_url: 'master' }}" alt="User 3" class="avatar avatar-3">
-    {% endif %}
-  </div>
-  {% endif %}
-  <div class="content">
-    <span class="names">
-      <strong>{{ names | strip }}</strong>
-      <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="badge">
-    </span>
-    <span class="text">
-      {{ section.settings.custom_text }}
-    </span>
-  </div>
-</div>
-
-<style>
-  .social-proof-box {
-    display: flex;
-    align-items: center;
-    background-color: {{ section.settings.background_color }};
-    padding: {{ section.settings.padding }};
-    border-radius: {{ section.settings.border_radius }}px;
-    font-family: Arial, sans-serif;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 12px;
-    color: {{ section.settings.text_color }};
-    font-weight: 500;
-    max-width: 100%;
-  }
-  
-  /* Font sizes */
-  @media (min-width: 768px) {
-    .social-proof-box {
-      font-size: {{ section.settings.font_size_desktop }}px;
-    }
-  }
-  
-  @media (max-width: 767px) {
-    .social-proof-box {
-      font-size: {{ section.settings.font_size_mobile }}px;
-    }
-  }
-  
-  /* Avatars */
-  .avatars {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-  }
-  
-  .avatar {
-    width: {{ section.settings.avatar_size }}px;
-    height: {{ section.settings.avatar_size }}px;
-    border-radius: 50%;
-    border: 2px solid {{ section.settings.avatar_border_color }};
-    object-fit: cover;
-    flex-shrink: 0;
-  }
-  
-  .avatar-1 {
-    z-index: 3;
-    margin-right: {% if section.settings.avatar_count > 1 %}-8px{% else %}0{% endif %};
-  }
-  
-  .avatar-2 {
-    z-index: 2;
-    margin-right: {% if section.settings.avatar_count >= 3 %}-8px{% else %}0{% endif %};
-  }
-  
-  .avatar-3 {
-    z-index: 1;
-  }
-  
-  /* Text content */
-  .content {
-    margin-left: {% if section.settings.avatar_count > 0 %}12px{% else %}0{% endif %};
-    line-height: 1.3;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    width: 100%;
-  }
-  
-  .names {
-    display: inline-flex;
-    align-items: center;
-    margin-right: 4px;
-    font-weight: 600;
-  }
-  
-  .text {
-    font-weight: 400;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  
-  .badge {
-    width: 16px;
-    height: 16px;
-    margin-left: 4px;
-    position: relative;
-    top: -1px;
-    flex-shrink: 0;
-  }
-  
-  /* Line break for large screens */
-  @media (min-width: 1300px) {
-    {% if section.settings.show_break_on_large %}
-    .text {
-      display: block;
-      width: 100%;
-    }
-    {% endif %}
-  }
-</style>`;
-
-  // Select the code to display based on selected type
-  const code = codeOutputType === 'standalone' ? standaloneCode : (codeOutputType === 'liquid-block' ? liquidBlockCode : sectionCode);
+  // Select the code to display - only standalone now
+  const code = standaloneCode;
   
   // Complete code display with the switcher
   const codeDisplay = (
