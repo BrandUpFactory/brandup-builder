@@ -866,22 +866,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               <div className="flex items-center">
                 <button
                   type="button"
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowBreakOnLarge(!showBreakOnLarge); }}
-                  className="flex items-center cursor-pointer bg-transparent border-none p-0 m-0 focus:outline-none"
-                >
-                  <div className={`relative w-9 h-5 ${showBreakOnLarge ? 'bg-[#1c2838]' : 'bg-gray-200'} rounded-full transition-colors`}>
-                    <div className={`absolute top-[2px] ${showBreakOnLarge ? 'right-[2px] translate-x-0' : 'left-[2px] translate-x-0'} bg-white border rounded-full h-4 w-4 transition-all`}></div>
-                  </div>
-                  <span className="ml-2 text-sm text-gray-600">Umbrechen</span>
-                </button>
-                <HelpTooltip text="Bricht auf großen Bildschirmen die letzten zwei Wörter in eine neue Zeile um." />
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <button
-                  type="button"
                   onClick={(e) => { e.preventDefault(); e.stopPropagation(); setBrandNameBold(!brandNameBold); }}
                   className="flex items-center cursor-pointer bg-transparent border-none p-0 m-0 focus:outline-none"
                 >
@@ -909,8 +893,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 <HelpTooltip text="Nutzt die komplette verfügbare Breite oder passt die Größe an den Inhalt an." />
               </div>
             </div>
-            
-            
           </div>
           
           {/* Font Size Controls */}
@@ -1075,8 +1057,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
           marginBottom: '12px',
           color: textColor,
-          width: '100%',
-          maxWidth: useFullWidth ? '100%' : '600px',
           width: useFullWidth ? '100%' : 'fit-content',
           maxWidth: '100%',
           fontWeight: '500',
@@ -1181,7 +1161,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 alt="Verifiziert" 
                 className="verified-badge-proof" 
                 style={{
-                  width: '16px',
+                  height: '16px',
                   marginLeft: '6px',
                   verticalAlign: 'middle',
                   objectFit: 'contain',
