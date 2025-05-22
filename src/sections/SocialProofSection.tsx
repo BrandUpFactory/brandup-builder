@@ -1145,13 +1145,11 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
             
             return (
               <>
-                {/* First line: Names + Badge + First part of text - inline, no wrapping */}
+                {/* First line: Names + Badge + First part of text */}
                 <div style={{ 
                   display: 'block',
                   width: '100%',
-                  marginBottom: '2px',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden'
+                  marginBottom: '2px'
                 }}>
                   <strong style={{ 
                     fontWeight: '600',
@@ -1182,11 +1180,10 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
                   }} />
                 </div>
                 
-                {/* Second line: Last words only - no wrapping */}
+                {/* Second line: Last words only */}
                 <div style={{ 
                   display: 'block',
-                  width: '100%',
-                  whiteSpace: 'nowrap'
+                  width: '100%'
                 }}>
                   <span style={{ 
                     fontWeight: '400',
