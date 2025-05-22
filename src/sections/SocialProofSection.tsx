@@ -1162,6 +1162,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 className="verified-badge-proof" 
                 style={{
                   height: '16px',
+                  width: 'auto',
                   marginLeft: '6px',
                   verticalAlign: 'middle',
                   objectFit: 'contain',
@@ -1170,9 +1171,37 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               />
             </span>
             
-            {false ? (
-              // Line break disabled to keep everything inline
-              null
+            {true ? (
+              // Always break text - 2 lines layout
+              (() => {
+                const { firstPart, lastTwoPart } = getLastTwoWords();
+                
+                return (
+                  <>
+                    <span style={{ 
+                      display: 'inline',
+                      fontWeight: '400',
+                      wordSpacing: '0.4em',
+                      letterSpacing: '0.03em'
+                    }} dangerouslySetInnerHTML={{ 
+                      __html: firstPart
+                    }} />
+                    
+                    <div style={{ width: '100%', display: 'block', marginTop: '2px' }}>
+                      <span style={{ 
+                        fontWeight: '400',
+                        wordSpacing: '0.4em',
+                        letterSpacing: '0.03em'
+                      }} dangerouslySetInnerHTML={{ 
+                        __html: lastTwoPart.replace(
+                          brandName, 
+                          `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`
+                        )
+                      }} />
+                    </div>
+                  </>
+                );
+              })()
             ) : (
               // Regular view without line break - stays on same line with names
               <span 
@@ -1433,7 +1462,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
     <span class="names-fixed">
       <strong>{{ names | strip }}</strong>
       {% if verified_image != blank %}
-      <img src="{{ verified_image }}" alt="Verifiziert" class="badge-fixed" loading="lazy">
+      <img src="{{ verified_image }}" alt="Verifiziert" class="badge-fixed" loading="lazy" style="height: 16px; width: auto;">
       {% endif %}
     </span>
     <span class="text-fixed">{{ custom_text }}</span>
