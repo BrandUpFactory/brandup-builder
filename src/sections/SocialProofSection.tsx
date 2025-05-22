@@ -73,8 +73,8 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
     e.stopPropagation();  // Only stop propagation, not preventDefault
   };
   
-  // Style template selection
-  const [selectedStyle, setSelectedStyle] = useState<number>(safeInitialData.selectedStyle !== undefined ? safeInitialData.selectedStyle : 0);
+  // Style template selection - force style 0 as default
+  const [selectedStyle, setSelectedStyle] = useState<number>(0);
   
   // Section content
   const [firstName1, setFirstName1] = useState(safeInitialData.firstName1 || 'Steffi')
@@ -89,10 +89,10 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
   const [verifiedImage, setVerifiedImage] = useState(safeInitialData.verifiedImage || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/insta-blue.png?v=1738073828')
   const [avatarCount, setAvatarCount] = useState(safeInitialData.avatarCount || 2)
 
-  // Section styling
-  const [backgroundColor, setBackgroundColor] = useState(safeInitialData.backgroundColor || styleTemplates[0].backgroundColor)
-  const [avatarBorderColor, setAvatarBorderColor] = useState(safeInitialData.avatarBorderColor || styleTemplates[0].avatarBorderColor)
-  const [textColor, setTextColor] = useState(safeInitialData.textColor || styleTemplates[0].textColor)
+  // Section styling - ensure defaults from style template 0
+  const [backgroundColor, setBackgroundColor] = useState(styleTemplates[0].backgroundColor)
+  const [avatarBorderColor, setAvatarBorderColor] = useState(styleTemplates[0].avatarBorderColor)
+  const [textColor, setTextColor] = useState('#000000') // Force black as default
   const [showBreakOnLarge, setShowBreakOnLarge] = useState(safeInitialData.showBreakOnLarge !== undefined ? safeInitialData.showBreakOnLarge : true)
   const [avatarSize, setAvatarSize] = useState(safeInitialData.avatarSize || '32px')
   const [borderRadius, setBorderRadius] = useState(safeInitialData.borderRadius || styleTemplates[0].borderRadius)
@@ -112,6 +112,7 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
   // Preview device state - use external device if provided, otherwise internal state
   const [internalPreviewDevice, setInternalPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
   const previewDevice = externalPreviewDevice || internalPreviewDevice
+  
   
   // Helper function to get effective padding
   const getEffectivePadding = () => {
@@ -200,7 +201,7 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
     avatarSize, borderRadius, padding, paddingTop, paddingRight,
     paddingBottom, paddingLeft, avatarCount, selectedStyle, 
     fontSizeDesktop, fontSizeMobile, brandNameBold, useFullWidth, onDataChange,
-    previewDevice
+    previewDevice, internalPreviewDevice
   ])
 
   // Handle avatar display names based on avatar count
@@ -1058,14 +1059,14 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
           padding: getEffectivePadding(),
           borderRadius: borderRadius,
           fontFamily: 'Arial, sans-serif',
-          fontSize: previewDevice === 'mobile' ? fontSizeMobile : fontSizeDesktop,
+          fontSize: getCurrentFontSize(),
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
           marginBottom: '12px',
           color: textColor,
           width: useFullWidth ? '100%' : 'fit-content',
-          maxWidth: '100%',
+          maxWidth: previewDevice === 'mobile' ? '320px' : '100%',
           fontWeight: '500',
-          transition: 'font-size 0.3s ease'
+          transition: 'all 0.3s ease'
         }}
             >
         {avatarCount > 0 && (
@@ -1139,72 +1140,51 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
             width: '100%'
           }}
         >
-          {/* Two-line layout with forced line breaks based on device */}
-          {(() => {
-            const { firstPart, lastTwoPart } = getLastTwoWords();
-            
-            return (
-              <div style={{ 
-                display: 'flex',
-                flexDirection: 'column',
-                width: '100%',
-                overflow: 'hidden'
+          {/* Simple two-line layout - force device-specific word breaking */}
+          <div style={{ 
+            display: 'block',
+            width: '100%',
+            lineHeight: '1.4'
+          }}>
+            {/* Line 1 */}
+            <div style={{ marginBottom: '2px' }}>
+              <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
+              <img 
+                src={verifiedImage}
+                alt="Verifiziert" 
+                style={{
+                  height: previewDevice === 'mobile' ? '13px' : '14px',
+                  maxWidth: 'none',
+                  marginLeft: '4px',
+                  marginRight: '4px',
+                  verticalAlign: 'baseline',
+                  transform: 'translateY(-1px)',
+                  objectFit: 'contain'
+                }}
+              />
+              <span style={{ 
+                fontWeight: '400',
+                wordSpacing: '0.1em',
+                letterSpacing: '0.01em'
               }}>
-                {/* First line: Names + Badge + First part of text */}
-                <div style={{ 
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginBottom: '2px',
-                  width: '100%'
-                }}>
-                  <strong style={{ 
-                    fontWeight: '600',
-                    whiteSpace: 'nowrap'
-                  }}>{getDisplayNames()}</strong>
-                  <img 
-                    src={verifiedImage}
-                    alt="Verifiziert" 
-                    className="verified-badge-proof" 
-                    style={{
-                      height: previewDevice === 'mobile' ? '13px' : '14px',
-                      maxWidth: 'none',
-                      marginLeft: '4px',
-                      marginRight: '4px',
-                      verticalAlign: 'baseline',
-                      transform: 'translateY(-1px)',
-                      objectFit: 'contain',
-                      flexShrink: 0
-                    }}
-                  />
-                  <span style={{ 
-                    fontWeight: '400',
-                    wordSpacing: '0.1em',
-                    letterSpacing: '0.01em',
-                    whiteSpace: 'nowrap'
-                  }} dangerouslySetInnerHTML={{ 
-                    __html: firstPart
-                  }} />
-                </div>
-                
-                {/* Second line: Last words only */}
-                <div style={{ 
-                  display: 'block',
-                  width: '100%'
-                }}>
-                  <span style={{ 
-                    fontWeight: '400',
-                    wordSpacing: '0.1em',
-                    letterSpacing: '0.01em'
-                  }} dangerouslySetInnerHTML={{ 
-                    __html: lastTwoPart.replace(
-                      brandName, 
-                      `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`
-                    )
-                  }} />
-                </div>
-              </div>
-            );
-          })()}
+                und <strong>12.752</strong> andere sind{previewDevice === 'desktop' ? ' begeistert' : ''}
+              </span>
+            </div>
+            
+            {/* Line 2 */}
+            <div>
+              <span style={{ 
+                fontWeight: '400',
+                wordSpacing: '0.1em',
+                letterSpacing: '0.01em'
+              }}>
+                {previewDevice === 'mobile' ? 'begeistert von ' : 'von '}
+                <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>
+                  {brandName}
+                </span>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
