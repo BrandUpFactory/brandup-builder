@@ -1153,30 +1153,35 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               
               return (
                 <>
-                  {/* First line: Names + Badge + First part of text */}
+                  {/* First line: Names + Badge + First part of text - inline */}
                   <div style={{ 
                     display: 'block',
                     width: '100%',
                     marginBottom: '2px'
                   }}>
-                    <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
+                    <strong style={{ 
+                      fontWeight: '600',
+                      display: 'inline'
+                    }}>{getDisplayNames()}</strong>
                     <img 
                       src={verifiedImage}
                       alt="Verifiziert" 
                       className="verified-badge-proof" 
                       style={{
                         height: '16px',
-                        width: 'auto',
+                        maxWidth: 'none',
                         marginLeft: '6px',
                         marginRight: '6px',
                         verticalAlign: 'middle',
-                        objectFit: 'contain'
+                        objectFit: 'contain',
+                        display: 'inline'
                       }}
                     />
                     <span style={{ 
                       fontWeight: '400',
                       wordSpacing: '0.4em',
-                      letterSpacing: '0.03em'
+                      letterSpacing: '0.03em',
+                      display: 'inline'
                     }} dangerouslySetInnerHTML={{ 
                       __html: firstPart
                     }} />
@@ -1201,26 +1206,6 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 </>
               );
             })()}
-            
-            {false ? (
-              null
-            ) : (
-              // Regular view without line break - stays on same line with names
-              <span 
-                style={{ 
-                  fontWeight: '400',
-                  display: 'inline',
-                  wordSpacing: '0.4em',
-                  letterSpacing: '0.03em'
-                }}
-                dangerouslySetInnerHTML={{ 
-                  __html: getFormattedText().replace(
-                    brandName, 
-                    `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`
-                  )
-                }}
-              />
-            )}
           </div>
         </div>
       </div>
@@ -1462,11 +1447,11 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   {% endif %}
   <div class="content-fixed">
     <div style="display: block; width: 100%; margin-bottom: 2px;">
-      <strong>{{ names | strip }}</strong>
+      <strong style="display: inline;">{{ names | strip }}</strong>
       {% if verified_image != blank %}
-      <img src="{{ verified_image }}" alt="Verifiziert" loading="lazy" style="height: 16px; width: auto; margin: 0 6px; vertical-align: middle; object-fit: contain;">
+      <img src="{{ verified_image }}" alt="Verifiziert" loading="lazy" style="height: 16px; max-width: none; margin: 0 6px; vertical-align: middle; object-fit: contain; display: inline;">
       {% endif %}
-      <span style="font-weight: 400; word-spacing: 0.4em; letter-spacing: 0.02em;">{{ custom_text | split: ' ' | slice: 0, -2 | join: ' ' }}</span>
+      <span style="font-weight: 400; word-spacing: 0.4em; letter-spacing: 0.02em; display: inline;">{{ custom_text | split: ' ' | slice: 0, -2 | join: ' ' }}</span>
     </div>
     <div style="display: block; width: 100%;">
       <span style="font-weight: 400; word-spacing: 0.4em; letter-spacing: 0.02em;">{{ custom_text | split: ' ' | slice: -2 | join: ' ' }}</span>
