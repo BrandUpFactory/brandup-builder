@@ -92,7 +92,7 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
   // Section styling
   const [backgroundColor, setBackgroundColor] = useState(safeInitialData.backgroundColor || styleTemplates[0].backgroundColor)
   const [avatarBorderColor, setAvatarBorderColor] = useState(safeInitialData.avatarBorderColor || styleTemplates[0].avatarBorderColor)
-  const [textColor, setTextColor] = useState(safeInitialData.textColor || '#000000')
+  const [textColor, setTextColor] = useState(safeInitialData.textColor || styleTemplates[0].textColor)
   const [showBreakOnLarge, setShowBreakOnLarge] = useState(safeInitialData.showBreakOnLarge !== undefined ? safeInitialData.showBreakOnLarge : true)
   const [avatarSize, setAvatarSize] = useState(safeInitialData.avatarSize || '32px')
   const [borderRadius, setBorderRadius] = useState(safeInitialData.borderRadius || styleTemplates[0].borderRadius)
@@ -1139,21 +1139,27 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
             width: '100%'
           }}
         >
-          {/* Two-line layout: Line 1 = Names + Badge + Text start, Line 2 = Last words */}
+          {/* Two-line layout with forced line breaks based on device */}
           {(() => {
             const { firstPart, lastTwoPart } = getLastTwoWords();
             
             return (
-              <>
+              <div style={{ 
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%',
+                overflow: 'hidden'
+              }}>
                 {/* First line: Names + Badge + First part of text */}
                 <div style={{ 
-                  display: 'block',
-                  width: '100%',
-                  marginBottom: '2px'
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '2px',
+                  width: '100%'
                 }}>
                   <strong style={{ 
                     fontWeight: '600',
-                    display: 'inline'
+                    whiteSpace: 'nowrap'
                   }}>{getDisplayNames()}</strong>
                   <img 
                     src={verifiedImage}
@@ -1167,14 +1173,14 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
                       verticalAlign: 'baseline',
                       transform: 'translateY(-1px)',
                       objectFit: 'contain',
-                      display: 'inline'
+                      flexShrink: 0
                     }}
                   />
                   <span style={{ 
                     fontWeight: '400',
                     wordSpacing: '0.1em',
                     letterSpacing: '0.01em',
-                    display: 'inline'
+                    whiteSpace: 'nowrap'
                   }} dangerouslySetInnerHTML={{ 
                     __html: firstPart
                   }} />
@@ -1196,7 +1202,7 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
                     )
                   }} />
                 </div>
-              </>
+              </div>
             );
           })()}
         </div>
@@ -1204,23 +1210,9 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
     </div>
   )
 
-  // Code Switcher Component - simplified to only show standalone
+  // Code display without switcher
   const CodeSwitcher = () => {
-    return (
-      <div className="flex border-b mb-4 pb-2">
-        <div className="flex items-center px-3 py-1.5 text-xs rounded-md bg-[#1c2838] text-white">
-          <span>Standalone HTML</span>
-          <div className="relative ml-1 group">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-              <path fillRule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM8.94 6.94a.75.75 0 1 1-1.06-1.06 2.5 2.5 0 0 1 3.536 0A.75.75 0 0 1 10.354 6.94 1 1 0 0 0 9.75 6.75a1 1 0 0 0-.81.31Zm-3.24 7.9a.75.75 0 1 0 1.06 1.06l4.25-4.25a.75.75 0 1 0-1.06-1.06L6.33 14.44 5.56 13.7a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l1.2 1.2a.75.75 0 0 0 1.06 0Z" clipRule="evenodd" />
-            </svg>
-            <div className="absolute left-0 bottom-full mb-2 p-2 bg-gray-800 text-white text-xs rounded w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity z-10">
-              Kompletter HTML-Code mit CSS - funktioniert überall ohne externe Abhängigkeiten. Desktop: 2 Wörter in zweiter Zeile, Mobil: 3 Wörter in zweiter Zeile.
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return null;
   };
 
   // Self-contained HTML code that works standalone without Shopify
