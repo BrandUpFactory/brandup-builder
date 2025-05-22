@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useMediaQuery } from 'react-responsive'
 
 interface SocialProofSectionProps {
   initialData?: {
@@ -33,6 +34,10 @@ interface SocialProofSectionProps {
   };
   onDataChange?: (data: any) => void;
   previewDevice?: 'desktop' | 'tablet' | 'mobile';
+  previewMode?: 'builder' | 'product';
+  productUrl?: string;
+  onPreviewModeChange?: (mode: 'builder' | 'product') => void;
+  onProductUrlChange?: (url: string) => void;
 }
 
 // Predefined style templates
@@ -63,7 +68,15 @@ const styleTemplates = [
   }
 ];
 
-export default function SocialProofSection({ initialData, onDataChange, previewDevice: externalPreviewDevice }: SocialProofSectionProps) {
+export default function SocialProofSection({ 
+  initialData, 
+  onDataChange, 
+  previewDevice: externalPreviewDevice,
+  previewMode,
+  productUrl,
+  onPreviewModeChange,
+  onProductUrlChange
+}: SocialProofSectionProps) {
   // Ensure initialData is an object
   const safeInitialData = initialData || {};
   
@@ -115,9 +128,9 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
   // Help popup state
   const [showImageHelp, setShowImageHelp] = useState(false)
   
-  // Product URL for preview integration
-  const [productUrl, setProductUrl] = useState('')
-  const [previewMode, setPreviewMode] = useState<'builder' | 'product'>('builder')
+  // Use external preview mode and product URL if provided
+  const currentPreviewMode = previewMode || 'builder'
+  const currentProductUrl = productUrl || ''
   
   
   // Helper function to get effective padding
@@ -1212,28 +1225,12 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
   // Enhanced Preview with Product Integration and Real Mobile Simulation
   const preview = (
     <div className="w-full h-full flex flex-col p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '200px' }}>
-      {/* Preview Mode Toggle */}
-      <div className="flex gap-2 mb-4">
-        <button
-          onClick={() => setPreviewMode('builder')}
-          className={`px-3 py-1.5 text-xs rounded ${previewMode === 'builder' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-        >
-          Builder Vorschau
-        </button>
-        <button
-          onClick={() => setPreviewMode('product')}
-          className={`px-3 py-1.5 text-xs rounded ${previewMode === 'product' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-        >
-          Produktseite Integration
-        </button>
-      </div>
-
-      {previewMode === 'product' && (
+      {currentPreviewMode === 'product' && (
         <div className="mb-4">
           <input
             type="text"
-            value={productUrl}
-            onChange={(e) => setProductUrl(e.target.value)}
+            value={currentProductUrl}
+            onChange={(e) => onProductUrlChange && onProductUrlChange(e.target.value)}
             placeholder="https://dein-shop.myshopify.com/products/produkt-name"
             className="w-full border px-3 py-2 rounded-md text-sm border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:outline-none"
           />
@@ -1241,193 +1238,102 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
         </div>
       )}
 
-      {previewMode === 'builder' ? (
-        // Enhanced Builder Preview with Real CSS Media Queries
+      {currentPreviewMode === 'builder' ? (
+        // Enhanced Builder Preview with Proper Mobile Simulation using react-responsive
         <div className="flex-1">
-          <style>{`
-            .social-proof-preview-container {
-              width: 100%;
-              transition: all 0.3s ease;
-            }
-            
-            .social-proof-preview {
-              display: flex;
-              align-items: center;
-              background-color: ${backgroundColor};
-              padding: ${getEffectivePadding()};
-              border-radius: ${borderRadius};
-              font-family: Arial, sans-serif;
-              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-              margin-bottom: 12px;
-              color: ${textColor};
-              font-weight: 500;
-              width: ${useFullWidth ? '100%' : 'fit-content'};
-              max-width: 100%;
-              box-sizing: border-box;
-              font-size: ${fontSizeDesktop};
-            }
-            
-            ${previewDevice === 'mobile' ? `
-              .social-proof-preview-container {
-                max-width: 375px;
-                margin: 0 auto;
-              }
-              
-              .social-proof-preview {
-                font-size: ${fontSizeMobile} !important;
-              }
-              
-              .mobile-only { display: block !important; }
-              .desktop-only { display: none !important; }
-            ` : `
-              .mobile-only { display: none !important; }
-              .desktop-only { display: block !important; }
-            `}
-            
-            .avatar-container {
-              display: flex;
-              align-items: center;
-              flex-shrink: 0;
-            }
-            
-            .avatar {
-              width: ${avatarSize};
-              height: ${avatarSize};
-              border-radius: 50%;
-              border: 2px solid ${avatarBorderColor};
-              object-fit: cover;
-              flex-shrink: 0;
-            }
-            
-            .text-content {
-              margin-left: ${avatarCount > 0 ? '12px' : '0'};
-              line-height: 1.4;
-              width: 100%;
-            }
-            
-            .line {
-              display: block;
-              width: 100%;
-            }
-            
-            .line:first-child {
-              margin-bottom: 2px;
-            }
-            
-            .badge {
-              height: ${previewDevice === 'mobile' ? '13px' : '14px'};
-              max-width: none;
-              margin: 0 4px;
-              vertical-align: baseline;
-              transform: translateY(-1px);
-              object-fit: contain;
-              display: inline;
-            }
-          `}</style>
-          
-          <div className="social-proof-preview-container">
-            <div className="social-proof-preview">
-              {avatarCount > 0 && (
-                <div className="avatar-container">
-                  {avatarCount >= 1 && (
-                    <img 
-                      src={avatarImage1} 
-                      alt="User 1" 
-                      className="avatar"
-                      style={{ 
-                        zIndex: 3, 
-                        marginRight: avatarCount > 1 ? '-8px' : '0' 
-                      }}
-                    />
-                  )}
-                  {avatarCount >= 2 && (
-                    <img 
-                      src={avatarImage2} 
-                      alt="User 2" 
-                      className="avatar"
-                      style={{ 
-                        zIndex: 2, 
-                        marginRight: avatarCount >= 3 ? '-8px' : '0' 
-                      }}
-                    />
-                  )}
-                  {avatarCount >= 3 && (
-                    <img 
-                      src={avatarImage3} 
-                      alt="User 3" 
-                      className="avatar"
-                      style={{ zIndex: 1 }}
-                    />
-                  )}
-                </div>
-              )}
-              
-              <div className="text-content">
-                {/* Desktop Layout */}
-                <div className="desktop-only">
-                  <div className="line">
-                    <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
-                    <img src={verifiedImage} alt="Verifiziert" className="badge" />
-                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
-                      und <strong>12.752</strong> andere sind begeistert
-                    </span>
-                  </div>
-                  <div className="line">
-                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
-                      von <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>{brandName}</span>
-                    </span>
-                  </div>
-                </div>
-                
-                {/* Mobile Layout */}
-                <div className="mobile-only">
-                  <div className="line">
-                    <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
-                    <img src={verifiedImage} alt="Verifiziert" className="badge" />
-                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
-                      und <strong>12.752</strong> andere sind
-                    </span>
-                  </div>
-                  <div className="line">
-                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
-                      begeistert von <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>{brandName}</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <MobileSimulationContainer 
+            previewDevice={previewDevice}
+            fontSizeDesktop={fontSizeDesktop}
+            fontSizeMobile={fontSizeMobile}
+            backgroundColor={backgroundColor}
+            textColor={textColor}
+            borderRadius={borderRadius}
+            useFullWidth={useFullWidth}
+            getEffectivePadding={getEffectivePadding}
+            avatarCount={avatarCount}
+            avatarSize={avatarSize}
+            avatarBorderColor={avatarBorderColor}
+            getDisplayNames={getDisplayNames}
+            verifiedImage={verifiedImage}
+            brandName={brandName}
+            brandNameBold={brandNameBold}
+            avatarImage1={avatarImage1}
+            avatarImage2={avatarImage2}
+            avatarImage3={avatarImage3}
+          />
         </div>
       ) : (
-        // Product Page Integration Preview
+        // Product Page Integration Preview - CORS-friendly approach
         <div className="flex-1">
-          {productUrl ? (
+          {currentProductUrl ? (
             <div className="border border-gray-300 rounded-lg overflow-hidden">
-              <div className="bg-gray-100 px-3 py-2 text-xs text-gray-600 border-b">
-                Produktseite mit integrierter Social Proof Section:
+              <div className="bg-blue-50 px-3 py-2 text-xs text-blue-800 border-b">
+                <div className="flex items-center space-x-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Produktseite Integration - Anleitung</span>
+                </div>
               </div>
-              <iframe
-                src={productUrl}
-                className="w-full h-96"
-                style={{
-                  transform: previewDevice === 'mobile' ? 'scale(0.6)' : 'scale(1)',
-                  transformOrigin: 'top left',
-                  width: previewDevice === 'mobile' ? '166%' : '100%',
-                  height: previewDevice === 'mobile' ? '160%' : '100%'
-                }}
-              />
-              <div className="bg-yellow-50 p-3 border-t text-xs text-yellow-800">
-                ⚠️ Dies ist nur eine Vorschau. Die Social Proof Section ist noch nicht in diese Seite integriert.
+              
+              <div className="p-4 space-y-4">
+                <div className="bg-white border border-gray-200 rounded-lg p-4">
+                  <h4 className="font-medium text-gray-900 mb-2">URL eingegeben:</h4>
+                  <code className="text-sm bg-gray-100 px-2 py-1 rounded text-blue-600">{currentProductUrl}</code>
+                </div>
+                
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <h4 className="font-medium text-yellow-800 mb-2">🔒 Warum kann die Seite nicht geladen werden?</h4>
+                  <p className="text-sm text-yellow-700 mb-3">
+                    Aus Sicherheitsgründen blockieren moderne Browser das Laden externer Websites in iframes (CORS-Policy). 
+                    Dies verhindert eine direkte Vorschau der Integration.
+                  </p>
+                </div>
+                
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-medium text-blue-800 mb-3">📋 So integrierst du die Section:</h4>
+                  <ol className="text-sm text-blue-700 space-y-2 list-decimal list-inside">
+                    <li>Kopiere den generierten HTML/Liquid Code (rechts im Editor)</li>
+                    <li>Gehe zu deinem Shopify Admin → Online Store → Themes</li>
+                    <li>Klicke auf "Aktionen" → "Code bearbeiten" bei deinem aktiven Theme</li>
+                    <li>Öffne die entsprechende Template-Datei (z.B. product.liquid)</li>
+                    <li>Füge den Code an der gewünschten Stelle ein</li>
+                    <li>Speichere die Änderungen</li>
+                  </ol>
+                </div>
+                
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 className="font-medium text-green-800 mb-2">✅ Alternative Vorschau:</h4>
+                  <p className="text-sm text-green-700 mb-2">
+                    Öffne die Produktseite in einem neuen Tab und nutze die Entwicklertools (F12), 
+                    um eine mobile Ansicht zu simulieren und zu testen, wie die Section aussehen würde.
+                  </p>
+                  <a 
+                    href={currentProductUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-sm text-green-600 hover:text-green-800 underline"
+                  >
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Produktseite in neuem Tab öffnen
+                  </a>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-center h-48 border border-gray-300 rounded-lg bg-gray-50">
+            <div className="flex items-center justify-center h-96 border border-gray-300 rounded-lg bg-gray-50">
               <div className="text-center text-gray-500">
-                <svg className="w-12 h-12 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
                 </svg>
-                <p>Gib eine Produktseiten-URL ein</p>
-                <p className="text-xs mt-1">um die Integration zu testen</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Produktseiten-Integration</h3>
+                <p className="text-sm mb-1">Gib eine Shopify Produktseiten-URL ein,</p>
+                <p className="text-sm">um Integrationshilfe zu erhalten</p>
+                <div className="mt-4 text-xs text-gray-400">
+                  Beispiel: https://dein-shop.myshopify.com/products/produkt-name
+                </div>
               </div>
             </div>
           )}
@@ -1571,6 +1477,225 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
       </pre>
     </>
   )
+
+  // Mobile Simulation Container Component using react-responsive
+  const MobileSimulationContainer = ({ 
+    previewDevice, 
+    fontSizeDesktop, 
+    fontSizeMobile, 
+    backgroundColor, 
+    textColor, 
+    borderRadius, 
+    useFullWidth, 
+    getEffectivePadding, 
+    avatarCount, 
+    avatarSize, 
+    avatarBorderColor, 
+    getDisplayNames, 
+    verifiedImage, 
+    brandName, 
+    brandNameBold, 
+    avatarImage1, 
+    avatarImage2, 
+    avatarImage3 
+  }: any) => {
+    // Force mobile context when preview device is mobile
+    const ForcedMediaQueryProvider = ({ children }: { children: React.ReactNode }) => {
+      if (previewDevice === 'mobile') {
+        // Create a mock window object for mobile simulation
+        const mockWindow = {
+          ...window,
+          innerWidth: 375,
+          matchMedia: (query: string) => {
+            // Force mobile media queries to match
+            const isMobileQuery = query.includes('max-width') || query.includes('767px') || query.includes('768px');
+            return {
+              matches: isMobileQuery,
+              media: query,
+              onchange: null,
+              addListener: () => {},
+              removeListener: () => {},
+              addEventListener: () => {},
+              removeEventListener: () => {},
+              dispatchEvent: () => false,
+            };
+          }
+        };
+        
+        // Temporarily override window for the children
+        const originalWindow = global.window;
+        (global as any).window = mockWindow;
+        
+        const result = children;
+        
+        // Restore original window
+        (global as any).window = originalWindow;
+        
+        return result;
+      }
+      
+      return children;
+    };
+    
+    // Use responsive hooks with forced context
+    const ResponsiveContent = () => {
+      const isMobile = previewDevice === 'mobile' || useMediaQuery({ maxWidth: 767 });
+      const currentFontSize = isMobile ? fontSizeMobile : fontSizeDesktop;
+      const currentBadgeSize = isMobile ? '13px' : '14px';
+      
+      return (
+        <div 
+          className="social-proof-preview-container"
+          style={{
+            width: '100%',
+            transition: 'all 0.3s ease',
+            maxWidth: previewDevice === 'mobile' ? '375px' : '100%',
+            margin: previewDevice === 'mobile' ? '0 auto' : '0',
+          }}
+        >
+          <div 
+            className="social-proof-preview"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor,
+              padding: getEffectivePadding(),
+              borderRadius,
+              fontFamily: 'Arial, sans-serif',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              marginBottom: '12px',
+              color: textColor,
+              fontWeight: 500,
+              width: useFullWidth ? '100%' : 'fit-content',
+              maxWidth: '100%',
+              boxSizing: 'border-box',
+              fontSize: currentFontSize,
+            }}
+          >
+            {avatarCount > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                {avatarCount >= 1 && (
+                  <img 
+                    src={avatarImage1} 
+                    alt="User 1" 
+                    style={{
+                      width: avatarSize,
+                      height: avatarSize,
+                      borderRadius: '50%',
+                      border: `2px solid ${avatarBorderColor}`,
+                      objectFit: 'cover',
+                      flexShrink: 0,
+                      zIndex: 3,
+                      marginRight: avatarCount > 1 ? '-8px' : '0'
+                    }}
+                  />
+                )}
+                {avatarCount >= 2 && (
+                  <img 
+                    src={avatarImage2} 
+                    alt="User 2" 
+                    style={{
+                      width: avatarSize,
+                      height: avatarSize,
+                      borderRadius: '50%',
+                      border: `2px solid ${avatarBorderColor}`,
+                      objectFit: 'cover',
+                      flexShrink: 0,
+                      zIndex: 2,
+                      marginRight: avatarCount >= 3 ? '-8px' : '0'
+                    }}
+                  />
+                )}
+                {avatarCount >= 3 && (
+                  <img 
+                    src={avatarImage3} 
+                    alt="User 3" 
+                    style={{
+                      width: avatarSize,
+                      height: avatarSize,
+                      borderRadius: '50%',
+                      border: `2px solid ${avatarBorderColor}`,
+                      objectFit: 'cover',
+                      flexShrink: 0,
+                      zIndex: 1
+                    }}
+                  />
+                )}
+              </div>
+            )}
+            
+            <div style={{ marginLeft: avatarCount > 0 ? '12px' : '0', lineHeight: 1.4, width: '100%' }}>
+              {/* Desktop Layout - 2 words on second line */}
+              {!isMobile && (
+                <div>
+                  <div style={{ display: 'block', width: '100%', marginBottom: '2px' }}>
+                    <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
+                    <img 
+                      src={verifiedImage} 
+                      alt="Verifiziert" 
+                      style={{
+                        height: currentBadgeSize,
+                        maxWidth: 'none',
+                        margin: '0 4px',
+                        verticalAlign: 'baseline',
+                        transform: 'translateY(-1px)',
+                        objectFit: 'contain',
+                        display: 'inline'
+                      }}
+                    />
+                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
+                      und <strong>12.752</strong> andere sind begeistert
+                    </span>
+                  </div>
+                  <div style={{ display: 'block', width: '100%' }}>
+                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
+                      von <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>{brandName}</span>
+                    </span>
+                  </div>
+                </div>
+              )}
+              
+              {/* Mobile Layout - 3 words on second line */}
+              {isMobile && (
+                <div>
+                  <div style={{ display: 'block', width: '100%', marginBottom: '2px' }}>
+                    <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
+                    <img 
+                      src={verifiedImage} 
+                      alt="Verifiziert" 
+                      style={{
+                        height: currentBadgeSize,
+                        maxWidth: 'none',
+                        margin: '0 4px',
+                        verticalAlign: 'baseline',
+                        transform: 'translateY(-1px)',
+                        objectFit: 'contain',
+                        display: 'inline'
+                      }}
+                    />
+                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
+                      und <strong>12.752</strong> andere sind
+                    </span>
+                  </div>
+                  <div style={{ display: 'block', width: '100%' }}>
+                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
+                      begeistert von <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>{brandName}</span>
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    };
+    
+    return (
+      <ForcedMediaQueryProvider>
+        <ResponsiveContent />
+      </ForcedMediaQueryProvider>
+    );
+  };
 
   return { 
     settings: (

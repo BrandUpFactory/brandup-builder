@@ -162,7 +162,13 @@ export default function EditorLayout({
       
       {activeTab === 'preview' && (
         <div className="border rounded-xl mb-4 h-96">
-          <DevicePreview onDeviceChange={onDeviceChange}>
+          <DevicePreview 
+            onDeviceChange={onDeviceChange}
+            previewMode={previewMode}
+            onPreviewModeChange={onPreviewModeChange}
+            productUrl={productUrl}
+            onProductUrlChange={onProductUrlChange}
+          >
             {preview}
           </DevicePreview>
         </div>
@@ -237,7 +243,13 @@ export default function EditorLayout({
           <div className="grid grid-cols-2 gap-4 h-full">
             {/* Preview */}
             <div className="border rounded-xl bg-white overflow-auto">
-              <DevicePreview onDeviceChange={onDeviceChange}>
+              <DevicePreview 
+                onDeviceChange={onDeviceChange}
+                previewMode={previewMode}
+                onPreviewModeChange={onPreviewModeChange}
+                productUrl={productUrl}
+                onProductUrlChange={onProductUrlChange}
+              >
                 {preview}
               </DevicePreview>
             </div>

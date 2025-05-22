@@ -223,10 +223,24 @@ function SocialProofEditor() {
   
   // Device state for preview
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
+  
+  // Preview mode state
+  const [previewMode, setPreviewMode] = useState<'builder' | 'product'>('builder')
+  const [productUrl, setProductUrl] = useState('')
 
   // Handle device change from EditorLayout
   const handleDeviceChange = (device: 'desktop' | 'tablet' | 'mobile') => {
     setPreviewDevice(device)
+  }
+  
+  // Handle preview mode change
+  const handlePreviewModeChange = (mode: 'builder' | 'product') => {
+    setPreviewMode(mode)
+  }
+  
+  // Handle product URL change
+  const handleProductUrlChange = (url: string) => {
+    setProductUrl(url)
   }
 
   // Create a wrapper component to handle the SocialProofSection format
@@ -234,7 +248,11 @@ function SocialProofEditor() {
     const { settings, preview, code } = SocialProofSection({
       initialData: sectionData,
       onDataChange: handleDataChange,
-      previewDevice: previewDevice
+      previewDevice: previewDevice,
+      previewMode: previewMode,
+      productUrl: productUrl,
+      onPreviewModeChange: handlePreviewModeChange,
+      onProductUrlChange: handleProductUrlChange
     });
     
     return (
@@ -251,6 +269,10 @@ function SocialProofEditor() {
         onImportData={handleImportData}
         hasUnsavedChanges={hasUnsavedChanges}
         onDeviceChange={handleDeviceChange}
+        previewMode={previewMode}
+        onPreviewModeChange={handlePreviewModeChange}
+        productUrl={productUrl}
+        onProductUrlChange={handleProductUrlChange}
       />
     );
   };

@@ -5,9 +5,20 @@ import { useState } from 'react'
 interface DevicePreviewProps {
   children: React.ReactNode
   onDeviceChange?: (device: 'desktop' | 'tablet' | 'mobile') => void
+  previewMode?: 'builder' | 'product'
+  onPreviewModeChange?: (mode: 'builder' | 'product') => void
+  productUrl?: string
+  onProductUrlChange?: (url: string) => void
 }
 
-export default function DevicePreview({ children, onDeviceChange }: DevicePreviewProps) {
+export default function DevicePreview({ 
+  children, 
+  onDeviceChange,
+  previewMode = 'builder',
+  onPreviewModeChange,
+  productUrl = '',
+  onProductUrlChange
+}: DevicePreviewProps) {
   const [device, setDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
   
   // Update device state and call parent callback if provided
@@ -69,7 +80,26 @@ export default function DevicePreview({ children, onDeviceChange }: DevicePrevie
             </svg>
           </button>
         </div>
-        {/* Dark mode button removed as per requirements */}
+        
+        {/* Preview Mode Controls */}
+        {onPreviewModeChange && (
+          <div className="flex space-x-1">
+            <button
+              onClick={() => onPreviewModeChange('builder')}
+              className={`px-2 py-1 text-xs rounded ${previewMode === 'builder' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+              title="Builder Vorschau"
+            >
+              Builder
+            </button>
+            <button
+              onClick={() => onPreviewModeChange('product')}
+              className={`px-2 py-1 text-xs rounded ${previewMode === 'product' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+              title="Produktseite Integration"
+            >
+              Integration
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Device Preview Frame */}
