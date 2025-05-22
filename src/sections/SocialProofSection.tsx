@@ -902,8 +902,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               <div className="flex items-center mt-1">
                 <input
                   type="range"
-                  min="12"
-                  max="24"
+                  min="10"
+                  max="20"
                   step="1"
                   value={fontSizeDesktop.replace('px', '')}
                   onChange={(e) => setFontSizeDesktop(`${e.target.value}px`)}
@@ -920,8 +920,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               <div className="flex items-center mt-1">
                 <input
                   type="range"
-                  min="5"
-                  max="25"
+                  min="8"
+                  max="18"
                   step="1"
                   value={fontSizeMobile.replace('px', '')}
                   onChange={(e) => setFontSizeMobile(`${e.target.value}px`)}
@@ -1057,7 +1057,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
           marginBottom: '12px',
           color: textColor,
-          width: 'fit-content',
+          width: '100%',
           maxWidth: '100%',
           fontWeight: '500',
           transition: 'font-size 0.3s ease'
@@ -1129,7 +1129,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           className="user-text-proof" 
           style={{
             marginLeft: avatarCount > 0 ? '12px' : '0',
-            lineHeight: '1.3',
+            lineHeight: '1.4',
             display: 'flex',
             flexDirection: 'row',
             flexWrap: 'wrap',
@@ -1151,7 +1151,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
             <span style={{ 
               display: 'inline-flex', 
               alignItems: 'center', 
-              marginRight: '4px', 
+              marginRight: '6px', 
               flexShrink: 0,
               whiteSpace: 'nowrap' // Prevent names from wrapping
             }}>
@@ -1161,11 +1161,11 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 alt="Verifiziert" 
                 className="verified-badge-proof" 
                 style={{
-                  width: '16px',
-                  height: '16px',
-                  marginLeft: '4px',
-                  position: 'relative',
-                  top: '-1px',
+                  width: '18px',
+                  height: '18px',
+                  marginLeft: '6px',
+                  verticalAlign: 'middle',
+                  objectFit: 'contain',
                   flexShrink: 0
                 }}
               />
@@ -1181,10 +1181,10 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                   <>
                     {/* Main part of text - stays on same line with names */}
                     <span style={{ 
-                      display: 'inline-flex', 
-                      alignItems: 'center',
+                      display: 'inline',
                       fontWeight: '400',
-                      flexShrink: 1
+                      wordSpacing: '0.2em',
+                      letterSpacing: '0.01em'
                     }} dangerouslySetInnerHTML={{ 
                       __html: firstPart
                     }} />
@@ -1192,7 +1192,11 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                     {/* Last two words with line break */}
                     {lastTwoPart && (
                       <div style={{ width: '100%', display: 'block', marginTop: '2px' }}>
-                        <span style={{ fontWeight: '400' }} dangerouslySetInnerHTML={{ 
+                        <span style={{ 
+                          fontWeight: '400',
+                          wordSpacing: '0.2em',
+                          letterSpacing: '0.01em'
+                        }} dangerouslySetInnerHTML={{ 
                           __html: lastTwoPart.replace(
                             brandName, 
                             `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`
@@ -1208,12 +1212,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               <span 
                 style={{ 
                   fontWeight: '400',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  flexShrink: 1,
-                  whiteSpace: 'normal',
-                  overflow: 'visible',
-                  textOverflow: 'clip'
+                  display: 'inline',
+                  wordSpacing: '0.2em',
+                  letterSpacing: '0.01em'
                 }}
                 dangerouslySetInnerHTML={{ 
                   __html: getFormattedText().replace(
