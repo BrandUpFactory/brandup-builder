@@ -95,8 +95,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   const [showBreakOnLarge, setShowBreakOnLarge] = useState(safeInitialData.showBreakOnLarge !== undefined ? safeInitialData.showBreakOnLarge : true)
   const [avatarSize, setAvatarSize] = useState(safeInitialData.avatarSize || '32px')
   const [borderRadius, setBorderRadius] = useState(safeInitialData.borderRadius || styleTemplates[0].borderRadius)
-  const [fontSizeDesktop, setFontSizeDesktop] = useState(safeInitialData.fontSizeDesktop || '14px')
-  const [fontSizeMobile, setFontSizeMobile] = useState(safeInitialData.fontSizeMobile || '10px')
+  const [fontSizeDesktop, setFontSizeDesktop] = useState(safeInitialData.fontSizeDesktop || '11px')
+  const [fontSizeMobile, setFontSizeMobile] = useState(safeInitialData.fontSizeMobile || '9px')
   const [brandNameBold, setBrandNameBold] = useState(safeInitialData.brandNameBold !== undefined ? safeInitialData.brandNameBold : true)
   
   // Padding settings
@@ -1183,8 +1183,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                     <span style={{ 
                       display: 'inline',
                       fontWeight: '400',
-                      wordSpacing: '0.2em',
-                      letterSpacing: '0.01em'
+                      wordSpacing: '0.4em',
+                      letterSpacing: '0.03em'
                     }} dangerouslySetInnerHTML={{ 
                       __html: firstPart
                     }} />
@@ -1194,8 +1194,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                       <div style={{ width: '100%', display: 'block', marginTop: '2px' }}>
                         <span style={{ 
                           fontWeight: '400',
-                          wordSpacing: '0.2em',
-                          letterSpacing: '0.01em'
+                          wordSpacing: '0.4em',
+                          letterSpacing: '0.03em'
                         }} dangerouslySetInnerHTML={{ 
                           __html: lastTwoPart.replace(
                             brandName, 
@@ -1213,8 +1213,8 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 style={{ 
                   fontWeight: '400',
                   display: 'inline',
-                  wordSpacing: '0.2em',
-                  letterSpacing: '0.01em'
+                  wordSpacing: '0.4em',
+                  letterSpacing: '0.03em'
                 }}
                 dangerouslySetInnerHTML={{ 
                   __html: getFormattedText().replace(
@@ -1412,8 +1412,28 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
 </body>
 </html>`;
 
-  // Ultra simple Liquid code that works without any syntax errors
-  const liquidBlockCode = `{% comment %}Social Proof Box (BrandUp Builder){% endcomment %}
+  // Standalone Liquid code that works independently
+  const liquidBlockCode = `{% comment %}Social Proof Box (BrandUp Builder) - Fixed{% endcomment %}
+
+{% comment %}Current settings embedded for standalone use{% endcomment %}
+{% assign avatar_count = ${avatarCount} %}
+{% assign first_name_1 = "${firstName1}" %}
+{% assign first_name_2 = "${firstName2}" %}
+{% assign first_name_3 = "${firstName3}" %}
+{% assign custom_text = "${customText.replace(/"/g, '&quot;').replace(/\n/g, ' ')}" %}
+{% assign background_color = "${backgroundColor}" %}
+{% assign text_color = "${textColor}" %}
+{% assign avatar_border_color = "${avatarBorderColor}" %}
+{% assign padding = "${getEffectivePadding()}" %}
+{% assign border_radius = "${borderRadius.replace('px', '')}" %}
+{% assign avatar_size = "${avatarSize.replace('px', '')}" %}
+{% assign font_size_desktop = "${fontSizeDesktop.replace('px', '')}" %}
+{% assign font_size_mobile = "${fontSizeMobile.replace('px', '')}" %}
+{% assign show_break_on_large = ${showBreakOnLarge} %}
+{% assign avatar_image_1 = "${avatarImage1}" %}
+{% assign avatar_image_2 = "${avatarImage2}" %}
+{% assign avatar_image_3 = "${avatarImage3}" %}
+{% assign verified_image = "${verifiedImage}" %}
 
 {% comment %}Build the names based on settings{% endcomment %}
 {% capture names %}
