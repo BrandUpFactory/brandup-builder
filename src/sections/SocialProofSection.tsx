@@ -1270,125 +1270,41 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Social Proof Box</title>
   <style>
-    .social-proof-box {
-      display: flex;
-      align-items: center;
-      background-color: ${backgroundColor};
-      padding: ${getEffectivePadding()};
-      border-radius: ${borderRadius};
-      font-family: Arial, sans-serif;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      margin-bottom: 12px;
-      color: ${textColor};
-      font-weight: 500;
-      max-width: 100%;
-      width: fit-content;
-    }
-    
-    /* Font sizes */
-    @media (min-width: 768px) {
-      .social-proof-box {
-        font-size: ${fontSizeDesktop};
-      }
+    /* Responsive font sizes */
+    .social-proof-standalone {
+      font-size: ${fontSizeDesktop};
     }
     
     @media (max-width: 767px) {
-      .social-proof-box {
+      .social-proof-standalone {
         font-size: ${fontSizeMobile};
       }
-    }
-    
-    /* Avatars */
-    .avatars {
-      display: flex;
-      align-items: center;
-      flex-shrink: 0;
-    }
-    
-    .avatar {
-      width: ${avatarSize};
-      height: ${avatarSize};
-      border-radius: 50%;
-      border: 2px solid ${avatarBorderColor};
-      object-fit: cover;
-      flex-shrink: 0;
-    }
-    
-    .avatar-1 {
-      z-index: 3;
-      margin-right: ${avatarCount > 1 ? '-8px' : '0'};
-    }
-    
-    .avatar-2 {
-      z-index: 2;
-      margin-right: ${avatarCount >= 3 ? '-8px' : '0'};
-    }
-    
-    .avatar-3 {
-      z-index: 1;
-    }
-    
-    /* Text content */
-    .content {
-      margin-left: ${avatarCount > 0 ? '12px' : '0'};
-      line-height: 1.3;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      width: 100%;
-    }
-    
-    .names {
-      display: inline-flex;
-      align-items: center;
-      margin-right: 4px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    
-    .text {
-      font-weight: 400;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    
-    .badge {
-      width: 16px;
-      height: 16px;
-      margin-left: 4px;
-      position: relative;
-      top: -1px;
-      flex-shrink: 0;
-    }
-    
-    /* Line break for large screens */
-    @media (min-width: 1300px) {
-      ${showBreakOnLarge ? '.text { display: block; width: 100%; margin-top: 2px; }' : ''}
     }
   </style>
 </head>
 <body>
-  <div class="social-proof-box">
+  <div class="social-proof-standalone" style="display: flex; align-items: center; background-color: ${backgroundColor}; padding: ${getEffectivePadding()}; border-radius: ${borderRadius}; font-family: Arial, sans-serif; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-bottom: 12px; color: ${textColor}; font-weight: 500; width: ${useFullWidth ? '100%' : 'fit-content'}; max-width: 100%; box-sizing: border-box;">
     ${avatarCount > 0 ? `
-    <div class="avatars">
-      ${avatarCount >= 1 ? `<img src="${avatarImage1}" alt="User 1" class="avatar avatar-1" onerror="this.style.display='none'">` : ''}
-      ${avatarCount >= 2 ? `<img src="${avatarImage2}" alt="User 2" class="avatar avatar-2" onerror="this.style.display='none'">` : ''}
-      ${avatarCount >= 3 ? `<img src="${avatarImage3}" alt="User 3" class="avatar avatar-3" onerror="this.style.display='none'">` : ''}
+    <div style="display: flex; align-items: center; flex-shrink: 0;">
+      ${avatarCount >= 1 ? `<img src="${avatarImage1}" alt="User 1" style="width: ${avatarSize}; height: ${avatarSize}; border-radius: 50%; border: 2px solid ${avatarBorderColor}; object-fit: cover; flex-shrink: 0; z-index: 3; margin-right: ${avatarCount > 1 ? '-8px' : '0'};" onerror="this.style.display='none'">` : ''}
+      ${avatarCount >= 2 ? `<img src="${avatarImage2}" alt="User 2" style="width: ${avatarSize}; height: ${avatarSize}; border-radius: 50%; border: 2px solid ${avatarBorderColor}; object-fit: cover; flex-shrink: 0; z-index: 2; margin-right: ${avatarCount >= 3 ? '-8px' : '0'};" onerror="this.style.display='none'">` : ''}
+      ${avatarCount >= 3 ? `<img src="${avatarImage3}" alt="User 3" style="width: ${avatarSize}; height: ${avatarSize}; border-radius: 50%; border: 2px solid ${avatarBorderColor}; object-fit: cover; flex-shrink: 0; z-index: 1;" onerror="this.style.display='none'">` : ''}
     </div>` : ''}
-    <div class="content">
-      <span class="names">
-        <strong>${getDisplayNames()}</strong>
-        <img src="${verifiedImage}" alt="Verifiziert" class="badge" onerror="this.style.display='none'">
-      </span>
-      ${showBreakOnLarge ? 
-        (() => {
-          const { firstPart, lastTwoPart } = getLastTwoWords();
-          return `<span class="text">${firstPart}</span>${lastTwoPart ? `<div class="text">${lastTwoPart.replace(brandName, `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`)}</div>` : ''}`;
-        })()
-        : 
-        `<span class="text">${getFormattedText().replace(brandName, `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`)}</span>`
-      }
+    <div style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: block; width: 100%;">
+      <div style="display: block; width: 100%; margin-bottom: 2px;">
+        <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
+        <img src="${verifiedImage}" alt="Verifiziert" style="height: 16px; max-width: none; margin: 0 6px; vertical-align: middle; object-fit: contain; display: inline;" onerror="this.style.display='none'">
+        <span style="font-weight: 400; word-spacing: 0.4em; letter-spacing: 0.03em; display: inline;">${(() => {
+          const { firstPart } = getLastTwoWords();
+          return firstPart;
+        })()}</span>
+      </div>
+      <div style="display: block; width: 100%;">
+        <span style="font-weight: 400; word-spacing: 0.4em; letter-spacing: 0.03em;">${(() => {
+          const { lastTwoPart } = getLastTwoWords();
+          return lastTwoPart.replace(brandName, `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
+        })()}</span>
+      </div>
     </div>
   </div>
 </body>
