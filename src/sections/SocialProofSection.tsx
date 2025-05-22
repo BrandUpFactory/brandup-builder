@@ -1047,146 +1047,91 @@ export default function SocialProofSection({ initialData, onDataChange, previewD
     setInternalPreviewDevice(device);
   };
   
-  const preview = (
-    <div className="w-full h-full flex items-start justify-start p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '200px' }}>
-      <div 
-        id="social-proof-component"
-        className="social-proof-box-proof" 
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          background: backgroundColor,
-          padding: getEffectivePadding(),
-          borderRadius: borderRadius,
-          fontFamily: 'Arial, sans-serif',
-          fontSize: getCurrentFontSize(),
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-          marginBottom: '12px',
-          color: textColor,
-          width: useFullWidth ? '100%' : 'fit-content',
-          maxWidth: previewDevice === 'mobile' ? '320px' : '100%',
-          fontWeight: '500',
-          transition: 'all 0.3s ease'
-        }}
-            >
-        {avatarCount > 0 && (
-          <div 
-            className="user-avatars-proof" 
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              flexShrink: 0 // Ensure this doesn't shrink when brand name breaks
-            }}
-          >
-            {avatarCount >= 1 && (
-              <img 
-                src={avatarImage1}
-                alt="User 1" 
-                className="avatar-proof" 
-                style={{
-                  width: avatarSize,
-                  height: avatarSize,
-                  borderRadius: '50%',
-                  marginRight: avatarCount > 1 ? '-8px' : '0',
-                  border: `2px solid ${avatarBorderColor}`,
-                  objectFit: 'cover',
-                  zIndex: 3,
-                  flexShrink: 0
-                }}
-              />
-            )}
-            {avatarCount >= 2 && (
-              <img 
-                src={avatarImage2}
-                alt="User 2" 
-                className="avatar-proof" 
-                style={{
-                  width: avatarSize,
-                  height: avatarSize,
-                  borderRadius: '50%',
-                  marginRight: avatarCount >= 3 ? '-8px' : '0',
-                  border: `2px solid ${avatarBorderColor}`,
-                  objectFit: 'cover',
-                  zIndex: 2,
-                  flexShrink: 0
-                }}
-              />
-            )}
-            {avatarCount >= 3 && (
-              <img 
-                src={avatarImage3}
-                alt="User 3" 
-                className="avatar-proof" 
-                style={{
-                  width: avatarSize,
-                  height: avatarSize,
-                  borderRadius: '50%',
-                  marginRight: '0',
-                  border: `2px solid ${avatarBorderColor}`,
-                  objectFit: 'cover',
-                  zIndex: 1,
-                  flexShrink: 0
-                }}
-              />
-            )}
+  // Generate the exact same HTML as the output code for preview
+  const generatePreviewHTML = () => {
+    return `
+      <div style="display: flex; align-items: center; background-color: ${backgroundColor}; padding: ${getEffectivePadding()}; border-radius: ${borderRadius}; font-family: Arial, sans-serif; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-bottom: 12px; color: ${textColor}; font-weight: 500; width: ${useFullWidth ? '100%' : 'fit-content'}; max-width: 100%; box-sizing: border-box; font-size: ${getCurrentFontSize()};">
+        ${avatarCount > 0 ? `
+        <div style="display: flex; align-items: center; flex-shrink: 0;">
+          ${avatarCount >= 1 ? `<img src="${avatarImage1}" alt="User 1" style="width: ${avatarSize}; height: ${avatarSize}; border-radius: 50%; border: 2px solid ${avatarBorderColor}; object-fit: cover; flex-shrink: 0; z-index: 3; margin-right: ${avatarCount > 1 ? '-8px' : '0'};" onerror="this.style.display='none'">` : ''}
+          ${avatarCount >= 2 ? `<img src="${avatarImage2}" alt="User 2" style="width: ${avatarSize}; height: ${avatarSize}; border-radius: 50%; border: 2px solid ${avatarBorderColor}; object-fit: cover; flex-shrink: 0; z-index: 2; margin-right: ${avatarCount >= 3 ? '-8px' : '0'};" onerror="this.style.display='none'">` : ''}
+          ${avatarCount >= 3 ? `<img src="${avatarImage3}" alt="User 3" style="width: ${avatarSize}; height: ${avatarSize}; border-radius: 50%; border: 2px solid ${avatarBorderColor}; object-fit: cover; flex-shrink: 0; z-index: 1;" onerror="this.style.display='none'">` : ''}
+        </div>` : ''}
+        
+        <!-- Mobile layout: 3 words on second line -->
+        <div class="mobile-layout" style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: ${previewDevice === 'mobile' ? 'block' : 'none'}; width: 100%;">
+          <div style="display: block; width: 100%; margin-bottom: 2px;">
+            <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
+            <img src="${verifiedImage}" alt="Verifiziert" style="height: 13px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
+            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${(() => {
+              const text = customText;
+              const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
+              const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
+              if (words.length <= 3) return text;
+              const lastThree = words.slice(-3).join(' ');
+              const lastOccurrence = text.lastIndexOf(lastThree);
+              if (lastOccurrence === -1) return text;
+              return text.substring(0, lastOccurrence).trim();
+            })()}</span>
           </div>
-        )}
-        <div 
-          className="user-text-proof" 
-          style={{
-            marginLeft: avatarCount > 0 ? '12px' : '0',
-            lineHeight: '1.4',
-            display: 'block',
-            width: '100%'
-          }}
-        >
-          {/* Simple two-line layout - force device-specific word breaking */}
-          <div style={{ 
-            display: 'block',
-            width: '100%',
-            lineHeight: '1.4'
-          }}>
-            {/* Line 1 */}
-            <div style={{ marginBottom: '2px' }}>
-              <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
-              <img 
-                src={verifiedImage}
-                alt="Verifiziert" 
-                style={{
-                  height: previewDevice === 'mobile' ? '13px' : '14px',
-                  maxWidth: 'none',
-                  marginLeft: '4px',
-                  marginRight: '4px',
-                  verticalAlign: 'baseline',
-                  transform: 'translateY(-1px)',
-                  objectFit: 'contain'
-                }}
-              />
-              <span style={{ 
-                fontWeight: '400',
-                wordSpacing: '0.1em',
-                letterSpacing: '0.01em'
-              }}>
-                und <strong>12.752</strong> andere sind{previewDevice === 'desktop' ? ' begeistert' : ''}
-              </span>
-            </div>
-            
-            {/* Line 2 */}
-            <div>
-              <span style={{ 
-                fontWeight: '400',
-                wordSpacing: '0.1em',
-                letterSpacing: '0.01em'
-              }}>
-                {previewDevice === 'mobile' ? 'begeistert von ' : 'von '}
-                <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>
-                  {brandName}
-                </span>
-              </span>
-            </div>
+          <div style="display: block; width: 100%;">
+            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${(() => {
+              const text = customText;
+              const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
+              const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
+              if (words.length <= 3) return '';
+              const lastThree = words.slice(-3).join(' ');
+              const lastOccurrence = text.lastIndexOf(lastThree);
+              if (lastOccurrence === -1) return '';
+              const result = text.substring(lastOccurrence).trim();
+              return result.replace(brandName, `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
+            })()}</span>
+          </div>
+        </div>
+        
+        <!-- Desktop layout: 2 words on second line -->
+        <div class="desktop-layout" style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: ${previewDevice === 'desktop' ? 'block' : 'none'}; width: 100%;">
+          <div style="display: block; width: 100%; margin-bottom: 2px;">
+            <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
+            <img src="${verifiedImage}" alt="Verifiziert" style="height: 14px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
+            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${(() => {
+              const text = customText;
+              const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
+              const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
+              if (words.length <= 2) return text;
+              const lastTwo = words.slice(-2).join(' ');
+              const lastOccurrence = text.lastIndexOf(lastTwo);
+              if (lastOccurrence === -1) return text;
+              return text.substring(0, lastOccurrence).trim();
+            })()}</span>
+          </div>
+          <div style="display: block; width: 100%;">
+            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${(() => {
+              const text = customText;
+              const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
+              const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
+              if (words.length <= 2) return '';
+              const lastTwo = words.slice(-2).join(' ');
+              const lastOccurrence = text.lastIndexOf(lastTwo);
+              if (lastOccurrence === -1) return '';
+              const result = text.substring(lastOccurrence).trim();
+              return result.replace(brandName, `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
+            })()}</span>
           </div>
         </div>
       </div>
+    `;
+  };
+
+  const preview = (
+    <div className="w-full h-full flex items-start justify-start p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '200px' }}>
+      <div 
+        dangerouslySetInnerHTML={{ __html: generatePreviewHTML() }}
+        style={{
+          width: '100%',
+          maxWidth: previewDevice === 'mobile' ? '320px' : '100%'
+        }}
+      />
     </div>
   )
 
