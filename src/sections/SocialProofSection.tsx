@@ -1147,61 +1147,63 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               width: '100%'
             }}
           >
-            {/* Names with verified badge - stays on the same line with text */}
-            <span style={{ 
-              display: 'inline-flex', 
-              alignItems: 'center', 
-              marginRight: '6px', 
-              flexShrink: 0,
-              whiteSpace: 'nowrap' // Prevent names from wrapping
-            }}>
-              <strong style={{ fontWeight: '600', flexShrink: 0 }}>{getDisplayNames()}</strong>
-              <img 
-                src={verifiedImage}
-                alt="Verifiziert" 
-                className="verified-badge-proof" 
-                style={{
-                  height: '16px',
-                  width: 'auto',
-                  marginLeft: '6px',
-                  verticalAlign: 'middle',
-                  objectFit: 'contain',
-                  flexShrink: 0
-                }}
-              />
-            </span>
-            
-            {true ? (
-              // Always break text - 2 lines layout
-              (() => {
-                const { firstPart, lastTwoPart } = getLastTwoWords();
-                
-                return (
-                  <>
+            {/* Two-line layout: Line 1 = Names + Badge + Text start, Line 2 = Last words */}
+            {(() => {
+              const { firstPart, lastTwoPart } = getLastTwoWords();
+              
+              return (
+                <>
+                  {/* First line: Names + Badge + First part of text */}
+                  <div style={{ 
+                    display: 'block',
+                    width: '100%',
+                    marginBottom: '2px'
+                  }}>
+                    <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
+                    <img 
+                      src={verifiedImage}
+                      alt="Verifiziert" 
+                      className="verified-badge-proof" 
+                      style={{
+                        height: '16px',
+                        width: 'auto',
+                        marginLeft: '6px',
+                        marginRight: '6px',
+                        verticalAlign: 'middle',
+                        objectFit: 'contain'
+                      }}
+                    />
                     <span style={{ 
-                      display: 'inline',
                       fontWeight: '400',
                       wordSpacing: '0.4em',
                       letterSpacing: '0.03em'
                     }} dangerouslySetInnerHTML={{ 
                       __html: firstPart
                     }} />
-                    
-                    <div style={{ width: '100%', display: 'block', marginTop: '2px' }}>
-                      <span style={{ 
-                        fontWeight: '400',
-                        wordSpacing: '0.4em',
-                        letterSpacing: '0.03em'
-                      }} dangerouslySetInnerHTML={{ 
-                        __html: lastTwoPart.replace(
-                          brandName, 
-                          `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`
-                        )
-                      }} />
-                    </div>
-                  </>
-                );
-              })()
+                  </div>
+                  
+                  {/* Second line: Last words only */}
+                  <div style={{ 
+                    display: 'block',
+                    width: '100%'
+                  }}>
+                    <span style={{ 
+                      fontWeight: '400',
+                      wordSpacing: '0.4em',
+                      letterSpacing: '0.03em'
+                    }} dangerouslySetInnerHTML={{ 
+                      __html: lastTwoPart.replace(
+                        brandName, 
+                        `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`
+                      )
+                    }} />
+                  </div>
+                </>
+              );
+            })()}
+            
+            {false ? (
+              null
             ) : (
               // Regular view without line break - stays on same line with names
               <span 
@@ -1459,13 +1461,16 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   </div>
   {% endif %}
   <div class="content-fixed">
-    <span class="names-fixed">
+    <div style="display: block; width: 100%; margin-bottom: 2px;">
       <strong>{{ names | strip }}</strong>
       {% if verified_image != blank %}
-      <img src="{{ verified_image }}" alt="Verifiziert" class="badge-fixed" loading="lazy" style="height: 16px; width: auto;">
+      <img src="{{ verified_image }}" alt="Verifiziert" loading="lazy" style="height: 16px; width: auto; margin: 0 6px; vertical-align: middle; object-fit: contain;">
       {% endif %}
-    </span>
-    <span class="text-fixed">{{ custom_text }}</span>
+      <span style="font-weight: 400; word-spacing: 0.4em; letter-spacing: 0.02em;">{{ custom_text | split: ' ' | slice: 0, -2 | join: ' ' }}</span>
+    </div>
+    <div style="display: block; width: 100%;">
+      <span style="font-weight: 400; word-spacing: 0.4em; letter-spacing: 0.02em;">{{ custom_text | split: ' ' | slice: -2 | join: ' ' }}</span>
+    </div>
   </div>
 </div>
 
