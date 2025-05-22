@@ -1042,7 +1042,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
   };
   
   const preview = (
-    <div className="w-full h-full flex items-center justify-center">
+    <div className="w-full h-full flex items-start justify-start p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '200px' }}>
       <div 
         id="social-proof-component"
         className="social-proof-box-proof" 
@@ -1058,6 +1058,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
           marginBottom: '12px',
           color: textColor,
           width: '100%',
+          maxWidth: '600px',
           maxWidth: '100%',
           fontWeight: '500',
           transition: 'font-size 0.3s ease'
@@ -1161,8 +1162,7 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
                 alt="Verifiziert" 
                 className="verified-badge-proof" 
                 style={{
-                  width: '18px',
-                  height: '18px',
+                  height: '16px',
                   marginLeft: '6px',
                   verticalAlign: 'middle',
                   objectFit: 'contain',
@@ -1171,42 +1171,9 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
               />
             </span>
             
-            {showBreakOnLarge ? (
-              // When line break is enabled, split text to move the last two words to next line
-              (() => {
-                // Get parts with last two words separated
-                const { firstPart, lastTwoPart } = getLastTwoWords();
-                
-                return (
-                  <>
-                    {/* Main part of text - stays on same line with names */}
-                    <span style={{ 
-                      display: 'inline',
-                      fontWeight: '400',
-                      wordSpacing: '0.4em',
-                      letterSpacing: '0.03em'
-                    }} dangerouslySetInnerHTML={{ 
-                      __html: firstPart
-                    }} />
-                    
-                    {/* Last two words with line break */}
-                    {lastTwoPart && (
-                      <div style={{ width: '100%', display: 'block', marginTop: '2px' }}>
-                        <span style={{ 
-                          fontWeight: '400',
-                          wordSpacing: '0.4em',
-                          letterSpacing: '0.03em'
-                        }} dangerouslySetInnerHTML={{ 
-                          __html: lastTwoPart.replace(
-                            brandName, 
-                            `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`
-                          )
-                        }} />
-                      </div>
-                    )}
-                  </>
-                );
-              })()
+            {false ? (
+              // Line break disabled to keep everything inline
+              null
             ) : (
               // Regular view without line break - stays on same line with names
               <span 
@@ -1437,44 +1404,44 @@ export default function SocialProofSection({ initialData, onDataChange }: Social
 
 {% comment %}Build the names based on settings{% endcomment %}
 {% capture names %}
-  {% if section.settings.avatar_count == 1 and section.settings.first_name_1 != blank %}
-    {{ section.settings.first_name_1 }}
-  {% elsif section.settings.avatar_count == 2 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank %}
-    {{ section.settings.first_name_1 }}, {{ section.settings.first_name_2 }}
-  {% elsif section.settings.avatar_count == 3 and section.settings.first_name_1 != blank and section.settings.first_name_2 != blank and section.settings.first_name_3 != blank %}
-    {{ section.settings.first_name_1 }}, {{ section.settings.first_name_2 }}, {{ section.settings.first_name_3 }}
+  {% if avatar_count == 1 and first_name_1 != blank %}
+    {{ first_name_1 }}
+  {% elsif avatar_count == 2 and first_name_1 != blank and first_name_2 != blank %}
+    {{ first_name_1 }}, {{ first_name_2 }}
+  {% elsif avatar_count == 3 and first_name_1 != blank and first_name_2 != blank and first_name_3 != blank %}
+    {{ first_name_1 }}, {{ first_name_2 }}, {{ first_name_3 }}
   {% else %}
     Steffi, Daniela
   {% endif %}
 {% endcapture %}
 
-<div class="social-proof-box">
-  {% if section.settings.avatar_count > 0 %}
-  <div class="avatars">
-    {% if section.settings.avatar_count >= 1 and section.settings.avatar_image_1 != blank %}
-    <img src="{{ section.settings.avatar_image_1 | img_url: 'master' }}" alt="User 1" class="avatar avatar-1">
+<div class="social-proof-fixed">
+  {% if avatar_count > 0 %}
+  <div class="avatars-fixed">
+    {% if avatar_count >= 1 and avatar_image_1 != blank %}
+    <img src="{{ avatar_image_1 }}" alt="User 1" class="avatar-fixed avatar-1-fixed" loading="lazy">
     {% endif %}
-    {% if section.settings.avatar_count >= 2 and section.settings.avatar_image_2 != blank %}
-    <img src="{{ section.settings.avatar_image_2 | img_url: 'master' }}" alt="User 2" class="avatar avatar-2">
+    {% if avatar_count >= 2 and avatar_image_2 != blank %}
+    <img src="{{ avatar_image_2 }}" alt="User 2" class="avatar-fixed avatar-2-fixed" loading="lazy">
     {% endif %}
-    {% if section.settings.avatar_count >= 3 and section.settings.avatar_image_3 != blank %}
-    <img src="{{ section.settings.avatar_image_3 | img_url: 'master' }}" alt="User 3" class="avatar avatar-3">
+    {% if avatar_count >= 3 and avatar_image_3 != blank %}
+    <img src="{{ avatar_image_3 }}" alt="User 3" class="avatar-fixed avatar-3-fixed" loading="lazy">
     {% endif %}
   </div>
   {% endif %}
-  <div class="content">
-    <span class="names">
+  <div class="content-fixed">
+    <span class="names-fixed">
       <strong>{{ names | strip }}</strong>
-      <img src="{{ section.settings.verified_image | img_url: 'master' }}" alt="Verifiziert" class="badge">
+      {% if verified_image != blank %}
+      <img src="{{ verified_image }}" alt="Verifiziert" class="badge-fixed" loading="lazy">
+      {% endif %}
     </span>
-    <span class="text">
-      {{ section.settings.custom_text }}
-    </span>
+    <span class="text-fixed">{{ custom_text }}</span>
   </div>
 </div>
 
 <style>
-  .social-proof-box {
+  .social-proof-fixed {
     display: flex;
     align-items: center;
     background-color: {{ section.settings.background_color }};
