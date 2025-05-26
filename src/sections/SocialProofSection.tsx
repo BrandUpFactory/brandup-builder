@@ -95,7 +95,7 @@ export default function SocialProofSection({
   const [firstName3, setFirstName3] = useState(safeInitialData.firstName3 || 'Maria')
   const [userCount, setUserCount] = useState(safeInitialData.userCount || '12.752')
   const [brandName, setBrandName] = useState(safeInitialData.brandName || 'Regenliebe')
-  const [customText, setCustomText] = useState(safeInitialData.customText || 'und <strong>12.752</strong> andere sind begeistert von Regenliebe')
+  const [customText, setCustomText] = useState(safeInitialData.customText || 'und 12.752 andere sind begeistert von Regenliebe')
   const [avatarImage1, setAvatarImage1] = useState(safeInitialData.avatarImage1 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619')
   const [avatarImage2, setAvatarImage2] = useState(safeInitialData.avatarImage2 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098')
   const [avatarImage3, setAvatarImage3] = useState(safeInitialData.avatarImage3 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-1.jpg?v=1738073619')
@@ -244,69 +244,77 @@ export default function SocialProofSection({
     return customText;
   };
   
-  // Function to get the last words for line breaking (2 for desktop, 3 for mobile)
-  const getLastTwoWords = () => {
+  // Verbesserte Funktion für HTML-Text-Splitting mit korrekter Tag-Behandlung
+  const getTextSplit = (htmlText: string, wordsForSecondLine: number) => {
     try {
-      // Process the HTML text with proper variable replacement
-      const processedText = getFormattedText();
+      // Entferne HTML-Tags für Word-Counting, aber merke dir Positionen
+      const plainText = htmlText.replace(/<[^>]*>/g, '');
+      const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/).filter(word => word.length > 0);
       
-      // First strip HTML tags for word counting
-      const plainText = processedText.replace(/<[^>]*>|<\/[^>]*>/g, '');
-      
-      // Normalize spaces (remove duplicates)
-      const normalizedText = plainText.replace(/\s+/g, ' ').trim();
-      
-      // Split into words
-      const words = normalizedText.split(/\s+/).filter(word => word.length > 0);
-      
-      // Determine how many words to put on second line based on device
-      const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
-        
       if (words.length <= wordsForSecondLine) {
-        return { firstPart: processedText, lastTwoPart: '' };
+        return { firstPart: htmlText, lastPart: '' };
       }
       
-      // Get the last words for second line
-      const lastWords = words.slice(-wordsForSecondLine).join(' ');
+      // Bestimme die letzten X Wörter
+      const lastWords = words.slice(-wordsForSecondLine);
+      const firstWords = words.slice(0, -wordsForSecondLine);
       
-      // Find the position of the last words in the original text
-      const lastIndex = normalizedText.lastIndexOf(lastWords);
+      // Erstelle Regex für den Split-Punkt
+      const lastWordsPattern = lastWords.map(word => 
+        word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      ).join('\\s+');
       
-      if (lastIndex === -1) {
-        // If we can't find the last words, just return the formatted text
-        return { firstPart: processedText, lastTwoPart: '' };
+      // Finde den Split-Punkt im HTML-Text
+      const regex = new RegExp(`(.*?)\\b(${lastWordsPattern})\\b(.*)$`, 'i');
+      const match = htmlText.match(regex);
+      
+      if (match) {
+        const beforeLastWords = match[1].trim();
+        const lastWordsWithFormatting = match[2] + (match[3] || '');
+        
+        return {
+          firstPart: beforeLastWords,
+          lastPart: lastWordsWithFormatting.trim()
+        };
       }
       
-      // Find the approximate position in the HTML text
-      // We need to search in the processed text for the last occurrence of lastWords
-      const lastOccurrence = processedText.lastIndexOf(lastWords);
+      // Fallback: Versuche einfachere Aufteilung
+      const splitPoint = Math.max(0, firstWords.length);
+      const firstPart = firstWords.join(' ');
+      const lastPart = lastWords.join(' ');
       
-      if (lastOccurrence === -1) {
-        // Try searching for individual words if exact match not found
-        const lastWord = words[words.length - 1];
+      // Versuche HTML-Tags beizubehalten
+      if (htmlText.includes('<') && htmlText.includes('>')) {
+        // Komplexere HTML-Behandlung: ersetze nur den Text-Inhalt
+        let result = htmlText;
         
-        // Find the last word position
-        const lastWordPos = processedText.lastIndexOf(lastWord);
+        // Finde Text-Nodes und teile sie auf
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlText;
         
-        if (lastWordPos > 0) {
-          // If found, split there
+        const textContent = tempDiv.textContent || tempDiv.innerText || '';
+        const textWords = textContent.replace(/\s+/g, ' ').trim().split(/\s+/);
+        
+        if (textWords.length > wordsForSecondLine) {
+          const splitIndex = textWords.length - wordsForSecondLine;
+          const firstText = textWords.slice(0, splitIndex).join(' ');
+          const lastText = textWords.slice(splitIndex).join(' ');
+          
           return {
-            firstPart: processedText.substring(0, lastWordPos).trim(),
-            lastTwoPart: processedText.substring(lastWordPos).trim()
+            firstPart: firstText,
+            lastPart: lastText
           };
         }
-        
-        return { firstPart: processedText, lastTwoPart: '' };
       }
       
-      // If found, return parts split at the last words
       return {
-        firstPart: processedText.substring(0, lastOccurrence).trim(),
-        lastTwoPart: processedText.substring(lastOccurrence).trim()
+        firstPart: firstPart,
+        lastPart: lastPart
       };
+      
     } catch (error) {
-      console.error('Error in getLastTwoWords:', error);
-      return { firstPart: getFormattedText(), lastTwoPart: '' };
+      console.error('Error in getTextSplit:', error);
+      return { firstPart: htmlText, lastPart: '' };
     }
   };
   
@@ -928,6 +936,12 @@ export default function SocialProofSection({
     const currentFontSize = previewDevice === 'mobile' ? fontSizeMobile : fontSizeDesktop;
     const currentBadgeSize = previewDevice === 'mobile' ? '13px' : '14px';
     
+    // Helper für Mobile (3 Wörter)
+    const getMobileSplit = () => getTextSplit(customText, 3);
+    
+    // Helper für Desktop (2 Wörter)  
+    const getDesktopSplit = () => getTextSplit(customText, 2);
+    
     return `
       <div style="display: flex; align-items: center; background-color: ${backgroundColor}; padding: ${getEffectivePadding()}; border-radius: ${borderRadius}; font-family: Arial, sans-serif; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-bottom: 12px; color: ${textColor}; font-weight: 500; width: ${useFullWidth ? '100%' : 'fit-content'}; max-width: 100%; box-sizing: border-box; font-size: ${currentFontSize};">
         ${avatarCount > 0 ? `
@@ -942,29 +956,10 @@ export default function SocialProofSection({
           <div style="display: block; width: 100%; margin-bottom: 2px;">
             <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
             <img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
-            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${(() => {
-              const text = customText;
-              const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
-              const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
-              if (words.length <= 3) return text;
-              const lastThree = words.slice(-3).join(' ');
-              const lastOccurrence = text.lastIndexOf(lastThree);
-              if (lastOccurrence === -1) return text;
-              return text.substring(0, lastOccurrence).trim();
-            })()}</span>
+            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${getMobileSplit().firstPart}</span>
           </div>
           <div style="display: block; width: 100%;">
-            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${(() => {
-              const text = customText;
-              const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
-              const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
-              if (words.length <= 3) return '';
-              const lastThree = words.slice(-3).join(' ');
-              const lastOccurrence = text.lastIndexOf(lastThree);
-              if (lastOccurrence === -1) return '';
-              const result = text.substring(lastOccurrence).trim();
-              return result.replace(brandName, `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
-            })()}</span>
+            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${getMobileSplit().lastPart.replace(new RegExp(brandName, 'g'), `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`)}</span>
           </div>
         </div>
         
@@ -973,29 +968,10 @@ export default function SocialProofSection({
           <div style="display: block; width: 100%; margin-bottom: 2px;">
             <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
             <img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
-            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${(() => {
-              const text = customText;
-              const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
-              const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
-              if (words.length <= 2) return text;
-              const lastTwo = words.slice(-2).join(' ');
-              const lastOccurrence = text.lastIndexOf(lastTwo);
-              if (lastOccurrence === -1) return text;
-              return text.substring(0, lastOccurrence).trim();
-            })()}</span>
+            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${getDesktopSplit().firstPart}</span>
           </div>
           <div style="display: block; width: 100%;">
-            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${(() => {
-              const text = customText;
-              const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
-              const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
-              if (words.length <= 2) return '';
-              const lastTwo = words.slice(-2).join(' ');
-              const lastOccurrence = text.lastIndexOf(lastTwo);
-              if (lastOccurrence === -1) return '';
-              const result = text.substring(lastOccurrence).trim();
-              return result.replace(brandName, `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
-            })()}</span>
+            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${getDesktopSplit().lastPart.replace(new RegExp(brandName, 'g'), `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`)}</span>
           </div>
         </div>
       </div>
@@ -1123,18 +1099,9 @@ export default function SocialProofSection({
                       style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}
                       dangerouslySetInnerHTML={{ 
                         __html: (() => {
-                          const text = customText;
-                          const plainText = text.replace(/<[^>]*>/g, '');
-                          const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
                           const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
-                          
-                          if (words.length <= wordsForSecondLine) return text;
-                          
-                          const lastWords = words.slice(-wordsForSecondLine).join(' ');
-                          const lastOccurrence = text.lastIndexOf(lastWords);
-                          
-                          if (lastOccurrence === -1) return text;
-                          return text.substring(0, lastOccurrence).trim();
+                          const { firstPart } = getTextSplit(customText, wordsForSecondLine);
+                          return firstPart;
                         })()
                       }}
                     />
@@ -1144,19 +1111,9 @@ export default function SocialProofSection({
                       style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}
                       dangerouslySetInnerHTML={{ 
                         __html: (() => {
-                          const text = customText;
-                          const plainText = text.replace(/<[^>]*>/g, '');
-                          const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
                           const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
-                          
-                          if (words.length <= wordsForSecondLine) return '';
-                          
-                          const lastWords = words.slice(-wordsForSecondLine).join(' ');
-                          const lastOccurrence = text.lastIndexOf(lastWords);
-                          
-                          if (lastOccurrence === -1) return '';
-                          const result = text.substring(lastOccurrence).trim();
-                          return result.replace(new RegExp(brandName, 'g'), `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
+                          const { lastPart } = getTextSplit(customText, wordsForSecondLine);
+                          return lastPart.replace(new RegExp(brandName, 'g'), `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
                         })()
                       }}
                     />
@@ -1252,7 +1209,11 @@ export default function SocialProofSection({
   };
 
   // Self-contained HTML code that works standalone without Shopify
-  const standaloneCode = `<!DOCTYPE html>
+  const standaloneCode = (() => {
+    const desktopSplit = getTextSplit(customText, 2);
+    const mobileSplit = getTextSplit(customText, 3);
+    
+    return `<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
@@ -1305,30 +1266,10 @@ export default function SocialProofSection({
         <div style="display: block; width: 100%; margin-bottom: 2px;">
           <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
           <img src="${verifiedImage}" alt="Verifiziert" style="height: 14px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
-          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${(() => {
-            // Desktop: 2 words on second line
-            const text = customText;
-            const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
-            const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
-            if (words.length <= 2) return text;
-            const lastTwo = words.slice(-2).join(' ');
-            const lastOccurrence = text.lastIndexOf(lastTwo);
-            if (lastOccurrence === -1) return text;
-            return text.substring(0, lastOccurrence).trim();
-          })()}</span>
+          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${desktopSplit.firstPart}</span>
         </div>
         <div style="display: block; width: 100%;">
-          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${(() => {
-            const text = customText;
-            const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
-            const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
-            if (words.length <= 2) return '';
-            const lastTwo = words.slice(-2).join(' ');
-            const lastOccurrence = text.lastIndexOf(lastTwo);
-            if (lastOccurrence === -1) return '';
-            const result = text.substring(lastOccurrence).trim();
-            return result.replace(brandName, `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
-          })()}</span>
+          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${desktopSplit.lastPart.replace(new RegExp(brandName, 'g'), `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`)}</span>
         </div>
       </div>
       
@@ -1337,36 +1278,17 @@ export default function SocialProofSection({
         <div style="display: block; width: 100%; margin-bottom: 2px;">
           <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
           <img src="${verifiedImage}" alt="Verifiziert" style="height: 13px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
-          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${(() => {
-            // Mobile: 3 words on second line
-            const text = customText;
-            const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
-            const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
-            if (words.length <= 3) return text;
-            const lastThree = words.slice(-3).join(' ');
-            const lastOccurrence = text.lastIndexOf(lastThree);
-            if (lastOccurrence === -1) return text;
-            return text.substring(0, lastOccurrence).trim();
-          })()}</span>
+          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${mobileSplit.firstPart}</span>
         </div>
         <div style="display: block; width: 100%;">
-          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${(() => {
-            const text = customText;
-            const plainText = text.replace(/<[^>]*>|<\/[^>]*>/g, '');
-            const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
-            if (words.length <= 3) return '';
-            const lastThree = words.slice(-3).join(' ');
-            const lastOccurrence = text.lastIndexOf(lastThree);
-            if (lastOccurrence === -1) return '';
-            const result = text.substring(lastOccurrence).trim();
-            return result.replace(brandName, `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
-          })()}</span>
+          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${mobileSplit.lastPart.replace(new RegExp(brandName, 'g'), `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`)}</span>
         </div>
       </div>
     </div>
   </div>
 </body>
 </html>`;
+  })();
 
 
   // Select the code to display - only standalone now

@@ -106,33 +106,51 @@ export default function RichTextEditor({
       <div className="flex items-center gap-2 p-2 bg-gray-50 border-b border-gray-200 rounded-t-md">
         <button
           type="button"
-          onClick={() => editor.chain().focus().toggleBold().run()}
+          onClick={() => {
+            const { from, to } = editor.state.selection
+            if (from !== to) {
+              // Nur wenn Text ausgewählt ist - dann formatieren
+              editor.chain().focus().toggleBold().run()
+            }
+          }}
           className={`flex items-center justify-center w-8 h-8 border border-gray-300 rounded hover:bg-gray-100 transition-colors ${
             editor.isActive('bold') ? 'bg-blue-100 border-blue-400' : 'bg-white'
           }`}
-          title="Fett"
+          title="Fett (nur bei Textauswahl)"
         >
           <strong className="text-sm">B</strong>
         </button>
         
         <button
           type="button"
-          onClick={() => editor.chain().focus().toggleItalic().run()}
+          onClick={() => {
+            const { from, to } = editor.state.selection
+            if (from !== to) {
+              // Nur wenn Text ausgewählt ist - dann formatieren
+              editor.chain().focus().toggleItalic().run()
+            }
+          }}
           className={`flex items-center justify-center w-8 h-8 border border-gray-300 rounded hover:bg-gray-100 transition-colors ${
             editor.isActive('italic') ? 'bg-blue-100 border-blue-400' : 'bg-white'
           }`}
-          title="Kursiv"
+          title="Kursiv (nur bei Textauswahl)"
         >
           <em className="text-sm">I</em>
         </button>
         
         <button
           type="button"
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          onClick={() => {
+            const { from, to } = editor.state.selection
+            if (from !== to) {
+              // Nur wenn Text ausgewählt ist - dann formatieren
+              editor.chain().focus().toggleUnderline().run()
+            }
+          }}
           className={`flex items-center justify-center w-8 h-8 border border-gray-300 rounded hover:bg-gray-100 transition-colors ${
             editor.isActive('underline') ? 'bg-blue-100 border-blue-400' : 'bg-white'
           }`}
-          title="Unterstrichen"
+          title="Unterstrichen (nur bei Textauswahl)"
         >
           <u className="text-sm">U</u>
         </button>
