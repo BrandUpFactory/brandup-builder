@@ -532,239 +532,192 @@ export default function SocialProofSection({
                 <span>Text:</span>
               </div>
               
-              {/* Simpler text editor with more reliable formatting controls */}
-              <div className="mt-1 space-y-3">
-                {/* Simple textarea for editing */}
-                <div className="relative">
-                  <textarea
-                    id="text-editor"
-                    value={customText}
-                    onChange={(e) => {
-                      setCustomText(e.target.value);
-                      // Force refresh for immediate preview update
-                      onDataChange && onDataChange({
-                        ...sectionData,
-                        customText: e.target.value
-                      });
+              {/* Benutzerfreundlicher Text-Editor */}
+              <div className="mt-1">
+                {/* Formatierungs-Toolbar */}
+                <div className="flex items-center gap-2 mb-2 p-2 bg-gray-50 border border-gray-200 rounded-t-md">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
+                      if (!textarea) return;
+                      
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      
+                      if (start === end) {
+                        // Kein Text ausgewählt - füge Beispieltext ein
+                        const beforeText = customText.substring(0, start);
+                        const afterText = customText.substring(start);
+                        const newText = beforeText + '<strong>Text</strong>' + afterText;
+                        setCustomText(newText);
+                        
+                        // Cursor nach dem eingefügten Text setzen
+                        setTimeout(() => {
+                          textarea.focus();
+                          const newPos = start + '<strong>Text</strong>'.length;
+                          textarea.setSelectionRange(newPos, newPos);
+                        }, 10);
+                      } else {
+                        // Text ausgewählt - formatieren
+                        const selectedText = customText.substring(start, end);
+                        const beforeText = customText.substring(0, start);
+                        const afterText = customText.substring(end);
+                        
+                        // Prüfe ob bereits formatiert
+                        if (selectedText.includes('<strong>')) {
+                          // Entferne Formatierung
+                          const cleanText = selectedText.replace(/<\/?strong>/g, '');
+                          const newText = beforeText + cleanText + afterText;
+                          setCustomText(newText);
+                        } else {
+                          // Füge Formatierung hinzu
+                          const newText = beforeText + `<strong>${selectedText}</strong>` + afterText;
+                          setCustomText(newText);
+                        }
+                        
+                        setTimeout(() => textarea.focus(), 10);
+                      }
                     }}
-                    className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                    placeholder="und <strong>12.752</strong> andere sind begeistert von Regenliebe"
-                    rows={3}
-                  />
+                    className="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 rounded hover:bg-gray-100 transition-colors"
+                    title="Fett"
+                  >
+                    <strong className="text-sm">B</strong>
+                  </button>
                   
-                  {/* More reliable text formatting toolbar */}
-                  <div className="flex mt-2 border-t pt-2">
-                    <div className="flex space-x-1">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          // Get textarea and safely check selection - this was failing before
-                          const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
-                          if (!textarea) return;
-                          
-                          try {
-                            // Get current selection range
-                            const start = textarea.selectionStart;
-                            const end = textarea.selectionEnd;
-                            
-                            // Check if anything is selected
-                            if (start === end) {
-                              alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
-                              return;
-                            }
-                            
-                            // Get selected text
-                            const selectedText = customText.substring(start, end);
-                            
-                            // Check if selected text is already bold
-                            if (selectedText.includes('<strong>') || selectedText.includes('</strong>')) {
-                              alert("Der ausgewählte Text enthält bereits Formatierung. Bitte wähle unformatierten Text aus.");
-                              return;
-                            }
-                            
-                            // Apply bold formatting
-                            const newText = 
-                              customText.substring(0, start) + 
-                              `<strong>${selectedText}</strong>` + 
-                              customText.substring(end);
-                            
-                            // Update state
-                            setCustomText(newText);
-                            
-                            // Force refresh for immediate preview update
-                            onDataChange && onDataChange({
-                              ...sectionData,
-                              customText: newText
-                            });
-                            
-                            // Focus back on textarea and set cursor position after the inserted tags
-                            setTimeout(() => {
-                              textarea.focus();
-                              const newPosition = start + `<strong>${selectedText}</strong>`.length;
-                              textarea.setSelectionRange(newPosition, newPosition);
-                            }, 10);
-                          } catch (error) {
-                            console.error("Error applying formatting:", error);
-                            alert("Fehler beim Formatieren des Textes. Bitte erneut versuchen.");
-                          }
-                        }}
-                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold"
-                        title="Fett machen"
-                      >
-                        <strong>B</strong>
-                      </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
+                      if (!textarea) return;
                       
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          // Get textarea and safely check selection - this was failing before
-                          const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
-                          if (!textarea) return;
-                          
-                          try {
-                            // Get current selection range
-                            const start = textarea.selectionStart;
-                            const end = textarea.selectionEnd;
-                            
-                            // Check if anything is selected
-                            if (start === end) {
-                              alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
-                              return;
-                            }
-                            
-                            // Get selected text
-                            const selectedText = customText.substring(start, end);
-                            
-                            // Check if selected text is already italic
-                            if (selectedText.includes('<em>') || selectedText.includes('</em>')) {
-                              alert("Der ausgewählte Text enthält bereits Formatierung. Bitte wähle unformatierten Text aus.");
-                              return;
-                            }
-                            
-                            // Apply italic formatting
-                            const newText = 
-                              customText.substring(0, start) + 
-                              `<em>${selectedText}</em>` + 
-                              customText.substring(end);
-                            
-                            // Update state
-                            setCustomText(newText);
-                            
-                            // Force refresh for immediate preview update
-                            onDataChange && onDataChange({
-                              ...sectionData,
-                              customText: newText
-                            });
-                            
-                            // Focus back on textarea and set cursor position after the inserted tags
-                            setTimeout(() => {
-                              textarea.focus();
-                              const newPosition = start + `<em>${selectedText}</em>`.length;
-                              textarea.setSelectionRange(newPosition, newPosition);
-                            }, 10);
-                          } catch (error) {
-                            console.error("Error applying formatting:", error);
-                            alert("Fehler beim Formatieren des Textes. Bitte erneut versuchen.");
-                          }
-                        }}
-                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold"
-                        title="Kursiv machen"
-                      >
-                        <em>I</em>
-                      </button>
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
                       
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          // Get textarea and safely check selection - this was failing before
-                          const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
-                          if (!textarea) return;
-                          
-                          try {
-                            // Get current selection range
-                            const start = textarea.selectionStart;
-                            const end = textarea.selectionEnd;
-                            
-                            // Check if anything is selected
-                            if (start === end) {
-                              alert("Bitte wähle zuerst den Text aus, den du formatieren möchtest.");
-                              return;
-                            }
-                            
-                            // Get selected text
-                            const selectedText = customText.substring(start, end);
-                            
-                            // Check if selected text is already underlined
-                            if (selectedText.includes('<u>') || selectedText.includes('</u>')) {
-                              alert("Der ausgewählte Text enthält bereits Formatierung. Bitte wähle unformatierten Text aus.");
-                              return;
-                            }
-                            
-                            // Apply underline formatting
-                            const newText = 
-                              customText.substring(0, start) + 
-                              `<u>${selectedText}</u>` + 
-                              customText.substring(end);
-                            
-                            // Update state
-                            setCustomText(newText);
-                            
-                            // Force refresh for immediate preview update
-                            onDataChange && onDataChange({
-                              ...sectionData,
-                              customText: newText
-                            });
-                            
-                            // Focus back on textarea and set cursor position after the inserted tags
-                            setTimeout(() => {
-                              textarea.focus();
-                              const newPosition = start + `<u>${selectedText}</u>`.length;
-                              textarea.setSelectionRange(newPosition, newPosition);
-                            }, 10);
-                          } catch (error) {
-                            console.error("Error applying formatting:", error);
-                            alert("Fehler beim Formatieren des Textes. Bitte erneut versuchen.");
-                          }
-                        }}
-                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded font-semibold"
-                        title="Unterstreichen"
-                      >
-                        <u>U</u>
-                      </button>
-                    </div>
-                    
-                    <div className="ml-auto">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          // Remove all HTML tags but keep text
-                          const plainText = customText.replace(/<[^>]*>|<\/[^>]*>/g, '');
-                          setCustomText(plainText);
-                          
-                          // Force refresh
-                          onDataChange && onDataChange({
-                            ...sectionData,
-                            customText: plainText
-                          });
-                        }}
-                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded"
-                        title="Formatierung entfernen"
-                      >
-                        Formatierung löschen
-                      </button>
-                    </div>
-                  </div>
+                      if (start === end) {
+                        // Kein Text ausgewählt - füge Beispieltext ein
+                        const beforeText = customText.substring(0, start);
+                        const afterText = customText.substring(start);
+                        const newText = beforeText + '<em>Text</em>' + afterText;
+                        setCustomText(newText);
+                        
+                        setTimeout(() => {
+                          textarea.focus();
+                          const newPos = start + '<em>Text</em>'.length;
+                          textarea.setSelectionRange(newPos, newPos);
+                        }, 10);
+                      } else {
+                        // Text ausgewählt - formatieren
+                        const selectedText = customText.substring(start, end);
+                        const beforeText = customText.substring(0, start);
+                        const afterText = customText.substring(end);
+                        
+                        if (selectedText.includes('<em>')) {
+                          const cleanText = selectedText.replace(/<\/?em>/g, '');
+                          const newText = beforeText + cleanText + afterText;
+                          setCustomText(newText);
+                        } else {
+                          const newText = beforeText + `<em>${selectedText}</em>` + afterText;
+                          setCustomText(newText);
+                        }
+                        
+                        setTimeout(() => textarea.focus(), 10);
+                      }
+                    }}
+                    className="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 rounded hover:bg-gray-100 transition-colors"
+                    title="Kursiv"
+                  >
+                    <em className="text-sm">I</em>
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
+                      if (!textarea) return;
+                      
+                      const start = textarea.selectionStart;
+                      const end = textarea.selectionEnd;
+                      
+                      if (start === end) {
+                        // Kein Text ausgewählt - füge Beispieltext ein
+                        const beforeText = customText.substring(0, start);
+                        const afterText = customText.substring(start);
+                        const newText = beforeText + '<u>Text</u>' + afterText;
+                        setCustomText(newText);
+                        
+                        setTimeout(() => {
+                          textarea.focus();
+                          const newPos = start + '<u>Text</u>'.length;
+                          textarea.setSelectionRange(newPos, newPos);
+                        }, 10);
+                      } else {
+                        // Text ausgewählt - formatieren
+                        const selectedText = customText.substring(start, end);
+                        const beforeText = customText.substring(0, start);
+                        const afterText = customText.substring(end);
+                        
+                        if (selectedText.includes('<u>')) {
+                          const cleanText = selectedText.replace(/<\/?u>/g, '');
+                          const newText = beforeText + cleanText + afterText;
+                          setCustomText(newText);
+                        } else {
+                          const newText = beforeText + `<u>${selectedText}</u>` + afterText;
+                          setCustomText(newText);
+                        }
+                        
+                        setTimeout(() => textarea.focus(), 10);
+                      }
+                    }}
+                    className="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 rounded hover:bg-gray-100 transition-colors"
+                    title="Unterstrichen"
+                  >
+                    <u className="text-sm">U</u>
+                  </button>
+                  
+                  <div className="w-px h-6 bg-gray-300 mx-1"></div>
+                  
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      // Entferne alle HTML-Tags
+                      const plainText = customText.replace(/<[^>]*>/g, '');
+                      setCustomText(plainText);
+                      setTimeout(() => {
+                        const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
+                        if (textarea) textarea.focus();
+                      }, 10);
+                    }}
+                    className="px-3 py-1 text-xs bg-white border border-gray-300 rounded hover:bg-gray-100 transition-colors"
+                    title="Alle Formatierungen entfernen"
+                  >
+                    Formatierung löschen
+                  </button>
                 </div>
                 
-                {/* Live preview */}
-                <div className="border border-gray-200 bg-gray-50 rounded-md p-3">
-                  <h3 className="text-xs font-medium text-gray-500 mb-2">Live-Vorschau:</h3>
-                  <div className="text-sm" dangerouslySetInnerHTML={{ __html: customText }}></div>
-                </div>
+                {/* Text-Eingabefeld */}
+                <textarea
+                  id="text-editor"
+                  value={customText}
+                  onChange={(e) => {
+                    setCustomText(e.target.value);
+                  }}
+                  className="w-full border border-gray-200 border-t-0 px-3 py-3 rounded-b-md text-sm focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition resize-none"
+                  placeholder="und <strong>12.752</strong> andere sind begeistert von Regenliebe"
+                  rows={4}
+                />
+                
+                <p className="text-xs text-gray-500 mt-2">
+                  💡 <strong>Tipp:</strong> Wähle Text aus und klicke auf die Formatierungs-Buttons, oder klicke ohne Auswahl um Beispieltext einzufügen.
+                </p>
               </div>
             </label>
           </div>
@@ -1322,65 +1275,66 @@ export default function SocialProofSection({
               )}
               
               <div style={{ marginLeft: avatarCount > 0 ? '12px' : '0', lineHeight: 1.4, width: '100%' }}>
-                {/* Desktop Layout - 2 words on second line */}
-                {previewDevice !== 'mobile' && (
-                  <div>
-                    <div style={{ display: 'block', width: '100%', marginBottom: '2px' }}>
-                      <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
-                      <img 
-                        src={verifiedImage} 
-                        alt="Verifiziert" 
-                        style={{
-                          height: '14px',
-                          maxWidth: 'none',
-                          margin: '0 4px',
-                          verticalAlign: 'baseline',
-                          transform: 'translateY(-1px)',
-                          objectFit: 'contain',
-                          display: 'inline'
-                        }}
-                      />
-                      <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
-                        und <strong>12.752</strong> andere sind begeistert
-                      </span>
-                    </div>
-                    <div style={{ display: 'block', width: '100%' }}>
-                      <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
-                        von <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>{brandName}</span>
-                      </span>
-                    </div>
+                {/* Dynamische Anzeige basierend auf customText */}
+                <div>
+                  <div style={{ display: 'block', width: '100%', marginBottom: '2px' }}>
+                    <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
+                    <img 
+                      src={verifiedImage} 
+                      alt="Verifiziert" 
+                      style={{
+                        height: previewDevice === 'mobile' ? '13px' : '14px',
+                        maxWidth: 'none',
+                        margin: '0 4px',
+                        verticalAlign: 'baseline',
+                        transform: 'translateY(-1px)',
+                        objectFit: 'contain',
+                        display: 'inline'
+                      }}
+                    />
+                    <span 
+                      style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}
+                      dangerouslySetInnerHTML={{ 
+                        __html: (() => {
+                          const text = customText;
+                          const plainText = text.replace(/<[^>]*>/g, '');
+                          const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
+                          const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
+                          
+                          if (words.length <= wordsForSecondLine) return text;
+                          
+                          const lastWords = words.slice(-wordsForSecondLine).join(' ');
+                          const lastOccurrence = text.lastIndexOf(lastWords);
+                          
+                          if (lastOccurrence === -1) return text;
+                          return text.substring(0, lastOccurrence).trim();
+                        })()
+                      }}
+                    />
                   </div>
-                )}
-                
-                {/* Mobile Layout - 3 words on second line */}
-                {previewDevice === 'mobile' && (
-                  <div>
-                    <div style={{ display: 'block', width: '100%', marginBottom: '2px' }}>
-                      <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
-                      <img 
-                        src={verifiedImage} 
-                        alt="Verifiziert" 
-                        style={{
-                          height: '13px',
-                          maxWidth: 'none',
-                          margin: '0 4px',
-                          verticalAlign: 'baseline',
-                          transform: 'translateY(-1px)',
-                          objectFit: 'contain',
-                          display: 'inline'
-                        }}
-                      />
-                      <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
-                        und <strong>12.752</strong> andere sind
-                      </span>
-                    </div>
-                    <div style={{ display: 'block', width: '100%' }}>
-                      <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
-                        begeistert von <span style={{ fontWeight: brandNameBold ? '600' : '400' }}>{brandName}</span>
-                      </span>
-                    </div>
+                  <div style={{ display: 'block', width: '100%' }}>
+                    <span 
+                      style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}
+                      dangerouslySetInnerHTML={{ 
+                        __html: (() => {
+                          const text = customText;
+                          const plainText = text.replace(/<[^>]*>/g, '');
+                          const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/);
+                          const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
+                          
+                          if (words.length <= wordsForSecondLine) return '';
+                          
+                          const lastWords = words.slice(-wordsForSecondLine).join(' ');
+                          const lastOccurrence = text.lastIndexOf(lastWords);
+                          
+                          if (lastOccurrence === -1) return '';
+                          const result = text.substring(lastOccurrence).trim();
+                          return result.replace(new RegExp(brandName, 'g'), `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
+                        })()
+                      }}
+                    />
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </div>
