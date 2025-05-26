@@ -194,7 +194,7 @@ export default function EditorLayout({
     <div className="hidden md:block">
       <div className="grid grid-cols-12 gap-4">
         {/* Settings Sidebar */}
-        <div className={`${showSettings ? 'col-span-3' : 'col-span-1'} transition-all duration-300`}>
+        <div className={`${showSettings ? 'col-span-4' : 'col-span-1'} transition-all duration-300`}>
           <div className="border rounded-xl bg-white h-[calc(100vh-200px)] flex flex-col">
             <div className="p-2 bg-gray-50 border-b flex items-center justify-between">
               <h2 className={`text-sm font-semibold text-gray-700 ${!showSettings && 'hidden'}`}>Einstellungen</h2>
@@ -243,7 +243,7 @@ export default function EditorLayout({
         </div>
 
         {/* Content Area - Changed to have preview and code side by side */}
-        <div className={`${showSettings ? 'col-span-9' : 'col-span-11'} flex flex-col h-[calc(100vh-200px)]`}>
+        <div className={`${showSettings ? 'col-span-8' : 'col-span-11'} flex flex-col h-[calc(100vh-200px)]`}>
           <div className="grid grid-cols-2 gap-4 h-full">
             {/* Preview */}
             <div className="border rounded-xl bg-white overflow-auto">
@@ -415,7 +415,7 @@ export default function EditorLayout({
                 Code kopieren
               </button>
               <button 
-                onClick={() => window.location.href = '/help'}
+                onClick={() => window.open('https://www.brandupfactory.com/help-center', '_blank')}
                 className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-1.5 transition font-medium border-l border-gray-200"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

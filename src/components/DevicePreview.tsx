@@ -81,7 +81,7 @@ export default function DevicePreview({
           </button>
         </div>
         
-        {/* Preview Mode Controls */}
+        {/* Preview Mode Controls - Integration button removed */}
         {onPreviewModeChange && (
           <div className="flex space-x-1">
             <button
@@ -90,13 +90,6 @@ export default function DevicePreview({
               title="Builder Vorschau"
             >
               Builder
-            </button>
-            <button
-              onClick={() => onPreviewModeChange('product')}
-              className={`px-2 py-1 text-xs rounded ${previewMode === 'product' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-              title="Produktseite Integration"
-            >
-              Integration
             </button>
           </div>
         )}
