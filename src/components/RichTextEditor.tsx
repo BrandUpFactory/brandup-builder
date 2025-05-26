@@ -80,7 +80,7 @@ export default function RichTextEditor({
         return false
       },
       handleClick: (view, pos, event) => {
-        // Lass TipTap normal mit Klicks umgehen
+        // Lass TipTap normal mit Klicks umgehen - kein Override
         return false
       },
       handleTextInput: (view, from, to, text) => {
@@ -113,10 +113,7 @@ export default function RichTextEditor({
               editor.chain().focus().toggleBold().run()
             }
           }}
-          className={`flex items-center justify-center w-8 h-8 border border-gray-300 rounded hover:bg-gray-100 transition-colors ${
-            // Nur aktiv zeigen wenn Text ausgewählt ist UND Bold aktiv ist
-            (editor.state.selection.from !== editor.state.selection.to && editor.isActive('bold')) ? 'bg-blue-100 border-blue-400' : 'bg-white'
-          }`}
+          className="flex items-center justify-center w-8 h-8 border border-gray-300 rounded hover:bg-gray-100 transition-colors bg-white"
           title="Fett hinzufügen/entfernen"
         >
           <strong className="text-sm">B</strong>
@@ -131,10 +128,7 @@ export default function RichTextEditor({
               editor.chain().focus().toggleItalic().run()
             }
           }}
-          className={`flex items-center justify-center w-8 h-8 border border-gray-300 rounded hover:bg-gray-100 transition-colors ${
-            // Nur aktiv zeigen wenn Text ausgewählt ist UND Italic aktiv ist
-            (editor.state.selection.from !== editor.state.selection.to && editor.isActive('italic')) ? 'bg-blue-100 border-blue-400' : 'bg-white'
-          }`}
+          className="flex items-center justify-center w-8 h-8 border border-gray-300 rounded hover:bg-gray-100 transition-colors bg-white"
           title="Kursiv hinzufügen/entfernen"
         >
           <em className="text-sm">I</em>
@@ -149,10 +143,7 @@ export default function RichTextEditor({
               editor.chain().focus().toggleUnderline().run()
             }
           }}
-          className={`flex items-center justify-center w-8 h-8 border border-gray-300 rounded hover:bg-gray-100 transition-colors ${
-            // Nur aktiv zeigen wenn Text ausgewählt ist UND Underline aktiv ist
-            (editor.state.selection.from !== editor.state.selection.to && editor.isActive('underline')) ? 'bg-blue-100 border-blue-400' : 'bg-white'
-          }`}
+          className="flex items-center justify-center w-8 h-8 border border-gray-300 rounded hover:bg-gray-100 transition-colors bg-white"
           title="Unterstrichen hinzufügen/entfernen"
         >
           <u className="text-sm">U</u>

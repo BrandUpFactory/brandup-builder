@@ -939,7 +939,7 @@ export default function SocialProofSection({
             <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${getMobileSplit().firstPart}</span>
           </div>
           <div style="display: block; width: 100%;">
-            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${getMobileSplit().lastPart.replace(new RegExp(brandName, 'g'), `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`)}</span>
+            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${getMobileSplit().lastPart}</span>
           </div>
         </div>
         
@@ -951,7 +951,7 @@ export default function SocialProofSection({
             <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${getDesktopSplit().firstPart}</span>
           </div>
           <div style="display: block; width: 100%;">
-            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${getDesktopSplit().lastPart.replace(new RegExp(brandName, 'g'), `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`)}</span>
+            <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${getDesktopSplit().lastPart}</span>
           </div>
         </div>
       </div>
@@ -1093,7 +1093,7 @@ export default function SocialProofSection({
                         __html: (() => {
                           const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
                           const { lastPart } = getTextSplit(customText, wordsForSecondLine);
-                          return lastPart.replace(new RegExp(brandName, 'g'), `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`);
+                          return lastPart;
                         })()
                       }}
                     />
@@ -1249,7 +1249,7 @@ export default function SocialProofSection({
           <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${desktopSplit.firstPart}</span>
         </div>
         <div style="display: block; width: 100%;">
-          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${desktopSplit.lastPart.replace(new RegExp(brandName, 'g'), `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`)}</span>
+          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${desktopSplit.lastPart}</span>
         </div>
       </div>
       
@@ -1261,7 +1261,7 @@ export default function SocialProofSection({
           <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${mobileSplit.firstPart}</span>
         </div>
         <div style="display: block; width: 100%;">
-          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${mobileSplit.lastPart.replace(new RegExp(brandName, 'g'), `<span style="font-weight: ${brandNameBold ? '600' : '400'}">${brandName}</span>`)}</span>
+          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${mobileSplit.lastPart}</span>
         </div>
       </div>
     </div>
