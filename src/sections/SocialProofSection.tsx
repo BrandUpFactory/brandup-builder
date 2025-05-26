@@ -95,7 +95,7 @@ export default function SocialProofSection({
   const [firstName3, setFirstName3] = useState(safeInitialData.firstName3 || 'Maria')
   const [userCount, setUserCount] = useState(safeInitialData.userCount || '12.752')
   const [brandName, setBrandName] = useState(safeInitialData.brandName || 'Regenliebe')
-  const [customText, setCustomText] = useState(safeInitialData.customText || 'und 12.752 andere sind begeistert von Regenliebe')
+  const [customText, setCustomText] = useState(safeInitialData.customText || 'und <strong>12.752</strong> andere sind begeistert von <strong>Regenliebe</strong>')
   const [avatarImage1, setAvatarImage1] = useState(safeInitialData.avatarImage1 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619')
   const [avatarImage2, setAvatarImage2] = useState(safeInitialData.avatarImage2 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098')
   const [avatarImage3, setAvatarImage3] = useState(safeInitialData.avatarImage3 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-1.jpg?v=1738073619')
@@ -244,10 +244,10 @@ export default function SocialProofSection({
     return customText;
   };
   
-  // Verbesserte Funktion für HTML-Text-Splitting mit korrekter Tag-Behandlung
+  // Einfache aber robuste Funktion für HTML-Text-Splitting
   const getTextSplit = (htmlText: string, wordsForSecondLine: number) => {
     try {
-      // Entferne HTML-Tags für Word-Counting, aber merke dir Positionen
+      // Extrahiere den reinen Text für Word-Counting
       const plainText = htmlText.replace(/<[^>]*>/g, '');
       const words = plainText.replace(/\s+/g, ' ').trim().split(/\s+/).filter(word => word.length > 0);
       
@@ -255,61 +255,41 @@ export default function SocialProofSection({
         return { firstPart: htmlText, lastPart: '' };
       }
       
-      // Bestimme die letzten X Wörter
-      const lastWords = words.slice(-wordsForSecondLine);
-      const firstWords = words.slice(0, -wordsForSecondLine);
+      // Bestimme Split-Point
+      const splitIndex = words.length - wordsForSecondLine;
+      const firstPartWords = words.slice(0, splitIndex);
+      const lastPartWords = words.slice(splitIndex);
       
-      // Erstelle Regex für den Split-Punkt
-      const lastWordsPattern = lastWords.map(word => 
-        word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-      ).join('\\s+');
+      // Einfacher Ansatz: Suche nach den letzten Wörtern im HTML-String
+      const lastWordsText = lastPartWords.join(' ');
       
-      // Finde den Split-Punkt im HTML-Text
-      const regex = new RegExp(`(.*?)\\b(${lastWordsPattern})\\b(.*)$`, 'i');
-      const match = htmlText.match(regex);
+      // Finde letztes Vorkommen der letzten Wörter
+      let searchText = lastWordsText;
+      let splitPosition = htmlText.lastIndexOf(searchText);
       
-      if (match) {
-        const beforeLastWords = match[1].trim();
-        const lastWordsWithFormatting = match[2] + (match[3] || '');
+      // Falls nicht gefunden, versuche es mit dem letzten Wort
+      if (splitPosition === -1 && lastPartWords.length > 0) {
+        searchText = lastPartWords[lastPartWords.length - 1];
+        splitPosition = htmlText.lastIndexOf(searchText);
+      }
+      
+      if (splitPosition !== -1) {
+        const firstPart = htmlText.substring(0, splitPosition).trim();
+        const lastPart = htmlText.substring(splitPosition).trim();
         
         return {
-          firstPart: beforeLastWords,
-          lastPart: lastWordsWithFormatting.trim()
+          firstPart: firstPart,
+          lastPart: lastPart
         };
       }
       
-      // Fallback: Versuche einfachere Aufteilung
-      const splitPoint = Math.max(0, firstWords.length);
-      const firstPart = firstWords.join(' ');
-      const lastPart = lastWords.join(' ');
-      
-      // Versuche HTML-Tags beizubehalten
-      if (htmlText.includes('<') && htmlText.includes('>')) {
-        // Komplexere HTML-Behandlung: ersetze nur den Text-Inhalt
-        let result = htmlText;
-        
-        // Finde Text-Nodes und teile sie auf
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlText;
-        
-        const textContent = tempDiv.textContent || tempDiv.innerText || '';
-        const textWords = textContent.replace(/\s+/g, ' ').trim().split(/\s+/);
-        
-        if (textWords.length > wordsForSecondLine) {
-          const splitIndex = textWords.length - wordsForSecondLine;
-          const firstText = textWords.slice(0, splitIndex).join(' ');
-          const lastText = textWords.slice(splitIndex).join(' ');
-          
-          return {
-            firstPart: firstText,
-            lastPart: lastText
-          };
-        }
-      }
+      // Fallback: Split nach Plain-Text
+      const firstPartText = firstPartWords.join(' ');
+      const lastPartText = lastPartWords.join(' ');
       
       return {
-        firstPart: firstPart,
-        lastPart: lastPart
+        firstPart: firstPartText,
+        lastPart: lastPartText
       };
       
     } catch (error) {

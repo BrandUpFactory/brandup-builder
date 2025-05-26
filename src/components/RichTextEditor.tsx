@@ -80,8 +80,12 @@ export default function RichTextEditor({
         return false
       },
       handleClick: (view, pos, event) => {
-        // Normale Click-Behandlung ohne automatische Formatierung
-        return false
+        // Verhindere automatische Formatierung beim Klicken
+        // Setze Cursor, aber ändere keine Formatierung
+        const { state, dispatch } = view
+        const tr = state.tr.setSelection(state.selection.constructor.near(state.doc.resolve(pos)))
+        dispatch(tr)
+        return true
       },
       handleTextInput: (view, from, to, text) => {
         // Normale Text-Eingabe ohne automatische Formatierung
@@ -109,14 +113,14 @@ export default function RichTextEditor({
           onClick={() => {
             const { from, to } = editor.state.selection
             if (from !== to) {
-              // Nur wenn Text ausgewählt ist - dann formatieren
+              // Text ausgewählt - immer togglen (hinzufügen oder entfernen)
               editor.chain().focus().toggleBold().run()
             }
           }}
           className={`flex items-center justify-center w-8 h-8 border border-gray-300 rounded hover:bg-gray-100 transition-colors ${
             editor.isActive('bold') ? 'bg-blue-100 border-blue-400' : 'bg-white'
           }`}
-          title="Fett (nur bei Textauswahl)"
+          title="Fett hinzufügen/entfernen"
         >
           <strong className="text-sm">B</strong>
         </button>
@@ -126,14 +130,14 @@ export default function RichTextEditor({
           onClick={() => {
             const { from, to } = editor.state.selection
             if (from !== to) {
-              // Nur wenn Text ausgewählt ist - dann formatieren
+              // Text ausgewählt - immer togglen (hinzufügen oder entfernen)
               editor.chain().focus().toggleItalic().run()
             }
           }}
           className={`flex items-center justify-center w-8 h-8 border border-gray-300 rounded hover:bg-gray-100 transition-colors ${
             editor.isActive('italic') ? 'bg-blue-100 border-blue-400' : 'bg-white'
           }`}
-          title="Kursiv (nur bei Textauswahl)"
+          title="Kursiv hinzufügen/entfernen"
         >
           <em className="text-sm">I</em>
         </button>
@@ -143,14 +147,14 @@ export default function RichTextEditor({
           onClick={() => {
             const { from, to } = editor.state.selection
             if (from !== to) {
-              // Nur wenn Text ausgewählt ist - dann formatieren
+              // Text ausgewählt - immer togglen (hinzufügen oder entfernen)
               editor.chain().focus().toggleUnderline().run()
             }
           }}
           className={`flex items-center justify-center w-8 h-8 border border-gray-300 rounded hover:bg-gray-100 transition-colors ${
             editor.isActive('underline') ? 'bg-blue-100 border-blue-400' : 'bg-white'
           }`}
-          title="Unterstrichen (nur bei Textauswahl)"
+          title="Unterstrichen hinzufügen/entfernen"
         >
           <u className="text-sm">U</u>
         </button>
