@@ -32,10 +32,28 @@ export default function RichTextEditor({
         horizontalRule: false,
         code: false,
         codeBlock: false,
+        hardBreak: false,
+        paragraph: {
+          HTMLAttributes: {
+            style: 'margin: 0; padding: 0; line-height: 1.5;'
+          }
+        }
       }),
-      Bold,
-      Italic,
-      Underline,
+      Bold.configure({
+        HTMLAttributes: {
+          style: 'font-weight: 600; display: inline;'
+        }
+      }),
+      Italic.configure({
+        HTMLAttributes: {
+          style: 'font-style: italic; display: inline;'
+        }
+      }),
+      Underline.configure({
+        HTMLAttributes: {
+          style: 'text-decoration: underline; display: inline;'
+        }
+      }),
     ],
     content: content,
     onUpdate: ({ editor }) => {
@@ -44,7 +62,31 @@ export default function RichTextEditor({
     editorProps: {
       attributes: {
         class: 'focus:outline-none min-h-[100px] p-3 text-sm leading-relaxed',
+        style: 'line-height: 1.5; word-wrap: break-word; white-space: pre-wrap;'
       },
+      handleKeyDown: (view, event) => {
+        // Verhindere automatische Formatierung durch Shortcuts
+        if (event.ctrlKey || event.metaKey) {
+          if (event.key === 'b' || event.key === 'i' || event.key === 'u') {
+            event.preventDefault()
+            return true
+          }
+        }
+        // Verhindere Enter-Key für neue Zeilen um Layout stabil zu halten
+        if (event.key === 'Enter') {
+          event.preventDefault()
+          return true
+        }
+        return false
+      },
+      handleClick: (view, pos, event) => {
+        // Normale Click-Behandlung ohne automatische Formatierung
+        return false
+      },
+      handleTextInput: (view, from, to, text) => {
+        // Normale Text-Eingabe ohne automatische Formatierung
+        return false
+      }
     },
   })
 
@@ -59,7 +101,7 @@ export default function RichTextEditor({
   }
 
   return (
-    <div className={`border border-gray-200 rounded-md ${className}`}>
+    <div className={`border border-gray-200 rounded-md rich-text-editor ${className}`}>
       {/* Toolbar */}
       <div className="flex items-center gap-2 p-2 bg-gray-50 border-b border-gray-200 rounded-t-md">
         <button

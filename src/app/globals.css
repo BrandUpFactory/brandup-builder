@@ -109,3 +109,69 @@ body {
   opacity: 1;
   pointer-events: auto;
 }
+
+/* Rich Text Editor Styles - Stable Layout */
+.rich-text-editor .ProseMirror {
+  outline: none !important;
+  line-height: 1.5 !important;
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+}
+
+.rich-text-editor .ProseMirror p {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: inherit !important;
+  display: block !important;
+  vertical-align: baseline !important;
+}
+
+.rich-text-editor .ProseMirror strong {
+  font-weight: 600 !important;
+  display: inline !important;
+  line-height: inherit !important;
+  vertical-align: baseline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.rich-text-editor .ProseMirror em {
+  font-style: italic !important;
+  display: inline !important;
+  line-height: inherit !important;
+  vertical-align: baseline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.rich-text-editor .ProseMirror u {
+  text-decoration: underline !important;
+  display: inline !important;
+  line-height: inherit !important;
+  vertical-align: baseline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.rich-text-editor .ProseMirror * {
+  vertical-align: baseline !important;
+  box-sizing: border-box !important;
+}
+
+/* Verhindere Layout-Shifts bei Formatierung */
+.rich-text-editor .ProseMirror {
+  min-height: 100px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Cursor-Styling */
+.rich-text-editor .ProseMirror {
+  caret-color: #1c2838;
+}
+
+/* Selection-Styling */
+.rich-text-editor .ProseMirror::selection {
+  background-color: #3b82f6;
+  color: white;
+}
