@@ -1,206 +1,125 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-/* ✅ Besseres Basislayout */
-html,
-body {
+/* Global styles */
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   margin: 0;
   padding: 0;
-  width: 100%;
-  height: 100%;
-  background: white;
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #ffffff;
+}
+
+* {
   box-sizing: border-box;
 }
 
-*, *::before, *::after {
-  box-sizing: inherit;
+/* Button styles */
+button {
+  font-family: inherit;
 }
 
-
-/* ✅ Animations */
-@keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-3px); }
-  50% { transform: translateX(3px); }
-  75% { transform: translateX(-3px); }
-  100% { transform: translateX(0); }
+/* Form input styles */
+input, textarea, select {
+  font-family: inherit;
 }
 
-.animate-shake {
-  animation: shake 0.4s ease-in-out;
+/* Toast notification styles */
+.toast {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background-color: #10b981;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+  animation: slideIn 0.3s ease-out;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.toast.error {
+  background-color: #ef4444;
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.2s ease-in-out;
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
-@keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
+/* Login form styles */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.animate-fadeOut {
-  animation: fadeOut 0.5s ease-in-out forwards;
+.login-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 400px;
 }
 
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.animate-slideUp {
-  animation: slideUp 0.3s ease-out;
-}
-
-/* Dropdown menu styles */
-.dropdown-container.active .dropdown-menu {
-  display: block;
-}
-
-/* Add a click overlay to handle clicks outside the dropdown */
-.dropdown-container.active::after {
-  content: '';
+/* Image Manager Modal Styles */
+.image-manager-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 90;
-}
-
-/* Add backdrop blur utility if not already provided by Tailwind */
-.backdrop-blur-sm {
-  backdrop-filter: blur(4px);
-}
-
-/* Keep dropdown visible for a brief period after leaving */
-.dropdown-menu {
-  transition: opacity 0.3s ease;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   opacity: 0;
   pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
 }
 
-.dropdown-container.active .dropdown-menu {
+.image-manager-overlay.show {
   opacity: 1;
   pointer-events: auto;
 }
 
-/* Rich Text Editor Styles - Ultra Stable Layout */
+/* Rich Text Editor Styles */
 .rich-text-editor .ProseMirror {
-  outline: none !important;
-  line-height: 1.5 !important;
-  white-space: nowrap !important;
-  word-wrap: normal !important;
-  overflow-x: auto !important;
-  height: auto !important;
-  min-height: 100px !important;
-  max-height: 200px !important;
+  outline: none;
+  padding: 8px;
+  min-height: 40px;
+  border: none;
+  line-height: 1.4;
+  cursor: text;
 }
 
 .rich-text-editor .ProseMirror p {
-  margin: 0 !important;
-  padding: 0 !important;
-  line-height: inherit !important;
-  display: inline-block !important;
-  vertical-align: top !important;
-  white-space: nowrap !important;
-  width: auto !important;
-  height: auto !important;
+  margin: 0;
+  display: inline;
+}
+
+.rich-text-editor .ProseMirror:focus {
+  outline: none;
 }
 
 .rich-text-editor .ProseMirror strong {
-  font-weight: 600 !important;
-  display: inline !important;
-  line-height: inherit !important;
-  vertical-align: baseline !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  font-weight: 600;
 }
 
 .rich-text-editor .ProseMirror em {
-  font-style: italic !important;
-  display: inline !important;
-  line-height: inherit !important;
-  vertical-align: baseline !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  font-style: italic;
 }
 
 .rich-text-editor .ProseMirror u {
-  text-decoration: underline !important;
-  display: inline !important;
-  line-height: inherit !important;
-  vertical-align: baseline !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.rich-text-editor .ProseMirror * {
-  vertical-align: baseline !important;
-  box-sizing: border-box !important;
-}
-
-/* Verhindere Layout-Shifts bei Formatierung */
-.rich-text-editor .ProseMirror {
-  min-height: 100px;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-/* Cursor-Styling */
-.rich-text-editor .ProseMirror {
-  caret-color: #1c2838;
-}
-
-/* Stabile Cursor-Position */
-.rich-text-editor .ProseMirror:focus {
-  outline: none !important;
-}
-
-.rich-text-editor .ProseMirror .ProseMirror-focused {
-  outline: none !important;
-}
-
-/* Cursor bleibt sichtbar */
-.rich-text-editor .ProseMirror {
-  cursor: text !important;
-}
-
-.rich-text-editor .ProseMirror:focus {
-  cursor: text !important;
-}
-
-.rich-text-editor .ProseMirror::after {
-  content: none !important;
-}
-
-/* Selection-Styling */
-.rich-text-editor .ProseMirror::selection {
-  background-color: #3b82f6;
-  color: white;
+  text-decoration: underline;
 }

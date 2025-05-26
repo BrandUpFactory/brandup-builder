@@ -95,7 +95,7 @@ export default function SocialProofSection({
   const [firstName3, setFirstName3] = useState(safeInitialData.firstName3 || 'Maria')
   const [userCount, setUserCount] = useState(safeInitialData.userCount || '12.752')
   const [brandName, setBrandName] = useState(safeInitialData.brandName || 'Regenliebe')
-  const [customText, setCustomText] = useState(safeInitialData.customText || 'und <strong>12.752</strong> andere sind begeistert von <strong>Regenliebe</strong>')
+  const [customText, setCustomText] = useState(safeInitialData.customText || 'und <strong>12.752</strong> andere sind begeistert von Regenliebe')
   const [avatarImage1, setAvatarImage1] = useState(safeInitialData.avatarImage1 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619')
   const [avatarImage2, setAvatarImage2] = useState(safeInitialData.avatarImage2 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098')
   const [avatarImage3, setAvatarImage3] = useState(safeInitialData.avatarImage3 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-1.jpg?v=1738073619')
@@ -1057,7 +1057,7 @@ export default function SocialProofSection({
                 </div>
               )}
               
-              <div style={{ marginLeft: avatarCount > 0 ? '12px' : '0', lineHeight: 1.4, width: '100%' }}>
+              <div style={{ marginLeft: avatarCount > 0 ? '12px' : '0', lineHeight: 1.4, width: '100%', flexShrink: 0 }}>
                 {/* Dynamische Anzeige basierend auf customText */}
                 <div>
                   <div style={{ display: 'block', width: '100%', marginBottom: '2px' }}>
