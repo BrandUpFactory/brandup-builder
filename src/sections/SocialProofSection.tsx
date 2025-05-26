@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import RichTextEditor from '../components/RichTextEditor'
 
 interface SocialProofSectionProps {
   initialData?: {
@@ -532,181 +533,17 @@ export default function SocialProofSection({
                 <span>Text:</span>
               </div>
               
-              {/* Benutzerfreundlicher Text-Editor */}
+              {/* Rich Text Editor */}
               <div className="mt-1">
-                {/* Formatierungs-Toolbar */}
-                <div className="flex items-center gap-2 mb-2 p-2 bg-gray-50 border border-gray-200 rounded-t-md">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      
-                      const editor = document.getElementById('visual-editor') as HTMLDivElement;
-                      if (!editor) return;
-                      
-                      const selection = window.getSelection();
-                      if (!selection || selection.rangeCount === 0) return;
-                      
-                      const range = selection.getRangeAt(0);
-                      
-                      if (range.collapsed) {
-                        // Kein Text ausgewählt - füge fetten Beispieltext ein
-                        const strongElement = document.createElement('strong');
-                        strongElement.textContent = 'Text';
-                        range.insertNode(strongElement);
-                        
-                        // Cursor nach dem eingefügten Element setzen
-                        const newRange = document.createRange();
-                        newRange.setStartAfter(strongElement);
-                        newRange.collapse(true);
-                        selection.removeAllRanges();
-                        selection.addRange(newRange);
-                      } else {
-                        // Text ausgewählt - formatieren
-                        document.execCommand('bold', false);
-                      }
-                      
-                      // Update customText with HTML content
-                      setCustomText(editor.innerHTML);
-                      editor.focus();
-                    }}
-                    className="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 rounded hover:bg-gray-100 transition-colors"
-                    title="Fett"
-                  >
-                    <strong className="text-sm">B</strong>
-                  </button>
-                  
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      
-                      const editor = document.getElementById('visual-editor') as HTMLDivElement;
-                      if (!editor) return;
-                      
-                      const selection = window.getSelection();
-                      if (!selection || selection.rangeCount === 0) return;
-                      
-                      const range = selection.getRangeAt(0);
-                      
-                      if (range.collapsed) {
-                        // Kein Text ausgewählt - füge kursiven Beispieltext ein
-                        const emElement = document.createElement('em');
-                        emElement.textContent = 'Text';
-                        range.insertNode(emElement);
-                        
-                        // Cursor nach dem eingefügten Element setzen
-                        const newRange = document.createRange();
-                        newRange.setStartAfter(emElement);
-                        newRange.collapse(true);
-                        selection.removeAllRanges();
-                        selection.addRange(newRange);
-                      } else {
-                        // Text ausgewählt - formatieren
-                        document.execCommand('italic', false);
-                      }
-                      
-                      // Update customText with HTML content
-                      setCustomText(editor.innerHTML);
-                      editor.focus();
-                    }}
-                    className="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 rounded hover:bg-gray-100 transition-colors"
-                    title="Kursiv"
-                  >
-                    <em className="text-sm">I</em>
-                  </button>
-                  
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      
-                      const editor = document.getElementById('visual-editor') as HTMLDivElement;
-                      if (!editor) return;
-                      
-                      const selection = window.getSelection();
-                      if (!selection || selection.rangeCount === 0) return;
-                      
-                      const range = selection.getRangeAt(0);
-                      
-                      if (range.collapsed) {
-                        // Kein Text ausgewählt - füge unterstrichenen Beispieltext ein
-                        const uElement = document.createElement('u');
-                        uElement.textContent = 'Text';
-                        range.insertNode(uElement);
-                        
-                        // Cursor nach dem eingefügten Element setzen
-                        const newRange = document.createRange();
-                        newRange.setStartAfter(uElement);
-                        newRange.collapse(true);
-                        selection.removeAllRanges();
-                        selection.addRange(newRange);
-                      } else {
-                        // Text ausgewählt - formatieren
-                        document.execCommand('underline', false);
-                      }
-                      
-                      // Update customText with HTML content
-                      setCustomText(editor.innerHTML);
-                      editor.focus();
-                    }}
-                    className="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 rounded hover:bg-gray-100 transition-colors"
-                    title="Unterstrichen"
-                  >
-                    <u className="text-sm">U</u>
-                  </button>
-                  
-                  <div className="w-px h-6 bg-gray-300 mx-1"></div>
-                  
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      
-                      const editor = document.getElementById('visual-editor') as HTMLDivElement;
-                      if (!editor) return;
-                      
-                      // Entferne alle Formatierungen, aber behalte den Text
-                      const plainText = editor.innerText || editor.textContent || '';
-                      editor.innerHTML = plainText;
-                      setCustomText(plainText);
-                      editor.focus();
-                    }}
-                    className="px-3 py-1 text-xs bg-white border border-gray-300 rounded hover:bg-gray-100 transition-colors"
-                    title="Alle Formatierungen entfernen"
-                  >
-                    Formatierung löschen
-                  </button>
-                </div>
-                
-                {/* Visueller Editor */}
-                <div
-                  id="visual-editor"
-                  contentEditable
-                  dangerouslySetInnerHTML={{ __html: customText }}
-                  onInput={(e) => {
-                    const target = e.target as HTMLDivElement;
-                    setCustomText(target.innerHTML);
-                  }}
-                  onBlur={(e) => {
-                    const target = e.target as HTMLDivElement;
-                    setCustomText(target.innerHTML);
-                  }}
-                  className="w-full border border-gray-200 border-t-0 px-3 py-3 rounded-b-md text-sm focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition min-h-[100px] bg-white"
-                  style={{ 
-                    minHeight: '100px',
-                    maxHeight: '200px',
-                    overflowY: 'auto',
-                    lineHeight: '1.5'
-                  }}
+                <RichTextEditor
+                  content={customText}
+                  onChange={setCustomText}
+                  placeholder="z.B. und 12.752 andere sind begeistert von Regenliebe"
+                  className="w-full"
                 />
                 
                 <p className="text-xs text-gray-500 mt-2">
-                  💡 <strong>Tipp:</strong> Wähle Text aus und klicke auf die Formatierungs-Buttons für <strong>fett</strong>, <em>kursiv</em> oder <u>unterstrichen</u>.
+                  💡 <strong>Tipp:</strong> Wähle Text aus und nutze die Toolbar für <strong>fett</strong>, <em>kursiv</em> oder <u>unterstrichen</u>.
                 </p>
               </div>
             </label>
