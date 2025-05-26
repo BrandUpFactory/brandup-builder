@@ -62,7 +62,7 @@ export default function RichTextEditor({
     editorProps: {
       attributes: {
         class: 'focus:outline-none min-h-[100px] p-3 text-sm leading-relaxed',
-        style: 'line-height: 1.5; word-wrap: break-word; white-space: pre-wrap;'
+        style: 'line-height: 1.5; word-wrap: break-word; white-space: normal;'
       },
       handleKeyDown: (view, event) => {
         // Verhindere automatische Formatierung durch Shortcuts
@@ -80,12 +80,8 @@ export default function RichTextEditor({
         return false
       },
       handleClick: (view, pos, event) => {
-        // Verhindere automatische Formatierung beim Klicken
-        // Setze Cursor, aber ändere keine Formatierung
-        const { state, dispatch } = view
-        const tr = state.tr.setSelection(state.selection.constructor.near(state.doc.resolve(pos)))
-        dispatch(tr)
-        return true
+        // Lass TipTap normal mit Klicks umgehen
+        return false
       },
       handleTextInput: (view, from, to, text) => {
         // Normale Text-Eingabe ohne automatische Formatierung

@@ -110,11 +110,11 @@ body {
   pointer-events: auto;
 }
 
-/* Rich Text Editor Styles - Stable Layout */
+/* Rich Text Editor Styles - Flexible Layout */
 .rich-text-editor .ProseMirror {
   outline: none !important;
   line-height: 1.5 !important;
-  white-space: pre-wrap !important;
+  white-space: normal !important;
   word-wrap: break-word !important;
 }
 
@@ -122,7 +122,7 @@ body {
   margin: 0 !important;
   padding: 0 !important;
   line-height: inherit !important;
-  display: block !important;
+  display: inline !important;
   vertical-align: baseline !important;
 }
 
