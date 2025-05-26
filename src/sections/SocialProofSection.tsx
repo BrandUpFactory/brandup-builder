@@ -541,45 +541,35 @@ export default function SocialProofSection({
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
-                      if (!textarea) return;
                       
-                      const start = textarea.selectionStart;
-                      const end = textarea.selectionEnd;
+                      const editor = document.getElementById('visual-editor') as HTMLDivElement;
+                      if (!editor) return;
                       
-                      if (start === end) {
-                        // Kein Text ausgewählt - füge Beispieltext ein
-                        const beforeText = customText.substring(0, start);
-                        const afterText = customText.substring(start);
-                        const newText = beforeText + '<strong>Text</strong>' + afterText;
-                        setCustomText(newText);
+                      const selection = window.getSelection();
+                      if (!selection || selection.rangeCount === 0) return;
+                      
+                      const range = selection.getRangeAt(0);
+                      
+                      if (range.collapsed) {
+                        // Kein Text ausgewählt - füge fetten Beispieltext ein
+                        const strongElement = document.createElement('strong');
+                        strongElement.textContent = 'Text';
+                        range.insertNode(strongElement);
                         
-                        // Cursor nach dem eingefügten Text setzen
-                        setTimeout(() => {
-                          textarea.focus();
-                          const newPos = start + '<strong>Text</strong>'.length;
-                          textarea.setSelectionRange(newPos, newPos);
-                        }, 10);
+                        // Cursor nach dem eingefügten Element setzen
+                        const newRange = document.createRange();
+                        newRange.setStartAfter(strongElement);
+                        newRange.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(newRange);
                       } else {
                         // Text ausgewählt - formatieren
-                        const selectedText = customText.substring(start, end);
-                        const beforeText = customText.substring(0, start);
-                        const afterText = customText.substring(end);
-                        
-                        // Prüfe ob bereits formatiert
-                        if (selectedText.includes('<strong>')) {
-                          // Entferne Formatierung
-                          const cleanText = selectedText.replace(/<\/?strong>/g, '');
-                          const newText = beforeText + cleanText + afterText;
-                          setCustomText(newText);
-                        } else {
-                          // Füge Formatierung hinzu
-                          const newText = beforeText + `<strong>${selectedText}</strong>` + afterText;
-                          setCustomText(newText);
-                        }
-                        
-                        setTimeout(() => textarea.focus(), 10);
+                        document.execCommand('bold', false);
                       }
+                      
+                      // Update customText with HTML content
+                      setCustomText(editor.innerHTML);
+                      editor.focus();
                     }}
                     className="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 rounded hover:bg-gray-100 transition-colors"
                     title="Fett"
@@ -592,41 +582,35 @@ export default function SocialProofSection({
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
-                      if (!textarea) return;
                       
-                      const start = textarea.selectionStart;
-                      const end = textarea.selectionEnd;
+                      const editor = document.getElementById('visual-editor') as HTMLDivElement;
+                      if (!editor) return;
                       
-                      if (start === end) {
-                        // Kein Text ausgewählt - füge Beispieltext ein
-                        const beforeText = customText.substring(0, start);
-                        const afterText = customText.substring(start);
-                        const newText = beforeText + '<em>Text</em>' + afterText;
-                        setCustomText(newText);
+                      const selection = window.getSelection();
+                      if (!selection || selection.rangeCount === 0) return;
+                      
+                      const range = selection.getRangeAt(0);
+                      
+                      if (range.collapsed) {
+                        // Kein Text ausgewählt - füge kursiven Beispieltext ein
+                        const emElement = document.createElement('em');
+                        emElement.textContent = 'Text';
+                        range.insertNode(emElement);
                         
-                        setTimeout(() => {
-                          textarea.focus();
-                          const newPos = start + '<em>Text</em>'.length;
-                          textarea.setSelectionRange(newPos, newPos);
-                        }, 10);
+                        // Cursor nach dem eingefügten Element setzen
+                        const newRange = document.createRange();
+                        newRange.setStartAfter(emElement);
+                        newRange.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(newRange);
                       } else {
                         // Text ausgewählt - formatieren
-                        const selectedText = customText.substring(start, end);
-                        const beforeText = customText.substring(0, start);
-                        const afterText = customText.substring(end);
-                        
-                        if (selectedText.includes('<em>')) {
-                          const cleanText = selectedText.replace(/<\/?em>/g, '');
-                          const newText = beforeText + cleanText + afterText;
-                          setCustomText(newText);
-                        } else {
-                          const newText = beforeText + `<em>${selectedText}</em>` + afterText;
-                          setCustomText(newText);
-                        }
-                        
-                        setTimeout(() => textarea.focus(), 10);
+                        document.execCommand('italic', false);
                       }
+                      
+                      // Update customText with HTML content
+                      setCustomText(editor.innerHTML);
+                      editor.focus();
                     }}
                     className="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 rounded hover:bg-gray-100 transition-colors"
                     title="Kursiv"
@@ -639,41 +623,35 @@ export default function SocialProofSection({
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
-                      if (!textarea) return;
                       
-                      const start = textarea.selectionStart;
-                      const end = textarea.selectionEnd;
+                      const editor = document.getElementById('visual-editor') as HTMLDivElement;
+                      if (!editor) return;
                       
-                      if (start === end) {
-                        // Kein Text ausgewählt - füge Beispieltext ein
-                        const beforeText = customText.substring(0, start);
-                        const afterText = customText.substring(start);
-                        const newText = beforeText + '<u>Text</u>' + afterText;
-                        setCustomText(newText);
+                      const selection = window.getSelection();
+                      if (!selection || selection.rangeCount === 0) return;
+                      
+                      const range = selection.getRangeAt(0);
+                      
+                      if (range.collapsed) {
+                        // Kein Text ausgewählt - füge unterstrichenen Beispieltext ein
+                        const uElement = document.createElement('u');
+                        uElement.textContent = 'Text';
+                        range.insertNode(uElement);
                         
-                        setTimeout(() => {
-                          textarea.focus();
-                          const newPos = start + '<u>Text</u>'.length;
-                          textarea.setSelectionRange(newPos, newPos);
-                        }, 10);
+                        // Cursor nach dem eingefügten Element setzen
+                        const newRange = document.createRange();
+                        newRange.setStartAfter(uElement);
+                        newRange.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(newRange);
                       } else {
                         // Text ausgewählt - formatieren
-                        const selectedText = customText.substring(start, end);
-                        const beforeText = customText.substring(0, start);
-                        const afterText = customText.substring(end);
-                        
-                        if (selectedText.includes('<u>')) {
-                          const cleanText = selectedText.replace(/<\/?u>/g, '');
-                          const newText = beforeText + cleanText + afterText;
-                          setCustomText(newText);
-                        } else {
-                          const newText = beforeText + `<u>${selectedText}</u>` + afterText;
-                          setCustomText(newText);
-                        }
-                        
-                        setTimeout(() => textarea.focus(), 10);
+                        document.execCommand('underline', false);
                       }
+                      
+                      // Update customText with HTML content
+                      setCustomText(editor.innerHTML);
+                      editor.focus();
                     }}
                     className="flex items-center justify-center w-8 h-8 bg-white border border-gray-300 rounded hover:bg-gray-100 transition-colors"
                     title="Unterstrichen"
@@ -688,13 +666,15 @@ export default function SocialProofSection({
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      // Entferne alle HTML-Tags
-                      const plainText = customText.replace(/<[^>]*>/g, '');
+                      
+                      const editor = document.getElementById('visual-editor') as HTMLDivElement;
+                      if (!editor) return;
+                      
+                      // Entferne alle Formatierungen, aber behalte den Text
+                      const plainText = editor.innerText || editor.textContent || '';
+                      editor.innerHTML = plainText;
                       setCustomText(plainText);
-                      setTimeout(() => {
-                        const textarea = document.getElementById('text-editor') as HTMLTextAreaElement;
-                        if (textarea) textarea.focus();
-                      }, 10);
+                      editor.focus();
                     }}
                     className="px-3 py-1 text-xs bg-white border border-gray-300 rounded hover:bg-gray-100 transition-colors"
                     title="Alle Formatierungen entfernen"
@@ -703,20 +683,30 @@ export default function SocialProofSection({
                   </button>
                 </div>
                 
-                {/* Text-Eingabefeld */}
-                <textarea
-                  id="text-editor"
-                  value={customText}
-                  onChange={(e) => {
-                    setCustomText(e.target.value);
+                {/* Visueller Editor */}
+                <div
+                  id="visual-editor"
+                  contentEditable
+                  dangerouslySetInnerHTML={{ __html: customText }}
+                  onInput={(e) => {
+                    const target = e.target as HTMLDivElement;
+                    setCustomText(target.innerHTML);
                   }}
-                  className="w-full border border-gray-200 border-t-0 px-3 py-3 rounded-b-md text-sm focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition resize-none"
-                  placeholder="und <strong>12.752</strong> andere sind begeistert von Regenliebe"
-                  rows={4}
+                  onBlur={(e) => {
+                    const target = e.target as HTMLDivElement;
+                    setCustomText(target.innerHTML);
+                  }}
+                  className="w-full border border-gray-200 border-t-0 px-3 py-3 rounded-b-md text-sm focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition min-h-[100px] bg-white"
+                  style={{ 
+                    minHeight: '100px',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    lineHeight: '1.5'
+                  }}
                 />
                 
                 <p className="text-xs text-gray-500 mt-2">
-                  💡 <strong>Tipp:</strong> Wähle Text aus und klicke auf die Formatierungs-Buttons, oder klicke ohne Auswahl um Beispieltext einzufügen.
+                  💡 <strong>Tipp:</strong> Wähle Text aus und klicke auf die Formatierungs-Buttons für <strong>fett</strong>, <em>kursiv</em> oder <u>unterstrichen</u>.
                 </p>
               </div>
             </label>

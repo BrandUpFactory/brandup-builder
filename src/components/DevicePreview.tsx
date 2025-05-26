@@ -86,7 +86,7 @@ export default function DevicePreview({
           <div className="flex space-x-1">
             <button
               onClick={() => onPreviewModeChange('builder')}
-              className={`px-2 py-1 text-xs rounded ${previewMode === 'builder' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+              className={`px-2 py-1 text-xs rounded ${previewMode === 'builder' ? 'bg-gray-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
               title="Builder Vorschau"
             >
               Builder
