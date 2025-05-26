@@ -110,12 +110,13 @@ body {
   pointer-events: auto;
 }
 
-/* Rich Text Editor Styles - Flexible Layout */
+/* Rich Text Editor Styles - Inline Layout */
 .rich-text-editor .ProseMirror {
   outline: none !important;
   line-height: 1.5 !important;
-  white-space: normal !important;
-  word-wrap: break-word !important;
+  white-space: nowrap !important;
+  word-wrap: normal !important;
+  overflow-x: auto !important;
 }
 
 .rich-text-editor .ProseMirror p {
@@ -124,6 +125,7 @@ body {
   line-height: inherit !important;
   display: inline !important;
   vertical-align: baseline !important;
+  white-space: nowrap !important;
 }
 
 .rich-text-editor .ProseMirror strong {
@@ -168,6 +170,15 @@ body {
 /* Cursor-Styling */
 .rich-text-editor .ProseMirror {
   caret-color: #1c2838;
+}
+
+/* Stabile Cursor-Position */
+.rich-text-editor .ProseMirror:focus {
+  outline: none !important;
+}
+
+.rich-text-editor .ProseMirror .ProseMirror-focused {
+  outline: none !important;
 }
 
 /* Selection-Styling */

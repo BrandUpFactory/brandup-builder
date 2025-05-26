@@ -114,7 +114,8 @@ export default function RichTextEditor({
             }
           }}
           className={`flex items-center justify-center w-8 h-8 border border-gray-300 rounded hover:bg-gray-100 transition-colors ${
-            editor.isActive('bold') ? 'bg-blue-100 border-blue-400' : 'bg-white'
+            // Nur aktiv zeigen wenn Text ausgewählt ist UND Bold aktiv ist
+            (editor.state.selection.from !== editor.state.selection.to && editor.isActive('bold')) ? 'bg-blue-100 border-blue-400' : 'bg-white'
           }`}
           title="Fett hinzufügen/entfernen"
         >
@@ -131,7 +132,8 @@ export default function RichTextEditor({
             }
           }}
           className={`flex items-center justify-center w-8 h-8 border border-gray-300 rounded hover:bg-gray-100 transition-colors ${
-            editor.isActive('italic') ? 'bg-blue-100 border-blue-400' : 'bg-white'
+            // Nur aktiv zeigen wenn Text ausgewählt ist UND Italic aktiv ist
+            (editor.state.selection.from !== editor.state.selection.to && editor.isActive('italic')) ? 'bg-blue-100 border-blue-400' : 'bg-white'
           }`}
           title="Kursiv hinzufügen/entfernen"
         >
@@ -148,7 +150,8 @@ export default function RichTextEditor({
             }
           }}
           className={`flex items-center justify-center w-8 h-8 border border-gray-300 rounded hover:bg-gray-100 transition-colors ${
-            editor.isActive('underline') ? 'bg-blue-100 border-blue-400' : 'bg-white'
+            // Nur aktiv zeigen wenn Text ausgewählt ist UND Underline aktiv ist
+            (editor.state.selection.from !== editor.state.selection.to && editor.isActive('underline')) ? 'bg-blue-100 border-blue-400' : 'bg-white'
           }`}
           title="Unterstrichen hinzufügen/entfernen"
         >
