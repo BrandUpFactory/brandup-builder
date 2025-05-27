@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import RichTextEditor from '../components/RichTextEditor'
 
 interface SocialProofSectionProps {
@@ -81,10 +81,14 @@ export default function SocialProofSection({
   onProductUrlChange
 }: SocialProofSectionProps) {
   
+  // Stable tutorial opener using useCallback
+  const handleShowTutorial = useCallback(() => {
+    setShowTutorial(true);
+  }, []);
+
   // Make showTutorial globally accessible for the EditorLayout button
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const handleShowTutorial = () => setShowTutorial(true);
       (window as any).showTutorial = handleShowTutorial;
       
       return () => {
@@ -94,7 +98,7 @@ export default function SocialProofSection({
         }
       };
     }
-  }, []);
+  }, [handleShowTutorial]);
   // Ensure initialData is an object
   const safeInitialData = initialData || {};
   
@@ -512,38 +516,47 @@ export default function SocialProofSection({
     );
   };
 
-  // Tutorial Modal
-  const TutorialModal = () => {
-    if (!showTutorial) return null;
+  // Stable tutorial handlers using useCallback
+  const handleTutorialClose = useCallback(() => {
+    setShowTutorial(false);
+  }, []);
 
-    const handleClose = () => {
+  const handleTutorialOverlayClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      e.preventDefault();
+      e.stopPropagation();
       setShowTutorial(false);
-    };
+    }
+  }, []);
 
-    const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-      if (e.target === e.currentTarget) {
-        handleClose();
-      }
-    };
+  const handleTutorialButtonClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowTutorial(false);
+  }, []);
+
+  // Tutorial Modal
+  const TutorialModal = useCallback(() => {
+    if (!showTutorial) return null;
 
     return (
       <div 
         className="fixed inset-0 overflow-y-auto"
         style={{ 
-          zIndex: 999999,
+          zIndex: 2147483647, // Maximum z-index value
           isolation: 'isolate',
           pointerEvents: 'auto'
         }}
       >
         <div 
           className="flex min-h-full items-center justify-center p-4"
-          onClick={handleOverlayClick}
+          onMouseDown={handleTutorialOverlayClick}
         >
-          <div className="fixed inset-0 bg-black/50"></div>
+          <div className="fixed inset-0 bg-black/50" onMouseDown={handleTutorialOverlayClick}></div>
           <div 
             className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
             style={{ zIndex: 1 }}
-            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="border-b border-gray-200 p-6">
@@ -556,7 +569,7 @@ export default function SocialProofSection({
                 </div>
                 <button
                   type="button"
-                  onClick={handleClose}
+                  onMouseDown={handleTutorialButtonClick}
                   className="text-gray-400 hover:text-gray-600 rounded-full p-2 hover:bg-gray-100 transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -631,7 +644,7 @@ export default function SocialProofSection({
               <div className="flex justify-center">
                 <button
                   type="button"
-                  onClick={handleClose}
+                  onMouseDown={handleTutorialButtonClick}
                   className="bg-[#1c2838] text-white px-6 py-2 rounded-lg hover:bg-[#1c2838]/90 transition-colors"
                 >
                   Verstanden, loslegen!
@@ -642,7 +655,7 @@ export default function SocialProofSection({
         </div>
       </div>
     );
-  };
+  }, [showTutorial, handleTutorialOverlayClick, handleTutorialButtonClick]);
 
   const settings = (
     <div className="space-y-6">
