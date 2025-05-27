@@ -283,28 +283,28 @@ export default function SocialProofSection({
   const getNamesWithBadge = (position: string, isMobile: boolean = false) => {
     const badgeSize = isMobile ? '13px' : '14px';
     const badgeElement = showBadge ? 
-      `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${badgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : 
+      `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${badgeSize}; max-width: none; margin: 0 2px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : 
       '<span style="margin: 0 1px;"> </span>';
 
     switch(avatarCount) {
       case 1:
         if (position === 'afterFirst') {
-          return `${firstName1}${badgeElement}<span style="margin: 0 1px;"> </span>`;
+          return `${firstName1}${badgeElement}`;
         }
         return firstName1;
       case 2:
         if (position === 'afterFirst') {
-          return `${firstName1}${badgeElement}, ${firstName2}<span style="margin: 0 1px;"> </span>`;
+          return `${firstName1}${badgeElement}, ${firstName2}`;
         }
         return `${firstName1}, ${firstName2}`;
       case 3:
         if (position === 'afterFirst') {
-          return `${firstName1}${badgeElement}, ${firstName2}, ${firstName3}<span style="margin: 0 1px;"> </span>`;
+          return `${firstName1}${badgeElement}, ${firstName2}, ${firstName3}`;
         }
         return `${firstName1}, ${firstName2}, ${firstName3}`;
       default:
         if (position === 'afterFirst') {
-          return `${firstName1}${badgeElement}, ${firstName2}<span style="margin: 0 1px;"> </span>`;
+          return `${firstName1}${badgeElement}, ${firstName2}`;
         }
         return `${firstName1}, ${firstName2}`;
     }
@@ -322,7 +322,7 @@ export default function SocialProofSection({
           style={{
             height: badgeSize,
             maxWidth: 'none',
-            margin: '0 4px',
+            margin: '0 2px',
             verticalAlign: 'baseline',
             transform: 'translateY(-1px)',
             objectFit: 'contain',
@@ -688,7 +688,15 @@ export default function SocialProofSection({
         <div className="space-y-2">
           <div className="flex gap-2 mt-1">
             <button
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAvatarCount(1); }}
+              onClick={(e) => { 
+                e.preventDefault(); 
+                e.stopPropagation(); 
+                setAvatarCount(1);
+                // Reset badge position to standard if it was afterFirst (since it's not available with 1 avatar)
+                if (badgePosition === 'afterFirst') {
+                  setBadgePosition('standard');
+                }
+              }}
               className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 1 ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
               1 Avatar
@@ -706,7 +714,15 @@ export default function SocialProofSection({
               3 Avatare
             </button>
             <button
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAvatarCount(0); }}
+              onClick={(e) => { 
+                e.preventDefault(); 
+                e.stopPropagation(); 
+                setAvatarCount(0);
+                // Reset badge position to standard if it was afterFirst or overAvatar (since they're not available without avatars)
+                if (badgePosition === 'afterFirst' || badgePosition === 'overAvatar') {
+                  setBadgePosition('standard');
+                }
+              }}
               className={`px-3 py-1.5 rounded text-xs flex-1 ${avatarCount === 0 ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
             >
               Keine
@@ -906,13 +922,15 @@ export default function SocialProofSection({
                     <div className="font-medium">Standard</div>
                     <div className="text-xs opacity-75">Nach allen Namen</div>
                   </button>
-                  <button
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setBadgePosition('afterFirst'); }}
-                    className={`px-3 py-2 rounded text-xs text-left ${badgePosition === 'afterFirst' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
-                  >
-                    <div className="font-medium">Nach erstem Namen</div>
-                    <div className="text-xs opacity-75">Direkt nach dem ersten Namen</div>
-                  </button>
+                  {avatarCount > 1 && (
+                    <button
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setBadgePosition('afterFirst'); }}
+                      className={`px-3 py-2 rounded text-xs text-left ${badgePosition === 'afterFirst' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+                    >
+                      <div className="font-medium">Nach erstem Namen</div>
+                      <div className="text-xs opacity-75">Direkt nach dem ersten Namen</div>
+                    </button>
+                  )}
                   {avatarCount > 0 && (
                     <button
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); setBadgePosition('overAvatar'); }}
@@ -1388,9 +1406,12 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                 <div>
                   <div style={{ display: 'block', width: '100%', marginBottom: '2px' }}>
                     {badgePosition === 'afterFirst' ? (
-                      <span style={{ fontWeight: '600' }}>
-                        {getNamesWithBadge('afterFirst', previewDevice === 'mobile').replace(/<[^>]*>/g, '')}
-                      </span>
+                      <span 
+                        style={{ fontWeight: '600' }}
+                        dangerouslySetInnerHTML={{ 
+                          __html: getNamesWithBadge('afterFirst', previewDevice === 'mobile')
+                        }}
+                      />
                     ) : (
                       <>
                         <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
@@ -1578,7 +1599,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
         <div style="display: block !important; width: 100% !important; margin: 0 0 2px 0 !important; padding: 0 !important;">
           ${badgePosition === 'afterFirst' ? `<strong style="display: inline !important; font-weight: 600 !important; margin: 0 !important; padding: 0 !important;">${getNamesWithBadge('afterFirst', false)}</strong>` : 
             `<strong style="display: inline !important; font-weight: 600 !important; margin: 0 !important; padding: 0 !important;">${getDisplayNames()}</strong>
-             ${showBadge && badgePosition === 'standard' ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 14px !important; max-width: none !important; margin: 0 4px !important; vertical-align: baseline !important; transform: translateY(-1px) !important; object-fit: contain !important; display: inline !important; padding: 0 !important; border: none !important;" onerror="this.style.display='none'">` : 
+             ${showBadge && badgePosition === 'standard' ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 14px !important; max-width: none !important; margin: 0 2px !important; vertical-align: baseline !important; transform: translateY(-1px) !important; object-fit: contain !important; display: inline !important; padding: 0 !important; border: none !important;" onerror="this.style.display='none'">` : 
                (badgePosition === 'overAvatar' ? '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>' : '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>')}`}
           <span style="font-weight: 400 !important; word-spacing: 0.1em !important; letter-spacing: 0.01em !important; display: inline !important; margin: 0 !important; padding: 0 !important;">${desktopSplit.firstPart}</span>
         </div>
@@ -1592,7 +1613,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
         <div style="display: block !important; width: 100% !important; margin: 0 0 2px 0 !important; padding: 0 !important;">
           ${badgePosition === 'afterFirst' ? `<strong style="display: inline !important; font-weight: 600 !important; margin: 0 !important; padding: 0 !important;">${getNamesWithBadge('afterFirst', true)}</strong>` : 
             `<strong style="display: inline !important; font-weight: 600 !important; margin: 0 !important; padding: 0 !important;">${getDisplayNames()}</strong>
-             ${showBadge && badgePosition === 'standard' ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 13px !important; max-width: none !important; margin: 0 4px !important; vertical-align: baseline !important; transform: translateY(-1px) !important; object-fit: contain !important; display: inline !important; padding: 0 !important; border: none !important;" onerror="this.style.display='none'">` : 
+             ${showBadge && badgePosition === 'standard' ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 13px !important; max-width: none !important; margin: 0 2px !important; vertical-align: baseline !important; transform: translateY(-1px) !important; object-fit: contain !important; display: inline !important; padding: 0 !important; border: none !important;" onerror="this.style.display='none'">` : 
                (badgePosition === 'overAvatar' ? '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>' : '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>')}`}
           <span style="font-weight: 400 !important; word-spacing: 0.1em !important; letter-spacing: 0.01em !important; display: inline !important; margin: 0 !important; padding: 0 !important;">${mobileSplit.firstPart}</span>
         </div>
