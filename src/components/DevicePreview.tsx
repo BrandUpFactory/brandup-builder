@@ -58,7 +58,7 @@ export default function DevicePreview({
   return (
     <div className="h-full flex flex-col overflow-hidden">
       {/* Device Control Bar */}
-      <div className="flex justify-between items-center p-2 bg-gray-100 rounded-t border-b mb-2">
+      <div className="flex justify-between items-center p-2 bg-white rounded-t border-b mb-2">
         <div className="flex space-x-1">
           <button
             onClick={() => handleDeviceChange('mobile')}

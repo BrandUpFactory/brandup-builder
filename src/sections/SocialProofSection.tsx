@@ -15,6 +15,7 @@ interface SocialProofSectionProps {
     avatarImage2?: string;
     avatarImage3?: string;
     verifiedImage?: string;
+    showBadge?: boolean;
     avatarBorderColor?: string;
     textColor?: string;
     showBreakOnLarge?: boolean;
@@ -100,6 +101,7 @@ export default function SocialProofSection({
   const [avatarImage2, setAvatarImage2] = useState(safeInitialData.avatarImage2 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098')
   const [avatarImage3, setAvatarImage3] = useState(safeInitialData.avatarImage3 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-1.jpg?v=1738073619')
   const [verifiedImage, setVerifiedImage] = useState(safeInitialData.verifiedImage || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/insta-blue.png?v=1738073828')
+  const [showBadge, setShowBadge] = useState(safeInitialData.showBadge !== undefined ? safeInitialData.showBadge : true)
   const [avatarCount, setAvatarCount] = useState(safeInitialData.avatarCount || 2)
 
   // Section styling - ensure defaults from style template 0
@@ -189,6 +191,7 @@ export default function SocialProofSection({
     avatarImage2,
     avatarImage3,
     verifiedImage,
+    showBadge,
     avatarBorderColor,
     textColor,
     showBreakOnLarge,
@@ -216,7 +219,7 @@ export default function SocialProofSection({
     }
   }, [
     firstName1, firstName2, firstName3, userCount, brandName, customText,
-    backgroundColor, avatarImage1, avatarImage2, avatarImage3, verifiedImage,
+    backgroundColor, avatarImage1, avatarImage2, avatarImage3, verifiedImage, showBadge,
     avatarBorderColor, textColor, showBreakOnLarge,
     avatarSize, borderRadius, padding, paddingTop, paddingRight,
     paddingBottom, paddingLeft, avatarCount, selectedStyle, 
@@ -626,27 +629,47 @@ export default function SocialProofSection({
             </label>
           )}
           
-          <label className="block text-sm text-[#1c2838]">
-            Verifizierungsbadge:
-            <div className="mt-1 flex items-center space-x-2">
-              {verifiedImage && (
-                <div className="w-6 h-6 border rounded overflow-hidden bg-white flex-shrink-0">
-                  <img
-                    src={verifiedImage}
-                    alt="Verifizierungsbadge"
-                    className="w-full h-full object-contain"
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowBadge(!showBadge); }}
+                  className="flex items-center cursor-pointer bg-transparent border-none p-0 m-0 focus:outline-none"
+                >
+                  <div className={`relative w-9 h-5 ${showBadge ? 'bg-[#1c2838]' : 'bg-gray-200'} rounded-full transition-colors`}>
+                    <div className={`absolute top-[2px] ${showBadge ? 'right-[2px] translate-x-0' : 'left-[2px] translate-x-0'} bg-white border rounded-full h-4 w-4 transition-all`}></div>
+                  </div>
+                  <span className="ml-2 text-sm text-gray-600">Verifizierungsbadge anzeigen</span>
+                </button>
+                <HelpTooltip text="Zeigt oder verbirgt das Verifizierungsbadge neben den Namen." />
+              </div>
+            </div>
+            
+            {showBadge && (
+              <label className="block text-sm text-[#1c2838]">
+                Badge-Bild:
+                <div className="mt-1 flex items-center space-x-2">
+                  {verifiedImage && (
+                    <div className="w-6 h-6 border rounded overflow-hidden bg-white flex-shrink-0">
+                      <img
+                        src={verifiedImage}
+                        alt="Verifizierungsbadge"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  )}
+                  <input
+                    type="text"
+                    value={verifiedImage}
+                    onChange={(e) => setVerifiedImage(e.target.value)}
+                    className="flex-1 border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+                    placeholder="https://cdn.shopify.com/s/files/1/.../badge.png"
                   />
                 </div>
-              )}
-              <input
-                type="text"
-                value={verifiedImage}
-                onChange={(e) => setVerifiedImage(e.target.value)}
-                className="flex-1 border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                placeholder="https://cdn.shopify.com/s/files/1/.../badge.png"
-              />
-            </div>
-          </label>
+              </label>
+            )}
+          </div>
         </div>
       </div>
       
@@ -935,7 +958,7 @@ export default function SocialProofSection({
         <div style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: ${previewDevice === 'mobile' ? 'block' : 'none'}; width: 100%;">
           <div style="display: block; width: 100%; margin-bottom: 2px;">
             <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-            <img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
+${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : ''}
             <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${getMobileSplit().firstPart}</span>
           </div>
           <div style="display: block; width: 100%;">
@@ -947,7 +970,7 @@ export default function SocialProofSection({
         <div style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: ${previewDevice === 'desktop' ? 'block' : 'none'}; width: 100%;">
           <div style="display: block; width: 100%; margin-bottom: 2px;">
             <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-            <img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
+${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : ''}
             <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${getDesktopSplit().firstPart}</span>
           </div>
           <div style="display: block; width: 100%;">
@@ -1062,19 +1085,21 @@ export default function SocialProofSection({
                 <div>
                   <div style={{ display: 'block', width: '100%', marginBottom: '2px' }}>
                     <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
-                    <img 
-                      src={verifiedImage} 
-                      alt="Verifiziert" 
-                      style={{
-                        height: previewDevice === 'mobile' ? '13px' : '14px',
-                        maxWidth: 'none',
-                        margin: '0 4px',
-                        verticalAlign: 'baseline',
-                        transform: 'translateY(-1px)',
-                        objectFit: 'contain',
-                        display: 'inline'
-                      }}
-                    />
+                    {showBadge && (
+                      <img 
+                        src={verifiedImage} 
+                        alt="Verifiziert" 
+                        style={{
+                          height: previewDevice === 'mobile' ? '13px' : '14px',
+                          maxWidth: 'none',
+                          margin: '0 4px',
+                          verticalAlign: 'baseline',
+                          transform: 'translateY(-1px)',
+                          objectFit: 'contain',
+                          display: 'inline'
+                        }}
+                      />
+                    )}
                     <span 
                       style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}
                       dangerouslySetInnerHTML={{ 
@@ -1245,7 +1270,7 @@ export default function SocialProofSection({
       <div class="desktop-layout">
         <div style="display: block; width: 100%; margin-bottom: 2px;">
           <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-          <img src="${verifiedImage}" alt="Verifiziert" style="height: 14px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
+${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 14px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : ''}
           <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${desktopSplit.firstPart}</span>
         </div>
         <div style="display: block; width: 100%;">
@@ -1257,7 +1282,7 @@ export default function SocialProofSection({
       <div class="mobile-layout">
         <div style="display: block; width: 100%; margin-bottom: 2px;">
           <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-          <img src="${verifiedImage}" alt="Verifiziert" style="height: 13px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">
+${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 13px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : ''}
           <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${mobileSplit.firstPart}</span>
         </div>
         <div style="display: block; width: 100%;">
