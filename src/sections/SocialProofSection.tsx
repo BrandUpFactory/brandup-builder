@@ -320,9 +320,9 @@ export default function SocialProofSection({
       );
     }
     
-    // For overAvatar position, we still need spacing when badge is off
-    if (position === 'overAvatar') {
-      return !showBadge ? <span style={{ margin: '0 1px' }}> </span> : null;
+    // For afterFirst and overAvatar positions, always add spacing between names and text
+    if (position === 'afterFirst' || position === 'overAvatar') {
+      return <span style={{ margin: '0 1px' }}> </span>;
     }
     
     return null;
@@ -1344,12 +1344,12 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                           style={{
                             position: 'absolute',
                             top: '-6px',
-                            right: avatarCount >= 3 ? '-4px' : '-2px',
+                            right: avatarCount >= 3 ? '0px' : '2px',
                             height: previewDevice === 'mobile' ? '16px' : '18px',
                             width: 'auto',
                             zIndex: 10,
                             objectFit: 'contain',
-                            transform: 'translateX(50%)'
+                            transform: 'translateX(30%)'
                           }}
                         />
                       )}
