@@ -82,9 +82,19 @@ export default function SocialProofSection({
 }: SocialProofSectionProps) {
   
   // Make showTutorial globally accessible for the EditorLayout button
-  if (typeof window !== 'undefined') {
-    (window as any).showTutorial = () => setShowTutorial(true);
-  }
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const handleShowTutorial = () => setShowTutorial(true);
+      (window as any).showTutorial = handleShowTutorial;
+      
+      return () => {
+        // Cleanup on unmount to prevent memory leaks
+        if ((window as any).showTutorial === handleShowTutorial) {
+          delete (window as any).showTutorial;
+        }
+      };
+    }
+  }, []);
   // Ensure initialData is an object
   const safeInitialData = initialData || {};
   
@@ -510,27 +520,29 @@ export default function SocialProofSection({
       setShowTutorial(false);
     };
 
-    const handleOverlayClick = (e: React.MouseEvent) => {
+    const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
       if (e.target === e.currentTarget) {
         handleClose();
       }
     };
 
-    const handleButtonClick = (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      handleClose();
-    };
-
     return (
-      <div className="fixed inset-0 z-[9999] overflow-y-auto">
+      <div 
+        className="fixed inset-0 overflow-y-auto"
+        style={{ 
+          zIndex: 999999,
+          isolation: 'isolate',
+          pointerEvents: 'auto'
+        }}
+      >
         <div 
           className="flex min-h-full items-center justify-center p-4"
           onClick={handleOverlayClick}
         >
-          <div className="fixed inset-0 bg-black/50" onClick={handleOverlayClick}></div>
+          <div className="fixed inset-0 bg-black/50"></div>
           <div 
-            className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto z-10"
+            className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            style={{ zIndex: 1 }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -544,7 +556,7 @@ export default function SocialProofSection({
                 </div>
                 <button
                   type="button"
-                  onClick={handleButtonClick}
+                  onClick={handleClose}
                   className="text-gray-400 hover:text-gray-600 rounded-full p-2 hover:bg-gray-100 transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -619,7 +631,7 @@ export default function SocialProofSection({
               <div className="flex justify-center">
                 <button
                   type="button"
-                  onClick={handleButtonClick}
+                  onClick={handleClose}
                   className="bg-[#1c2838] text-white px-6 py-2 rounded-lg hover:bg-[#1c2838]/90 transition-colors"
                 >
                   Verstanden, loslegen!
@@ -986,22 +998,6 @@ export default function SocialProofSection({
           </label>
           
           <div className="space-y-2 pt-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <button
-                  type="button"
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setBrandNameBold(!brandNameBold); }}
-                  className="flex items-center cursor-pointer bg-transparent border-none p-0 m-0 focus:outline-none"
-                >
-                  <div className={`relative w-9 h-5 ${brandNameBold ? 'bg-[#1c2838]' : 'bg-gray-200'} rounded-full transition-colors`}>
-                    <div className={`absolute top-[2px] ${brandNameBold ? 'right-[2px] translate-x-0' : 'left-[2px] translate-x-0'} bg-white border rounded-full h-4 w-4 transition-all`}></div>
-                  </div>
-                  <span className="ml-2 text-sm text-gray-600">Markenname fett</span>
-                </button>
-                <HelpTooltip text="Stellt den Markennamen fett dar." />
-              </div>
-            </div>
-            
             <div className="flex items-center justify-between mt-3">
               <div className="flex items-center">
                 <button
