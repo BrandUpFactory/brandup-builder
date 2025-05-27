@@ -237,6 +237,11 @@ export default function TemplateEditorClient({
     setSaveMessage(null);
     
     try {
+      // First trigger the section component to update its data
+      if (typeof window !== 'undefined' && (window as any).triggerSocialProofUpdate) {
+        (window as any).triggerSocialProofUpdate();
+      }
+      
       console.log("⚡ SaveAction: Attempting to save section data");
       console.log("⚡ SaveAction: Current section data", JSON.stringify(currentSectionData, null, 2));
       

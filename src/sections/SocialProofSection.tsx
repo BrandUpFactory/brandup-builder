@@ -8,8 +8,6 @@ interface SocialProofSectionProps {
     firstName1?: string;
     firstName2?: string;
     firstName3?: string;
-    userCount?: string;
-    brandName?: string;
     backgroundColor?: string;
     avatarImage1?: string;
     avatarImage2?: string;
@@ -114,8 +112,6 @@ export default function SocialProofSection({
   const [firstName1, setFirstName1] = useState(safeInitialData.firstName1 || 'Anna')
   const [firstName2, setFirstName2] = useState(safeInitialData.firstName2 || 'Lisa')
   const [firstName3, setFirstName3] = useState(safeInitialData.firstName3 || 'Sarah')
-  const [userCount, setUserCount] = useState(safeInitialData.userCount || '1.234')
-  const [brandName, setBrandName] = useState(safeInitialData.brandName || 'Mein Shop')
   const [customText, setCustomText] = useState(safeInitialData.customText || 'und viele andere lieben dieses Produkt')
   const [avatarImage1, setAvatarImage1] = useState(safeInitialData.avatarImage1 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619')
   const [avatarImage2, setAvatarImage2] = useState(safeInitialData.avatarImage2 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098')
@@ -221,8 +217,6 @@ export default function SocialProofSection({
     firstName1,
     firstName2,
     firstName3,
-    userCount,
-    brandName,
     backgroundColor,
     avatarImage1,
     avatarImage2,
@@ -249,21 +243,24 @@ export default function SocialProofSection({
     useFullWidth
   };
 
-  // Update parent component when data changes
-  useEffect(() => {
+  // Function to manually trigger data update to parent
+  const triggerDataUpdate = useCallback(() => {
     if (onDataChange) {
-      // Always notify parent to handle the data
       onDataChange(sectionData);
     }
-  }, [
-    firstName1, firstName2, firstName3, userCount, brandName, customText,
-    backgroundColor, avatarImage1, avatarImage2, avatarImage3, verifiedImage, showBadge, badgePosition,
-    avatarBorderColor, textColor, showBreakOnLarge,
-    avatarSize, borderRadius, padding, paddingTop, paddingRight,
-    paddingBottom, paddingLeft, avatarCount, selectedStyle, 
-    fontSizeDesktop, fontSizeMobile, brandNameBold, useFullWidth, onDataChange,
-    previewDevice, internalPreviewDevice
-  ])
+  }, [onDataChange, sectionData]);
+
+  // Expose the update function globally so the save button can call it
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).triggerSocialProofUpdate = triggerDataUpdate;
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete (window as any).triggerSocialProofUpdate;
+      }
+    };
+  }, [triggerDataUpdate]);
 
   // Handle avatar display names based on avatar count
   const getDisplayNames = () => {
