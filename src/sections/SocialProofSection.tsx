@@ -111,12 +111,12 @@ export default function SocialProofSection({
   const [selectedStyle, setSelectedStyle] = useState<number>(0);
   
   // Section content
-  const [firstName1, setFirstName1] = useState(safeInitialData.firstName1 || 'Steffi')
-  const [firstName2, setFirstName2] = useState(safeInitialData.firstName2 || 'Daniela')
-  const [firstName3, setFirstName3] = useState(safeInitialData.firstName3 || 'Maria')
-  const [userCount, setUserCount] = useState(safeInitialData.userCount || '12.752')
-  const [brandName, setBrandName] = useState(safeInitialData.brandName || 'Regenliebe')
-  const [customText, setCustomText] = useState(safeInitialData.customText || 'und <strong>12.752</strong> andere sind begeistert von Regenliebe')
+  const [firstName1, setFirstName1] = useState(safeInitialData.firstName1 || 'Anna')
+  const [firstName2, setFirstName2] = useState(safeInitialData.firstName2 || 'Lisa')
+  const [firstName3, setFirstName3] = useState(safeInitialData.firstName3 || 'Sarah')
+  const [userCount, setUserCount] = useState(safeInitialData.userCount || '1.234')
+  const [brandName, setBrandName] = useState(safeInitialData.brandName || 'Mein Shop')
+  const [customText, setCustomText] = useState(safeInitialData.customText || 'und viele andere lieben dieses Produkt')
   const [avatarImage1, setAvatarImage1] = useState(safeInitialData.avatarImage1 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619')
   const [avatarImage2, setAvatarImage2] = useState(safeInitialData.avatarImage2 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098')
   const [avatarImage3, setAvatarImage3] = useState(safeInitialData.avatarImage3 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-1.jpg?v=1738073619')
@@ -787,7 +787,7 @@ export default function SocialProofSection({
                 <RichTextEditor
                   content={customText}
                   onChange={setCustomText}
-                  placeholder="z.B. und 12.752 andere sind begeistert von Regenliebe"
+                  placeholder="z.B. und viele andere lieben dieses Produkt"
                   className="w-full"
                 />
                 
@@ -1215,7 +1215,7 @@ export default function SocialProofSection({
         <!-- Mobile layout: 3 words on second line -->
         <div style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: ${previewDevice === 'mobile' ? 'block' : 'none'}; width: 100%;">
           <div style="display: block; width: 100%; margin-bottom: 2px;">
-            <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
+            <strong style="display: inline; font-weight: 700;">${getDisplayNames()}</strong>
 ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 1px;"> </span>'}
             <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${getMobileSplit().firstPart}</span>
           </div>
@@ -1227,7 +1227,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
         <!-- Desktop layout: 2 words on second line -->
         <div style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: ${previewDevice === 'desktop' ? 'block' : 'none'}; width: 100%;">
           <div style="display: block; width: 100%; margin-bottom: 2px;">
-            <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
+            <strong style="display: inline; font-weight: 700;">${getDisplayNames()}</strong>
 ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 1px;"> </span>'}
             <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${getDesktopSplit().firstPart}</span>
           </div>
@@ -1414,26 +1414,32 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                       />
                     ) : (
                       <>
-                        <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
+                        <strong style={{ fontWeight: '700' }}>{getDisplayNames()}</strong>
                         {getBadgeOrSpacing(badgePosition, previewDevice === 'mobile')}
                       </>
                     )}
-                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
-                      {(() => {
-                        const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
-                        const { firstPart } = getTextSplit(customText, wordsForSecondLine);
-                        return firstPart.replace(/<[^>]*>/g, '');
-                      })()}
-                    </span>
+                    <span 
+                      style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}
+                      dangerouslySetInnerHTML={{
+                        __html: (() => {
+                          const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
+                          const { firstPart } = getTextSplit(customText, wordsForSecondLine);
+                          return firstPart;
+                        })()
+                      }}
+                    />
                   </div>
                   <div style={{ display: 'block', width: '100%' }}>
-                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
-                      {(() => {
-                        const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
-                        const { lastPart } = getTextSplit(customText, wordsForSecondLine);
-                        return lastPart.replace(/<[^>]*>/g, '');
-                      })()}
-                    </span>
+                    <span 
+                      style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}
+                      dangerouslySetInnerHTML={{
+                        __html: (() => {
+                          const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
+                          const { lastPart } = getTextSplit(customText, wordsForSecondLine);
+                          return lastPart;
+                        })()
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -1597,8 +1603,8 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       <!-- Desktop layout: 2 words on second line -->
       <div class="desktop-layout">
         <div style="display: block !important; width: 100% !important; margin: 0 0 2px 0 !important; padding: 0 !important;">
-          ${badgePosition === 'afterFirst' ? `<strong style="display: inline !important; font-weight: 600 !important; margin: 0 !important; padding: 0 !important;">${getNamesWithBadge('afterFirst', false)}</strong>` : 
-            `<strong style="display: inline !important; font-weight: 600 !important; margin: 0 !important; padding: 0 !important;">${getDisplayNames()}</strong>
+          ${badgePosition === 'afterFirst' ? `<strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${getNamesWithBadge('afterFirst', false)}</strong>` : 
+            `<strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${getDisplayNames()}</strong>
              ${showBadge && badgePosition === 'standard' ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 14px !important; max-width: none !important; margin: 0 2px !important; vertical-align: baseline !important; transform: translateY(-1px) !important; object-fit: contain !important; display: inline !important; padding: 0 !important; border: none !important;" onerror="this.style.display='none'">` : 
                (badgePosition === 'overAvatar' ? '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>' : '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>')}`}
           <span style="font-weight: 400 !important; word-spacing: 0.1em !important; letter-spacing: 0.01em !important; display: inline !important; margin: 0 !important; padding: 0 !important;">${desktopSplit.firstPart}</span>
@@ -1611,8 +1617,8 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       <!-- Mobile layout: 3 words on second line -->
       <div class="mobile-layout">
         <div style="display: block !important; width: 100% !important; margin: 0 0 2px 0 !important; padding: 0 !important;">
-          ${badgePosition === 'afterFirst' ? `<strong style="display: inline !important; font-weight: 600 !important; margin: 0 !important; padding: 0 !important;">${getNamesWithBadge('afterFirst', true)}</strong>` : 
-            `<strong style="display: inline !important; font-weight: 600 !important; margin: 0 !important; padding: 0 !important;">${getDisplayNames()}</strong>
+          ${badgePosition === 'afterFirst' ? `<strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${getNamesWithBadge('afterFirst', true)}</strong>` : 
+            `<strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${getDisplayNames()}</strong>
              ${showBadge && badgePosition === 'standard' ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 13px !important; max-width: none !important; margin: 0 2px !important; vertical-align: baseline !important; transform: translateY(-1px) !important; object-fit: contain !important; display: inline !important; padding: 0 !important; border: none !important;" onerror="this.style.display='none'">` : 
                (badgePosition === 'overAvatar' ? '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>' : '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>')}`}
           <span style="font-weight: 400 !important; word-spacing: 0.1em !important; letter-spacing: 0.01em !important; display: inline !important; margin: 0 !important; padding: 0 !important;">${mobileSplit.firstPart}</span>
