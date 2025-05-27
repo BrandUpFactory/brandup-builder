@@ -1388,40 +1388,31 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                 <div>
                   <div style={{ display: 'block', width: '100%', marginBottom: '2px' }}>
                     {badgePosition === 'afterFirst' ? (
-                      <span 
-                        style={{ fontWeight: '600' }}
-                        dangerouslySetInnerHTML={{ 
-                          __html: getNamesWithBadge('afterFirst', previewDevice === 'mobile')
-                        }}
-                      />
+                      <span style={{ fontWeight: '600' }}>
+                        {getNamesWithBadge('afterFirst', previewDevice === 'mobile').replace(/<[^>]*>/g, '')}
+                      </span>
                     ) : (
                       <>
                         <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
                         {getBadgeOrSpacing(badgePosition, previewDevice === 'mobile')}
                       </>
                     )}
-                    <span 
-                      style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}
-                      dangerouslySetInnerHTML={{ 
-                        __html: (() => {
-                          const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
-                          const { firstPart } = getTextSplit(customText, wordsForSecondLine);
-                          return firstPart;
-                        })()
-                      }}
-                    />
+                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
+                      {(() => {
+                        const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
+                        const { firstPart } = getTextSplit(customText, wordsForSecondLine);
+                        return firstPart.replace(/<[^>]*>/g, '');
+                      })()}
+                    </span>
                   </div>
                   <div style={{ display: 'block', width: '100%' }}>
-                    <span 
-                      style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}
-                      dangerouslySetInnerHTML={{ 
-                        __html: (() => {
-                          const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
-                          const { lastPart } = getTextSplit(customText, wordsForSecondLine);
-                          return lastPart;
-                        })()
-                      }}
-                    />
+                    <span style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}>
+                      {(() => {
+                        const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
+                        const { lastPart } = getTextSplit(customText, wordsForSecondLine);
+                        return lastPart.replace(/<[^>]*>/g, '');
+                      })()}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1519,108 +1510,25 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
     const mobileSplit = getTextSplit(customText, 3);
     
     return `<style>
-    /* Defensive CSS - Block ALL possible theme interference on images and content */
-    .social-proof-isolated,
+    /* Clean CSS reset for social proof section */
+    .social-proof-isolated {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     .social-proof-isolated *,
-    .social-proof-isolated img,
-    .social-proof-isolated span,
-    .social-proof-isolated strong,
-    .social-proof-isolated div {
-      /* Block all margin/padding variations */
-      margin: 0 !important;
-      margin-top: 0 !important;
-      margin-right: 0 !important;
-      margin-bottom: 0 !important;
-      margin-left: 0 !important;
-      margin-block: 0 !important;
-      margin-block-start: 0 !important;
-      margin-block-end: 0 !important;
-      margin-inline: 0 !important;
-      margin-inline-start: 0 !important;
-      margin-inline-end: 0 !important;
-      padding: 0 !important;
-      padding-top: 0 !important;
-      padding-right: 0 !important;
-      padding-bottom: 0 !important;
-      padding-left: 0 !important;
-      padding-block: 0 !important;
-      padding-block-start: 0 !important;
-      padding-block-end: 0 !important;
-      padding-inline: 0 !important;
-      padding-inline-start: 0 !important;
-      padding-inline-end: 0 !important;
-      
-      /* Block common theme properties */
-      border: none !important;
-      border-radius: 0 !important;
-      background: none !important;
-      background-color: transparent !important;
-      background-image: none !important;
-      box-shadow: none !important;
-      text-shadow: none !important;
-      filter: none !important;
-      transform: none !important;
-      transition: none !important;
-      animation: none !important;
-      
-      /* Block text styling */
-      text-decoration: none !important;
-      text-transform: none !important;
-      text-indent: 0 !important;
-      letter-spacing: normal !important;
-      word-spacing: normal !important;
-      line-height: normal !important;
-      text-align: left !important;
-      vertical-align: baseline !important;
-      
-      /* Block positioning */
-      position: static !important;
-      top: auto !important;
-      right: auto !important;
-      bottom: auto !important;
-      left: auto !important;
-      z-index: auto !important;
-      
-      /* Block sizing */
-      width: auto !important;
-      height: auto !important;
-      min-width: 0 !important;
-      min-height: 0 !important;
-      max-width: none !important;
-      max-height: none !important;
-      
-      /* Block display and layout */
-      display: initial !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      overflow: visible !important;
-      float: none !important;
-      clear: none !important;
-      
-      /* Block font styling */
-      font: inherit !important;
-      font-family: inherit !important;
-      font-size: inherit !important;
-      font-weight: normal !important;
-      font-style: normal !important;
-      font-variant: normal !important;
-      color: inherit !important;
-      
-      /* Block list styling */
-      list-style: none !important;
-      list-style-type: none !important;
-      list-style-position: outside !important;
-      list-style-image: none !important;
-      
-      /* Block table styling */
-      border-collapse: separate !important;
-      border-spacing: 0 !important;
-      caption-side: top !important;
-      empty-cells: show !important;
-      table-layout: auto !important;
-      
-      /* Ensure box-sizing is controlled */
-      box-sizing: border-box !important;
+    .social-proof-isolated *::before,
+    .social-proof-isolated *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .social-proof-isolated img {
+      border: none;
+      vertical-align: middle;
+      max-width: 100%;
     }
 
     /* Mobile responsive text layout and font size */
