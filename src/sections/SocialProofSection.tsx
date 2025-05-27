@@ -32,6 +32,8 @@ interface SocialProofSectionProps {
     fontSizeMobile?: string;
     brandNameBold?: boolean;
     useFullWidth?: boolean;
+    textWrapDesktop?: number;
+    textWrapMobile?: number;
   };
   onDataChange?: (data: any) => void;
   previewDevice?: 'desktop' | 'tablet' | 'mobile';
@@ -132,6 +134,10 @@ export default function SocialProofSection({
   const [fontSizeMobile, setFontSizeMobile] = useState(safeInitialData.fontSizeMobile || '9px')
   const [brandNameBold, setBrandNameBold] = useState(safeInitialData.brandNameBold !== undefined ? safeInitialData.brandNameBold : true)
   const [useFullWidth, setUseFullWidth] = useState(safeInitialData.useFullWidth !== undefined ? safeInitialData.useFullWidth : true)
+  
+  // Text wrapping settings
+  const [textWrapDesktop, setTextWrapDesktop] = useState(safeInitialData.textWrapDesktop || 65)
+  const [textWrapMobile, setTextWrapMobile] = useState(safeInitialData.textWrapMobile || 85)
   
   // Padding settings
   const [useSinglePadding, setUseSinglePadding] = useState(true)
@@ -240,7 +246,9 @@ export default function SocialProofSection({
     fontSizeDesktop,
     fontSizeMobile,
     brandNameBold,
-    useFullWidth
+    useFullWidth,
+    textWrapDesktop,
+    textWrapMobile
   };
 
   // Function to manually trigger data update to parent
@@ -1098,6 +1106,57 @@ export default function SocialProofSection({
               </div>
             </label>
           </div>
+          
+          {/* Text Wrapping Controls */}
+          <div className="space-y-3 mt-6 pt-4 border-t border-gray-200">
+            <h4 className="font-medium text-sm text-[#1c2838]">Textumbruch-Einstellungen</h4>
+            
+            <label className="block text-sm text-[#1c2838]">
+              Umbruch Desktop (ab welcher Breite):
+              <div className="flex items-center mt-1">
+                <input
+                  type="range"
+                  min="50"
+                  max="100"
+                  step="5"
+                  value={textWrapDesktop}
+                  onChange={(e) => setTextWrapDesktop(parseInt(e.target.value))}
+                  onClick={handleRangeInput}
+                  onMouseMove={handleRangeInput}
+                  className="w-full accent-[#1c2838]"
+                />
+                <span className="ml-2 text-xs text-gray-500 w-12">{textWrapDesktop}%</span>
+              </div>
+            </label>
+            
+            <label className="block text-sm text-[#1c2838]">
+              Umbruch Mobil (ab welcher Breite):
+              <div className="flex items-center mt-1">
+                <input
+                  type="range"
+                  min="50"
+                  max="100"
+                  step="5"
+                  value={textWrapMobile}
+                  onChange={(e) => setTextWrapMobile(parseInt(e.target.value))}
+                  onClick={handleRangeInput}
+                  onMouseMove={handleRangeInput}
+                  className="w-full accent-[#1c2838]"
+                />
+                <span className="ml-2 text-xs text-gray-500 w-12">{textWrapMobile}%</span>
+              </div>
+            </label>
+            
+            <div className="bg-blue-50 rounded-lg p-3 border border-blue-200 mt-3">
+              <h5 className="font-medium text-blue-800 mb-2 text-sm">💡 Wie funktioniert der Textumbruch?</h5>
+              <div className="text-xs text-blue-700 space-y-1">
+                <p>• <strong>50%:</strong> Text bricht früh um → mehr Zeilen</p>
+                <p>• <strong>100%:</strong> Text nutzt maximale Breite → weniger Zeilen</p>
+                <p>• Der Text beginnt immer in derselben Zeile wie die Namen</p>
+                <p>• Umbruch erfolgt automatisch bei der gewählten Breite</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -1419,7 +1478,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                 style={{ 
                   marginLeft: avatarCount > 0 ? '12px' : '0', 
                   lineHeight: 1.4, 
-                  width: previewDevice === 'mobile' ? '85%' : '65%',
+                  width: previewDevice === 'mobile' ? `${textWrapMobile}%` : `${textWrapDesktop}%`,
                   flexShrink: 0,
                   wordWrap: 'break-word',
                   overflowWrap: 'break-word'
@@ -1569,7 +1628,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
     
     @media (max-width: 767px) {
       .social-proof-text {
-        width: 85%;
+        width: ${textWrapMobile}%;
       }
       .social-proof-responsive {
         font-size: ${fontSizeMobile} !important;
@@ -1578,7 +1637,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
     
     @media (min-width: 768px) {
       .social-proof-text {
-        width: 65%;
+        width: ${textWrapDesktop}%;
       }
     }
   </style>
