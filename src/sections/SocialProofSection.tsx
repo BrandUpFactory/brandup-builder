@@ -1519,101 +1519,59 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
     const mobileSplit = getTextSplit(customText, 3);
     
     return `<style>
-    /* Minimal CSS Reset - only target specific theme interference */
-    .social-proof-box-container,
-    .social-proof-box-container *,
-    .social-proof-box-container *:before,
-    .social-proof-box-container *:after {
-      /* Only override the most problematic theme CSS properties */
+    /* Ultra-specific CSS Reset - ONLY override the problematic margin-block from themes */
+    .social-proof-box-container img {
       margin-block: 0 !important;
       margin-block-start: 0 !important;
       margin-block-end: 0 !important;
-      margin-inline-start: unset !important;
-      margin-inline-end: unset !important;
-      box-sizing: border-box !important;
-    }
-
-    /* Main container - use inline styles as much as possible */
-    .social-proof-box-container {
-      display: flex;
-      align-items: center;
-      background-color: ${backgroundColor};
-      padding: ${getEffectivePadding()};
-      border-radius: ${borderRadius};
-      font-family: Arial, sans-serif;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      margin-bottom: 12px;
-      color: ${textColor};
-      font-weight: 500;
-      width: ${useFullWidth ? '100%' : 'fit-content'};
-      max-width: 100%;
-      font-size: ${fontSizeDesktop};
-      line-height: 1.4;
-    }
-
-    /* Over Avatar Badge positioning */
-    .avatar-with-badge {
-      position: relative;
     }
     
-    .badge-over-avatar {
-      position: absolute;
-      top: -6px;
-      right: 2px;
-      transform: translateX(30%);
-      z-index: 10;
-      height: 18px;
-      width: auto;
-      object-fit: contain;
+    /* Only target the specific issue without breaking anything else */
+    .social-proof-box-container * {
+      margin-block: 0 !important;
+      margin-block-start: 0 !important;
+      margin-block-end: 0 !important;
     }
 
-    /* Responsive font sizes and badge sizes */
+    /* Mobile responsive text layout and font size */
     @media (max-width: 767px) {
-      .social-proof-box-container {
-        font-size: ${fontSizeMobile};
+      .desktop-layout {
+        display: none;
       }
-      .badge-over-avatar {
-        height: 16px;
+      .mobile-layout {
+        display: block;
       }
-    }
-    
-    /* Mobile responsive text layout */
-    @media (max-width: 767px) {
-      .social-proof-box-container .desktop-layout {
-        display: none !important;
-      }
-      .social-proof-box-container .mobile-layout {
-        display: block !important;
+      .social-proof-responsive {
+        font-size: ${fontSizeMobile} !important;
       }
     }
     
-    /* Desktop layout */
     @media (min-width: 768px) {
-      .social-proof-box-container .mobile-layout {
-        display: none !important;
+      .mobile-layout {
+        display: none;
       }
-      .social-proof-box-container .desktop-layout {
-        display: block !important;
+      .desktop-layout {
+        display: block;
       }
     }
   </style>
-  <div class="social-proof-box-container">
+  <div class="social-proof-responsive" style="display: flex; align-items: center; background-color: ${backgroundColor}; padding: ${getEffectivePadding()}; border-radius: ${borderRadius}; font-family: Arial, sans-serif; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-bottom: 12px; color: ${textColor}; font-weight: 500; width: ${useFullWidth ? '100%' : 'fit-content'}; max-width: 100%; box-sizing: border-box; font-size: ${fontSizeDesktop}; line-height: 1.4;">
     ${avatarCount > 0 ? `
     <div style="display: flex; align-items: center; flex-shrink: 0;">
       ${avatarCount >= 1 ? `
-        <div ${badgePosition === 'overAvatar' && showBadge && avatarCount === 1 ? 'class="avatar-with-badge"' : ''} style="${badgePosition === 'overAvatar' && showBadge && avatarCount === 1 ? 'position: relative; ' : ''}margin-right: ${avatarCount > 1 ? '-8px' : '0'}; z-index: 3;">
+        <div style="${badgePosition === 'overAvatar' && showBadge && avatarCount === 1 ? 'position: relative; ' : ''}margin-right: ${avatarCount > 1 ? '-8px' : '0'}; z-index: 3;">
           <img src="${avatarImage1}" alt="User 1" style="width: ${avatarSize}; height: ${avatarSize}; border-radius: 50%; border: 2px solid ${avatarBorderColor}; object-fit: cover; flex-shrink: 0; display: block;" onerror="this.style.display='none'">
-          ${badgePosition === 'overAvatar' && showBadge && avatarCount === 1 ? `<img src="${verifiedImage}" alt="Verifiziert" class="badge-over-avatar" onerror="this.style.display='none'">` : ''}
+          ${badgePosition === 'overAvatar' && showBadge && avatarCount === 1 ? `<img src="${verifiedImage}" alt="Verifiziert" style="position: absolute; top: -6px; right: 2px; transform: translateX(30%); z-index: 10; height: ${fontSizeDesktop === fontSizeMobile ? '16px' : '18px'}; width: auto; object-fit: contain;" onerror="this.style.display='none'">` : ''}
         </div>` : ''}
       ${avatarCount >= 2 ? `
-        <div ${badgePosition === 'overAvatar' && showBadge && avatarCount === 2 ? 'class="avatar-with-badge"' : ''} style="${badgePosition === 'overAvatar' && showBadge && avatarCount === 2 ? 'position: relative; ' : ''}margin-right: ${avatarCount >= 3 ? '-8px' : '0'}; z-index: 2;">
+        <div style="${badgePosition === 'overAvatar' && showBadge && avatarCount === 2 ? 'position: relative; ' : ''}margin-right: ${avatarCount >= 3 ? '-8px' : '0'}; z-index: 2;">
           <img src="${avatarImage2}" alt="User 2" style="width: ${avatarSize}; height: ${avatarSize}; border-radius: 50%; border: 2px solid ${avatarBorderColor}; object-fit: cover; flex-shrink: 0; display: block;" onerror="this.style.display='none'">
-          ${badgePosition === 'overAvatar' && showBadge && avatarCount === 2 ? `<img src="${verifiedImage}" alt="Verifiziert" class="badge-over-avatar" onerror="this.style.display='none'">` : ''}
+          ${badgePosition === 'overAvatar' && showBadge && avatarCount === 2 ? `<img src="${verifiedImage}" alt="Verifiziert" style="position: absolute; top: -6px; right: 2px; transform: translateX(30%); z-index: 10; height: ${fontSizeDesktop === fontSizeMobile ? '16px' : '18px'}; width: auto; object-fit: contain;" onerror="this.style.display='none'">` : ''}
         </div>` : ''}
       ${avatarCount >= 3 ? `
-        <div ${badgePosition === 'overAvatar' && showBadge && avatarCount === 3 ? 'class="avatar-with-badge"' : ''} style="${badgePosition === 'overAvatar' && showBadge && avatarCount === 3 ? 'position: relative; ' : ''}z-index: 1;">
+        <div style="${badgePosition === 'overAvatar' && showBadge && avatarCount === 3 ? 'position: relative; ' : ''}z-index: 1;">
           <img src="${avatarImage3}" alt="User 3" style="width: ${avatarSize}; height: ${avatarSize}; border-radius: 50%; border: 2px solid ${avatarBorderColor}; object-fit: cover; flex-shrink: 0; display: block;" onerror="this.style.display='none'">
-          ${badgePosition === 'overAvatar' && showBadge && avatarCount === 3 ? `<img src="${verifiedImage}" alt="Verifiziert" class="badge-over-avatar" onerror="this.style.display='none'">` : ''}
+          ${badgePosition === 'overAvatar' && showBadge && avatarCount === 3 ? `<img src="${verifiedImage}" alt="Verifiziert" style="position: absolute; top: -6px; right: 2px; transform: translateX(30%); z-index: 10; height: ${fontSizeDesktop === fontSizeMobile ? '16px' : '18px'}; width: auto; object-fit: contain;" onerror="this.style.display='none'">` : ''}
         </div>` : ''}
     </div>` : ''}
     <div style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: block; width: 100%;">
