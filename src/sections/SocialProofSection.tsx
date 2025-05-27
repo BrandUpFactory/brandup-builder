@@ -509,23 +509,33 @@ export default function SocialProofSection({
     return (
       <div className="fixed inset-0 z-50 overflow-y-auto">
         <div className="flex min-h-full items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowTutorial(false)}></div>
-          <div className="relative bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto">
-            {/* Header mit Gradient */}
-            <div className="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-8 rounded-t-2xl">
-              <div className="absolute inset-0 bg-black/10 rounded-t-2xl"></div>
-              <div className="relative flex justify-between items-start">
+          <div 
+            className="fixed inset-0 bg-black/50" 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setShowTutorial(false);
+            }}
+          ></div>
+          <div className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="border-b border-gray-200 p-6">
+              <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="text-3xl font-bold text-white mb-2">
-                    Social Proof Builder
+                  <h3 className="text-2xl font-semibold text-[#1c2838]">
+                    Social Proof Builder - Anleitung
                   </h3>
-                  <p className="text-indigo-100 text-lg">Schritt-für-Schritt zur perfekten Conversion</p>
+                  <p className="text-gray-600 mt-1">In 3 Schritten zu mehr Conversions</p>
                 </div>
                 <button
-                  onClick={() => setShowTutorial(false)}
-                  className="bg-white/20 hover:bg-white/30 backdrop-blur text-white rounded-full p-2 transition-all duration-200"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowTutorial(false);
+                  }}
+                  className="text-gray-400 hover:text-gray-600 rounded-full p-2 hover:bg-gray-100 transition-colors"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -533,142 +543,77 @@ export default function SocialProofSection({
             </div>
             
             {/* Content */}
-            <div className="p-8">
-              {/* Stats Row */}
-              <div className="grid grid-cols-3 gap-6 mb-12">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-indigo-600 mb-1">+34%</div>
-                  <div className="text-sm text-gray-600">Höhere Conversion</div>
+            <div className="p-6">
+              {/* Quick Start Steps */}
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="bg-[#1c2838] text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mb-3">1</div>
+                  <h4 className="font-semibold text-[#1c2838] mb-2">Stil wählen</h4>
+                  <p className="text-sm text-gray-600">Wähle einen der 3 vordefinierten Designs als Basis</p>
                 </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-600 mb-1">5 Min</div>
-                  <div className="text-sm text-gray-600">Setup Zeit</div>
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="bg-[#1c2838] text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mb-3">2</div>
+                  <h4 className="font-semibold text-[#1c2838] mb-2">Anpassen</h4>
+                  <p className="text-sm text-gray-600">Namen, Avatare, Text und Badge-Position konfigurieren</p>
                 </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-pink-600 mb-1">100%</div>
-                  <div className="text-sm text-gray-600">Mobile Ready</div>
-                </div>
-              </div>
-
-              {/* Quick Start */}
-              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-8 mb-8 border border-emerald-200">
-                <div className="flex items-start space-x-4">
-                  <div className="bg-emerald-100 rounded-full p-3">
-                    <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-2xl font-bold text-emerald-900 mb-3">Quick Start - In 3 Schritten fertig</h4>
-                    <div className="grid md:grid-cols-3 gap-6">
-                      <div className="bg-white rounded-xl p-4 border border-emerald-200">
-                        <div className="bg-emerald-100 text-emerald-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mb-3">1</div>
-                        <h5 className="font-semibold text-emerald-900 mb-2">Stil wählen</h5>
-                        <p className="text-sm text-emerald-700">Wähle einen der 3 vordefinierten Designs aus</p>
-                      </div>
-                      <div className="bg-white rounded-xl p-4 border border-emerald-200">
-                        <div className="bg-emerald-100 text-emerald-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mb-3">2</div>
-                        <h5 className="font-semibold text-emerald-900 mb-2">Inhalte anpassen</h5>
-                        <p className="text-sm text-emerald-700">Namen, Zahlen und Text personalisieren</p>
-                      </div>
-                      <div className="bg-white rounded-xl p-4 border border-emerald-200">
-                        <div className="bg-emerald-100 text-emerald-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mb-3">3</div>
-                        <h5 className="font-semibold text-emerald-900 mb-2">Code kopieren</h5>
-                        <p className="text-sm text-emerald-700">Fertigen Code in Shopify einfügen - Done!</p>
-                      </div>
-                    </div>
-                  </div>
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="bg-[#1c2838] text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mb-3">3</div>
+                  <h4 className="font-semibold text-[#1c2838] mb-2">Code kopieren</h4>
+                  <p className="text-sm text-gray-600">Fertigen Code in deine Website einfügen</p>
                 </div>
               </div>
 
-              {/* Feature Grid */}
-              <div className="grid md:grid-cols-2 gap-8 mb-8">
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
-                  <div className="flex items-center mb-4">
-                    <div className="bg-blue-100 rounded-full p-2 mr-3">
-                      <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a4 4 0 004-4V5z" />
-                      </svg>
+              {/* Features */}
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-semibold text-[#1c2838] mb-3">Wichtige Features:</h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="border border-gray-200 rounded-lg p-4">
+                      <h5 className="font-medium text-[#1c2838] mb-2">📱 Responsive Design</h5>
+                      <p className="text-sm text-gray-600">Optimiert für Desktop und Mobile</p>
                     </div>
-                    <h4 className="text-xl font-bold text-blue-900">Smart Responsive</h4>
-                  </div>
-                  <p className="text-blue-700 mb-4">Automatische Anpassung für Desktop und Mobile mit unterschiedlichen Layouts und Schriftgrößen.</p>
-                  <div className="bg-white rounded-lg p-3 border border-blue-200">
-                    <div className="text-xs text-blue-600 font-medium mb-2">Live Preview:</div>
-                    <div className="space-y-2">
-                      <div className="bg-blue-100 rounded p-2 text-xs">Desktop: Elegante 2-Zeilen Aufteilung</div>
-                      <div className="bg-blue-100 rounded p-2 text-xs">Mobile: Kompakte 3-Wörter Struktur</div>
+                    <div className="border border-gray-200 rounded-lg p-4">
+                      <h5 className="font-medium text-[#1c2838] mb-2">🏷️ Flexible Badges</h5>
+                      <p className="text-sm text-gray-600">3 Positionen: Standard, Nach erstem Namen, Über Avatar</p>
+                    </div>
+                    <div className="border border-gray-200 rounded-lg p-4">
+                      <h5 className="font-medium text-[#1c2838] mb-2">🎨 Vollständig anpassbar</h5>
+                      <p className="text-sm text-gray-600">Farben, Größen, Abstände und mehr</p>
+                    </div>
+                    <div className="border border-gray-200 rounded-lg p-4">
+                      <h5 className="font-medium text-[#1c2838] mb-2">⚡ Schnell & SEO-optimiert</h5>
+                      <p className="text-sm text-gray-600">Minimaler Code für beste Performance</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200">
-                  <div className="flex items-center mb-4">
-                    <div className="bg-purple-100 rounded-full p-2 mr-3">
-                      <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
-                    </div>
-                    <h4 className="text-xl font-bold text-purple-900">Flexibles Badge System</h4>
-                  </div>
-                  <p className="text-purple-700 mb-4">Verifizierungsbadge an 3 verschiedenen Positionen - für maximale Wirkung und Design-Flexibilität.</p>
-                  <div className="space-y-2">
-                    <div className="bg-white rounded-lg p-2 border border-purple-200 text-xs">
-                      <span className="font-medium">Standard:</span> Nach allen Namen
-                    </div>
-                    <div className="bg-white rounded-lg p-2 border border-purple-200 text-xs">
-                      <span className="font-medium">Prominent:</span> Nach erstem Namen
-                    </div>
-                    <div className="bg-white rounded-lg p-2 border border-purple-200 text-xs">
-                      <span className="font-medium">Elegant:</span> Über dem Avatar
-                    </div>
+                {/* Pro Tips */}
+                <div>
+                  <h4 className="font-semibold text-[#1c2838] mb-3">Pro-Tipps:</h4>
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <ul className="space-y-2 text-sm text-gray-600">
+                      <li>• Verwende echte Namen und Zahlen für mehr Glaubwürdigkeit</li>
+                      <li>• Platziere die Social Proof Box über dem "In den Warenkorb" Button</li>
+                      <li>• Teste verschiedene Badge-Positionen für optimale Conversion</li>
+                      <li>• Nutze 2-3 Avatare für den besten visuellen Effekt</li>
+                    </ul>
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Advanced Tips */}
-              <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-8 border border-amber-200">
-                <h4 className="text-2xl font-bold text-amber-900 mb-6 flex items-center">
-                  <svg className="w-8 h-8 text-amber-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  Pro-Tipps für maximale Conversion
-                </h4>
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div className="bg-white rounded-xl p-4 border border-amber-200">
-                    <div className="text-2xl mb-3">🎯</div>
-                    <h5 className="font-semibold text-amber-900 mb-2">Echte Zahlen</h5>
-                    <p className="text-sm text-amber-700">Verwende echte Analytics-Daten für authentische Zahlen</p>
-                  </div>
-                  <div className="bg-white rounded-xl p-4 border border-amber-200">
-                    <div className="text-2xl mb-3">📍</div>
-                    <h5 className="font-semibold text-amber-900 mb-2">Beste Position</h5>
-                    <p className="text-sm text-amber-700">Direkt über dem "In den Warenkorb" Button platzieren</p>
-                  </div>
-                  <div className="bg-white rounded-xl p-4 border border-amber-200">
-                    <div className="text-2xl mb-3">🔄</div>
-                    <h5 className="font-semibold text-amber-900 mb-2">A/B Testing</h5>
-                    <p className="text-sm text-amber-700">Teste verschiedene Texte und Avatar-Anzahlen</p>
-                  </div>
-                  <div className="bg-white rounded-xl p-4 border border-amber-200">
-                    <div className="text-2xl mb-3">⚡</div>
-                    <h5 className="font-semibold text-amber-900 mb-2">Performance</h5>
-                    <p className="text-sm text-amber-700">Optimiert für beste Ladezeiten und SEO</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Call to Action */}
-              <div className="mt-8 text-center bg-gradient-to-r from-gray-50 to-white rounded-2xl p-8">
-                <h4 className="text-2xl font-bold text-gray-900 mb-4">Bereit für mehr Conversions? 🚀</h4>
-                <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-                  Starte jetzt mit der Erstellung deiner Social Proof Box und sieh zu, wie deine Verkäufe durch die Decke gehen!
-                </p>
+            {/* Footer */}
+            <div className="border-t border-gray-200 p-6">
+              <div className="flex justify-center">
                 <button
-                  onClick={() => setShowTutorial(false)}
-                  className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl hover:shadow-xl transition-all duration-300 font-semibold text-lg transform hover:scale-105"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowTutorial(false);
+                  }}
+                  className="bg-[#1c2838] text-white px-6 py-2 rounded-lg hover:bg-[#1c2838]/90 transition-colors"
                 >
-                  ✨ Jetzt Social Proof erstellen
+                  Verstanden, loslegen!
                 </button>
               </div>
             </div>
@@ -934,13 +879,15 @@ export default function SocialProofSection({
                     <div className="font-medium">Nach erstem Namen</div>
                     <div className="text-xs opacity-75">Direkt nach dem ersten Namen</div>
                   </button>
-                  <button
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setBadgePosition('overAvatar'); }}
-                    className={`px-3 py-2 rounded text-xs text-left ${badgePosition === 'overAvatar' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
-                  >
-                    <div className="font-medium">Über Avatar</div>
-                    <div className="text-xs opacity-75">Rechts oben über dem 2. Avatar</div>
-                  </button>
+                  {avatarCount > 0 && (
+                    <button
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setBadgePosition('overAvatar'); }}
+                      className={`px-3 py-2 rounded text-xs text-left ${badgePosition === 'overAvatar' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+                    >
+                      <div className="font-medium">Über Avatar</div>
+                      <div className="text-xs opacity-75">Rechts oben über dem letzten Avatar</div>
+                    </button>
+                  )}
                 </div>
               </label>
             </div>
@@ -1306,20 +1253,38 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
               {avatarCount > 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, position: 'relative' }}>
                   {avatarCount >= 1 && (
-                    <img 
-                      src={avatarImage1} 
-                      alt="User 1" 
-                      style={{
-                        width: avatarSize,
-                        height: avatarSize,
-                        borderRadius: '50%',
-                        border: `2px solid ${avatarBorderColor}`,
-                        objectFit: 'cover',
-                        flexShrink: 0,
-                        zIndex: 3,
-                        marginRight: avatarCount > 1 ? '-8px' : '0'
-                      }}
-                    />
+                    <div style={{ position: 'relative' }}>
+                      <img 
+                        src={avatarImage1} 
+                        alt="User 1" 
+                        style={{
+                          width: avatarSize,
+                          height: avatarSize,
+                          borderRadius: '50%',
+                          border: `2px solid ${avatarBorderColor}`,
+                          objectFit: 'cover',
+                          flexShrink: 0,
+                          zIndex: 3,
+                          marginRight: avatarCount > 1 ? '-8px' : '0'
+                        }}
+                      />
+                      {badgePosition === 'overAvatar' && showBadge && avatarCount === 1 && (
+                        <img 
+                          src={verifiedImage} 
+                          alt="Verifiziert" 
+                          style={{
+                            position: 'absolute',
+                            top: '-6px',
+                            right: '2px',
+                            height: previewDevice === 'mobile' ? '16px' : '18px',
+                            width: 'auto',
+                            zIndex: 10,
+                            objectFit: 'contain',
+                            transform: 'translateX(30%)'
+                          }}
+                        />
+                      )}
+                    </div>
                   )}
                   {avatarCount >= 2 && (
                     <div style={{ position: 'relative' }}>
@@ -1337,14 +1302,14 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                           marginRight: avatarCount >= 3 ? '-8px' : '0'
                         }}
                       />
-                      {badgePosition === 'overAvatar' && showBadge && (
+                      {badgePosition === 'overAvatar' && showBadge && avatarCount === 2 && (
                         <img 
                           src={verifiedImage} 
                           alt="Verifiziert" 
                           style={{
                             position: 'absolute',
                             top: '-6px',
-                            right: avatarCount >= 3 ? '0px' : '2px',
+                            right: '2px',
                             height: previewDevice === 'mobile' ? '16px' : '18px',
                             width: 'auto',
                             zIndex: 10,
@@ -1356,19 +1321,37 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                     </div>
                   )}
                   {avatarCount >= 3 && (
-                    <img 
-                      src={avatarImage3} 
-                      alt="User 3" 
-                      style={{
-                        width: avatarSize,
-                        height: avatarSize,
-                        borderRadius: '50%',
-                        border: `2px solid ${avatarBorderColor}`,
-                        objectFit: 'cover',
-                        flexShrink: 0,
-                        zIndex: 1
-                      }}
-                    />
+                    <div style={{ position: 'relative' }}>
+                      <img 
+                        src={avatarImage3} 
+                        alt="User 3" 
+                        style={{
+                          width: avatarSize,
+                          height: avatarSize,
+                          borderRadius: '50%',
+                          border: `2px solid ${avatarBorderColor}`,
+                          objectFit: 'cover',
+                          flexShrink: 0,
+                          zIndex: 1
+                        }}
+                      />
+                      {badgePosition === 'overAvatar' && showBadge && avatarCount === 3 && (
+                        <img 
+                          src={verifiedImage} 
+                          alt="Verifiziert" 
+                          style={{
+                            position: 'absolute',
+                            top: '-6px',
+                            right: '2px',
+                            height: previewDevice === 'mobile' ? '16px' : '18px',
+                            width: 'auto',
+                            zIndex: 10,
+                            objectFit: 'contain',
+                            transform: 'translateX(30%)'
+                          }}
+                        />
+                      )}
+                    </div>
                   )}
                 </div>
               )}
