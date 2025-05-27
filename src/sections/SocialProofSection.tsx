@@ -1525,68 +1525,222 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Social Proof Box</title>
   <style>
-    /* Responsive font sizes */
-    .social-proof-standalone {
-      font-size: ${fontSizeDesktop};
+    /* CSS Reset and Isolation for Social Proof Box */
+    .social-proof-box-container,
+    .social-proof-box-container *,
+    .social-proof-box-container *::before,
+    .social-proof-box-container *::after {
+      /* Reset all properties that might be affected by theme CSS */
+      margin: 0 !important;
+      padding: 0 !important;
+      border: 0 !important;
+      outline: 0 !important;
+      background: transparent !important;
+      text-decoration: none !important;
+      text-transform: none !important;
+      letter-spacing: normal !important;
+      word-spacing: normal !important;
+      text-align: left !important;
+      vertical-align: baseline !important;
+      line-height: normal !important;
+      box-sizing: border-box !important;
+      display: initial !important;
+      flex: initial !important;
+      grid: initial !important;
+      position: static !important;
+      top: auto !important;
+      right: auto !important;
+      bottom: auto !important;
+      left: auto !important;
+      z-index: auto !important;
+      transform: none !important;
+      transition: none !important;
+      animation: none !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      overflow: visible !important;
+      width: auto !important;
+      height: auto !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      max-width: none !important;
+      max-height: none !important;
+      float: none !important;
+      clear: none !important;
+      resize: none !important;
+      content: normal !important;
+      quotes: none !important;
+      counter-reset: none !important;
+      counter-increment: none !important;
+      page-break-before: auto !important;
+      page-break-after: auto !important;
+      page-break-inside: auto !important;
+      orphans: 2 !important;
+      widows: 2 !important;
+      font: initial !important;
+      font-family: Arial, sans-serif !important;
+      font-size: inherit !important;
+      font-weight: normal !important;
+      font-style: normal !important;
+      font-variant: normal !important;
+      text-indent: 0 !important;
+      text-shadow: none !important;
+      color: inherit !important;
+      white-space: normal !important;
+      word-wrap: normal !important;
+      word-break: normal !important;
+      hyphens: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      cursor: auto !important;
+      list-style: none !important;
+      caption-side: top !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      empty-cells: show !important;
+      table-layout: auto !important;
     }
-    
+
+    /* Apply specific styles after reset */
+    .social-proof-box-container {
+      display: flex !important;
+      align-items: center !important;
+      background-color: ${backgroundColor} !important;
+      padding: ${getEffectivePadding()} !important;
+      border-radius: ${borderRadius} !important;
+      font-family: Arial, sans-serif !important;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+      margin-bottom: 12px !important;
+      color: ${textColor} !important;
+      font-weight: 500 !important;
+      width: ${useFullWidth ? '100%' : 'fit-content'} !important;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
+      font-size: ${fontSizeDesktop} !important;
+    }
+
+    .social-proof-box-container .avatar-container {
+      display: flex !important;
+      align-items: center !important;
+      flex-shrink: 0 !important;
+    }
+
+    .social-proof-box-container .avatar-img {
+      border-radius: 50% !important;
+      border: 2px solid ${avatarBorderColor} !important;
+      object-fit: cover !important;
+      flex-shrink: 0 !important;
+      display: block !important;
+    }
+
+    .social-proof-box-container .text-container {
+      line-height: 1.4 !important;
+      display: block !important;
+      width: 100% !important;
+    }
+
+    .social-proof-box-container .text-line {
+      display: block !important;
+      width: 100% !important;
+    }
+
+    .social-proof-box-container .text-line.first {
+      margin-bottom: 2px !important;
+    }
+
+    .social-proof-box-container .name-strong {
+      display: inline !important;
+      font-weight: 600 !important;
+    }
+
+    .social-proof-box-container .badge-img {
+      max-width: none !important;
+      margin: 0 4px !important;
+      vertical-align: baseline !important;
+      transform: translateY(-1px) !important;
+      object-fit: contain !important;
+      display: inline !important;
+    }
+
+    .social-proof-box-container .text-span {
+      font-weight: 400 !important;
+      word-spacing: 0.1em !important;
+      letter-spacing: 0.01em !important;
+      display: inline !important;
+    }
+
+    .social-proof-box-container .spacing-span {
+      margin: 0 1px !important;
+      display: inline !important;
+    }
+
+    /* Responsive font sizes */
     @media (max-width: 767px) {
-      .social-proof-standalone {
-        font-size: ${fontSizeMobile};
+      .social-proof-box-container {
+        font-size: ${fontSizeMobile} !important;
+      }
+      .social-proof-box-container .badge-img {
+        height: 13px !important;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .social-proof-box-container .badge-img {
+        height: 14px !important;
       }
     }
     
     /* Mobile responsive text layout - hide desktop layout */
     @media (max-width: 767px) {
-      .desktop-layout {
+      .social-proof-box-container .desktop-layout {
         display: none !important;
       }
-      .mobile-layout {
+      .social-proof-box-container .mobile-layout {
         display: block !important;
       }
     }
     
     /* Desktop layout - hide mobile layout */
     @media (min-width: 768px) {
-      .mobile-layout {
+      .social-proof-box-container .mobile-layout {
         display: none !important;
       }
-      .desktop-layout {
+      .social-proof-box-container .desktop-layout {
         display: block !important;
       }
     }
   </style>
 </head>
 <body>
-  <div class="social-proof-standalone" style="display: flex; align-items: center; background-color: ${backgroundColor}; padding: ${getEffectivePadding()}; border-radius: ${borderRadius}; font-family: Arial, sans-serif; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-bottom: 12px; color: ${textColor}; font-weight: 500; width: ${useFullWidth ? '100%' : 'fit-content'}; max-width: 100%; box-sizing: border-box;">
+  <div class="social-proof-box-container">
     ${avatarCount > 0 ? `
-    <div style="display: flex; align-items: center; flex-shrink: 0;">
-      ${avatarCount >= 1 ? `<img src="${avatarImage1}" alt="User 1" style="width: ${avatarSize}; height: ${avatarSize}; border-radius: 50%; border: 2px solid ${avatarBorderColor}; object-fit: cover; flex-shrink: 0; z-index: 3; margin-right: ${avatarCount > 1 ? '-8px' : '0'};" onerror="this.style.display='none'">` : ''}
-      ${avatarCount >= 2 ? `<img src="${avatarImage2}" alt="User 2" style="width: ${avatarSize}; height: ${avatarSize}; border-radius: 50%; border: 2px solid ${avatarBorderColor}; object-fit: cover; flex-shrink: 0; z-index: 2; margin-right: ${avatarCount >= 3 ? '-8px' : '0'};" onerror="this.style.display='none'">` : ''}
-      ${avatarCount >= 3 ? `<img src="${avatarImage3}" alt="User 3" style="width: ${avatarSize}; height: ${avatarSize}; border-radius: 50%; border: 2px solid ${avatarBorderColor}; object-fit: cover; flex-shrink: 0; z-index: 1;" onerror="this.style.display='none'">` : ''}
+    <div class="avatar-container">
+      ${avatarCount >= 1 ? `<img src="${avatarImage1}" alt="User 1" class="avatar-img" style="width: ${avatarSize}; height: ${avatarSize}; z-index: 3; margin-right: ${avatarCount > 1 ? '-8px' : '0'};" onerror="this.style.display='none'">` : ''}
+      ${avatarCount >= 2 ? `<img src="${avatarImage2}" alt="User 2" class="avatar-img" style="width: ${avatarSize}; height: ${avatarSize}; z-index: 2; margin-right: ${avatarCount >= 3 ? '-8px' : '0'};" onerror="this.style.display='none'">` : ''}
+      ${avatarCount >= 3 ? `<img src="${avatarImage3}" alt="User 3" class="avatar-img" style="width: ${avatarSize}; height: ${avatarSize}; z-index: 1;" onerror="this.style.display='none'">` : ''}
     </div>` : ''}
-    <div style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: block; width: 100%;">
+    <div class="text-container" style="margin-left: ${avatarCount > 0 ? '12px' : '0'};">
       <!-- Desktop layout: 2 words on second line -->
       <div class="desktop-layout">
-        <div style="display: block; width: 100%; margin-bottom: 2px;">
-          <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 14px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 1px;"> </span>'}
-          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${desktopSplit.firstPart}</span>
+        <div class="text-line first">
+          <strong class="name-strong">${getDisplayNames()}</strong>
+${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" class="badge-img" onerror="this.style.display='none'">` : '<span class="spacing-span"> </span>'}
+          <span class="text-span">${desktopSplit.firstPart}</span>
         </div>
-        <div style="display: block; width: 100%;">
-          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${desktopSplit.lastPart}</span>
+        <div class="text-line">
+          <span class="text-span">${desktopSplit.lastPart}</span>
         </div>
       </div>
       
       <!-- Mobile layout: 3 words on second line -->
       <div class="mobile-layout">
-        <div style="display: block; width: 100%; margin-bottom: 2px;">
-          <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 13px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 1px;"> </span>'}
-          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${mobileSplit.firstPart}</span>
+        <div class="text-line first">
+          <strong class="name-strong">${getDisplayNames()}</strong>
+${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" class="badge-img" onerror="this.style.display='none'">` : '<span class="spacing-span"> </span>'}
+          <span class="text-span">${mobileSplit.firstPart}</span>
         </div>
-        <div style="display: block; width: 100%;">
-          <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em;">${mobileSplit.lastPart}</span>
+        <div class="text-line">
+          <span class="text-span">${mobileSplit.lastPart}</span>
         </div>
       </div>
     </div>
