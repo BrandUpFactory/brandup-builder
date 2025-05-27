@@ -506,18 +506,33 @@ export default function SocialProofSection({
   const TutorialModal = () => {
     if (!showTutorial) return null;
 
+    const handleClose = () => {
+      setShowTutorial(false);
+    };
+
+    const handleOverlayClick = (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) {
+        handleClose();
+      }
+    };
+
+    const handleButtonClick = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      handleClose();
+    };
+
     return (
-      <div className="fixed inset-0 z-50 overflow-y-auto">
-        <div className="flex min-h-full items-center justify-center p-4">
+      <div className="fixed inset-0 z-[9999] overflow-y-auto">
+        <div 
+          className="flex min-h-full items-center justify-center p-4"
+          onClick={handleOverlayClick}
+        >
+          <div className="fixed inset-0 bg-black/50"></div>
           <div 
-            className="fixed inset-0 bg-black/50" 
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setShowTutorial(false);
-            }}
-          ></div>
-          <div className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Header */}
             <div className="border-b border-gray-200 p-6">
               <div className="flex justify-between items-center">
@@ -528,11 +543,8 @@ export default function SocialProofSection({
                   <p className="text-gray-600 mt-1">In 3 Schritten zu mehr Conversions</p>
                 </div>
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowTutorial(false);
-                  }}
+                  type="button"
+                  onClick={handleButtonClick}
                   className="text-gray-400 hover:text-gray-600 rounded-full p-2 hover:bg-gray-100 transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -606,11 +618,8 @@ export default function SocialProofSection({
             <div className="border-t border-gray-200 p-6">
               <div className="flex justify-center">
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowTutorial(false);
-                  }}
+                  type="button"
+                  onClick={handleButtonClick}
                   className="bg-[#1c2838] text-white px-6 py-2 rounded-lg hover:bg-[#1c2838]/90 transition-colors"
                 >
                   Verstanden, loslegen!
@@ -1253,7 +1262,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
               {avatarCount > 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, position: 'relative' }}>
                   {avatarCount >= 1 && (
-                    <div style={{ position: 'relative' }}>
+                    <div style={{ position: badgePosition === 'overAvatar' && showBadge && avatarCount === 1 ? 'relative' : 'static' }}>
                       <img 
                         src={avatarImage1} 
                         alt="User 1" 
@@ -1287,7 +1296,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                     </div>
                   )}
                   {avatarCount >= 2 && (
-                    <div style={{ position: 'relative' }}>
+                    <div style={{ position: badgePosition === 'overAvatar' && showBadge && avatarCount === 2 ? 'relative' : 'static' }}>
                       <img 
                         src={avatarImage2} 
                         alt="User 2" 
@@ -1321,7 +1330,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                     </div>
                   )}
                   {avatarCount >= 3 && (
-                    <div style={{ position: 'relative' }}>
+                    <div style={{ position: badgePosition === 'overAvatar' && showBadge && avatarCount === 3 ? 'relative' : 'static' }}>
                       <img 
                         src={avatarImage3} 
                         alt="User 3" 
