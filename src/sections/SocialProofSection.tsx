@@ -280,7 +280,7 @@ export default function SocialProofSection({
   const getNamesWithBadge = (position: string, isMobile: boolean = false) => {
     const badgeSize = isMobile ? '13px' : '14px';
     const badgeElement = showBadge ? 
-      `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${badgeSize}; max-width: none; margin: 0 2px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : 
+      `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${badgeSize}; max-width: none; margin: 0 1px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : 
       '<span style="margin: 0 1px;"> </span>';
 
     switch(avatarCount) {
@@ -291,17 +291,17 @@ export default function SocialProofSection({
         return firstName1;
       case 2:
         if (position === 'afterFirst') {
-          return `${firstName1}${badgeElement}, ${firstName2}`;
+          return `${firstName1}${badgeElement}, ${firstName2} `;
         }
         return `${firstName1}, ${firstName2}`;
       case 3:
         if (position === 'afterFirst') {
-          return `${firstName1}${badgeElement}, ${firstName2}, ${firstName3}`;
+          return `${firstName1}${badgeElement}, ${firstName2}, ${firstName3} `;
         }
         return `${firstName1}, ${firstName2}, ${firstName3}`;
       default:
         if (position === 'afterFirst') {
-          return `${firstName1}${badgeElement}, ${firstName2}`;
+          return `${firstName1}${badgeElement}, ${firstName2} `;
         }
         return `${firstName1}, ${firstName2}`;
     }
@@ -319,7 +319,7 @@ export default function SocialProofSection({
           style={{
             height: badgeSize,
             maxWidth: 'none',
-            margin: '0 2px',
+            margin: '0 1px',
             verticalAlign: 'baseline',
             transform: 'translateY(-1px)',
             objectFit: 'contain',
@@ -1415,47 +1415,36 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                 </div>
               )}
               
-              <div style={{ marginLeft: avatarCount > 0 ? '12px' : '0', lineHeight: 1.4, width: '100%', flexShrink: 0 }}>
-                {/* Dynamische Anzeige basierend auf customText */}
-                <div>
-                  <div style={{ display: 'block', width: '100%', marginBottom: '2px' }}>
-                    {badgePosition === 'afterFirst' ? (
-                      <span 
-                        style={{ fontWeight: '600' }}
-                        dangerouslySetInnerHTML={{ 
-                          __html: getNamesWithBadge('afterFirst', previewDevice === 'mobile')
-                        }}
-                      />
-                    ) : (
-                      <>
-                        <strong style={{ fontWeight: '700' }}>{getDisplayNames()}</strong>
-                        {getBadgeOrSpacing(badgePosition, previewDevice === 'mobile')}
-                      </>
-                    )}
+              <div 
+                style={{ 
+                  marginLeft: avatarCount > 0 ? '12px' : '0', 
+                  lineHeight: 1.4, 
+                  width: previewDevice === 'mobile' ? '85%' : '65%',
+                  flexShrink: 0,
+                  wordWrap: 'break-word',
+                  overflowWrap: 'break-word'
+                }}
+              >
+                {/* Einzeiliger Text mit automatischem Umbruch */}
+                <span style={{ display: 'inline' }}>
+                  {badgePosition === 'afterFirst' ? (
                     <span 
-                      style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}
-                      dangerouslySetInnerHTML={{
-                        __html: (() => {
-                          const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
-                          const { firstPart } = getTextSplit(customText, wordsForSecondLine);
-                          return firstPart;
-                        })()
+                      style={{ fontWeight: '700' }}
+                      dangerouslySetInnerHTML={{ 
+                        __html: getNamesWithBadge('afterFirst', previewDevice === 'mobile')
                       }}
                     />
-                  </div>
-                  <div style={{ display: 'block', width: '100%' }}>
-                    <span 
-                      style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}
-                      dangerouslySetInnerHTML={{
-                        __html: (() => {
-                          const wordsForSecondLine = previewDevice === 'mobile' ? 3 : 2;
-                          const { lastPart } = getTextSplit(customText, wordsForSecondLine);
-                          return lastPart;
-                        })()
-                      }}
-                    />
-                  </div>
-                </div>
+                  ) : (
+                    <>
+                      <strong style={{ fontWeight: '700' }}>{getDisplayNames()}</strong>
+                      {getBadgeOrSpacing(badgePosition, previewDevice === 'mobile')}
+                    </>
+                  )}
+                  <span 
+                    style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}
+                    dangerouslySetInnerHTML={{ __html: customText }}
+                  />
+                </span>
               </div>
             </div>
           </div>
@@ -1547,9 +1536,6 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
 
   // Self-contained HTML code that works standalone without Shopify
   const standaloneCode = (() => {
-    const desktopSplit = getTextSplit(customText, 2);
-    const mobileSplit = getTextSplit(customText, 3);
-    
     return `<style>
     /* Clean CSS reset for social proof section */
     .social-proof-isolated {
@@ -1572,13 +1558,18 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       max-width: 100%;
     }
 
-    /* Mobile responsive text layout and font size */
+    /* Responsive text container with automatic line breaking */
+    .social-proof-text {
+      margin-left: ${avatarCount > 0 ? '12px' : '0'};
+      line-height: 1.4;
+      flex-shrink: 0;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    
     @media (max-width: 767px) {
-      .desktop-layout {
-        display: none;
-      }
-      .mobile-layout {
-        display: block;
+      .social-proof-text {
+        width: 85%;
       }
       .social-proof-responsive {
         font-size: ${fontSizeMobile} !important;
@@ -1586,11 +1577,8 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
     }
     
     @media (min-width: 768px) {
-      .mobile-layout {
-        display: none;
-      }
-      .desktop-layout {
-        display: block;
+      .social-proof-text {
+        width: 65%;
       }
     }
   </style>
@@ -1613,34 +1601,14 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
           ${badgePosition === 'overAvatar' && showBadge && avatarCount === 3 ? `<img src="${verifiedImage}" alt="Verifiziert" style="position: absolute !important; top: -6px !important; right: 2px !important; transform: translateX(30%) !important; z-index: 10 !important; height: ${fontSizeDesktop === fontSizeMobile ? '16px' : '18px'} !important; width: auto !important; object-fit: contain !important; margin: 0 !important; padding: 0 !important; border: none !important;" onerror="this.style.display='none'">` : ''}
         </div>` : ''}
     </div>` : ''}
-    <div style="margin: 0 0 0 ${avatarCount > 0 ? '12px' : '0'} !important; line-height: 1.4 !important; display: block !important; width: 100% !important; padding: 0 !important;">
-      <!-- Desktop layout: 2 words on second line -->
-      <div class="desktop-layout">
-        <div style="display: block !important; width: 100% !important; margin: 0 0 2px 0 !important; padding: 0 !important;">
-          ${badgePosition === 'afterFirst' ? `<strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${getNamesWithBadge('afterFirst', false)}</strong>` : 
-            `<strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${getDisplayNames()}</strong>
-             ${showBadge && badgePosition === 'standard' ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 14px !important; max-width: none !important; margin: 0 2px !important; vertical-align: baseline !important; transform: translateY(-1px) !important; object-fit: contain !important; display: inline !important; padding: 0 !important; border: none !important;" onerror="this.style.display='none'">` : 
-               (badgePosition === 'overAvatar' ? '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>' : '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>')}`}
-          <span style="font-weight: 400 !important; word-spacing: 0.1em !important; letter-spacing: 0.01em !important; display: inline !important; margin: 0 !important; padding: 0 !important;">${desktopSplit.firstPart}</span>
-        </div>
-        <div style="display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important;">
-          <span style="font-weight: 400 !important; word-spacing: 0.1em !important; letter-spacing: 0.01em !important; margin: 0 !important; padding: 0 !important;">${desktopSplit.lastPart}</span>
-        </div>
-      </div>
-      
-      <!-- Mobile layout: 3 words on second line -->
-      <div class="mobile-layout">
-        <div style="display: block !important; width: 100% !important; margin: 0 0 2px 0 !important; padding: 0 !important;">
-          ${badgePosition === 'afterFirst' ? `<strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${getNamesWithBadge('afterFirst', true)}</strong>` : 
-            `<strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${getDisplayNames()}</strong>
-             ${showBadge && badgePosition === 'standard' ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 13px !important; max-width: none !important; margin: 0 2px !important; vertical-align: baseline !important; transform: translateY(-1px) !important; object-fit: contain !important; display: inline !important; padding: 0 !important; border: none !important;" onerror="this.style.display='none'">` : 
-               (badgePosition === 'overAvatar' ? '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>' : '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>')}`}
-          <span style="font-weight: 400 !important; word-spacing: 0.1em !important; letter-spacing: 0.01em !important; display: inline !important; margin: 0 !important; padding: 0 !important;">${mobileSplit.firstPart}</span>
-        </div>
-        <div style="display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important;">
-          <span style="font-weight: 400 !important; word-spacing: 0.1em !important; letter-spacing: 0.01em !important; margin: 0 !important; padding: 0 !important;">${mobileSplit.lastPart}</span>
-        </div>
-      </div>
+    <div class="social-proof-text" style="padding: 0 !important;">
+      <span style="display: inline !important;">
+        ${badgePosition === 'afterFirst' ? `<strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${getNamesWithBadge('afterFirst', false)}</strong>` : 
+          `<strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${getDisplayNames()}</strong>
+           ${showBadge && badgePosition === 'standard' ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 14px !important; max-width: none !important; margin: 0 1px !important; vertical-align: baseline !important; transform: translateY(-1px) !important; object-fit: contain !important; display: inline !important; padding: 0 !important; border: none !important;" onerror="this.style.display='none'">` : 
+             (badgePosition === 'overAvatar' ? '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>' : '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>')}`}
+        <span style="font-weight: 400 !important; word-spacing: 0.1em !important; letter-spacing: 0.01em !important; display: inline !important; margin: 0 !important; padding: 0 !important;">${customText}</span>
+      </span>
     </div>
   </div>`;
   })();
