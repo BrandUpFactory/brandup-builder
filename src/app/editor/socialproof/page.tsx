@@ -243,6 +243,12 @@ function SocialProofEditor() {
     setProductUrl(url)
   }
 
+  // Handle show tutorial
+  const handleShowTutorial = () => {
+    // This will be handled by the SocialProofSection directly
+    // by setting the showTutorial state to true
+  }
+
   // Create a wrapper component to handle the SocialProofSection format
   const SocialProofSectionWrapper = () => {
     const { settings, preview, code } = SocialProofSection({

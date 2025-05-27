@@ -80,6 +80,11 @@ export default function SocialProofSection({
   onPreviewModeChange,
   onProductUrlChange
 }: SocialProofSectionProps) {
+  
+  // Make showTutorial globally accessible for the EditorLayout button
+  if (typeof window !== 'undefined') {
+    (window as any).showTutorial = () => setShowTutorial(true);
+  }
   // Ensure initialData is an object
   const safeInitialData = initialData || {};
   
@@ -169,6 +174,21 @@ export default function SocialProofSection({
     setAvatarBorderColor(template.avatarBorderColor);
     setBorderRadius(template.borderRadius);
     setPadding(template.padding);
+    
+    // Set badge position based on style
+    switch(index) {
+      case 0:
+        setBadgePosition('standard');
+        break;
+      case 1:
+        setBadgePosition('afterFirst');
+        break;
+      case 2:
+        setBadgePosition('overAvatar');
+        break;
+      default:
+        setBadgePosition('standard');
+    }
     
     // Always update both single padding and individual padding values
     // This ensures consistent state across all padding-related variables
@@ -274,6 +294,38 @@ export default function SocialProofSection({
         }
         return `${firstName1}, ${firstName2}`;
     }
+  };
+
+  // Get badge or spacing for non-afterFirst positions
+  const getBadgeOrSpacing = (position: string, isMobile: boolean = false) => {
+    const badgeSize = isMobile ? '13px' : '14px';
+    
+    if (position === 'standard') {
+      return showBadge ? (
+        <img 
+          src={verifiedImage} 
+          alt="Verifiziert" 
+          style={{
+            height: badgeSize,
+            maxWidth: 'none',
+            margin: '0 4px',
+            verticalAlign: 'baseline',
+            transform: 'translateY(-1px)',
+            objectFit: 'contain',
+            display: 'inline'
+          }}
+        />
+      ) : (
+        <span style={{ margin: '0 1px' }}> </span>
+      );
+    }
+    
+    // For overAvatar position, we still need spacing when badge is off
+    if (position === 'overAvatar') {
+      return !showBadge ? <span style={{ margin: '0 1px' }}> </span> : null;
+    }
+    
+    return null;
   };
   
   // Format the custom text for the preview
@@ -891,28 +943,6 @@ export default function SocialProofSection({
                   </button>
                 </div>
               </label>
-              
-              <label className="block text-sm text-[#1c2838]">
-                Badge-Bild:
-                <div className="mt-1 flex items-center space-x-2">
-                  {verifiedImage && (
-                    <div className="w-6 h-6 border rounded overflow-hidden bg-white flex-shrink-0">
-                      <img
-                        src={verifiedImage}
-                        alt="Verifizierungsbadge"
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                  )}
-                  <input
-                    type="text"
-                    value={verifiedImage}
-                    onChange={(e) => setVerifiedImage(e.target.value)}
-                    className="flex-1 border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                    placeholder="https://cdn.shopify.com/s/files/1/.../badge.png"
-                  />
-                </div>
-              </label>
             </div>
           )}
         </div>
@@ -1313,12 +1343,13 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                           alt="Verifiziert" 
                           style={{
                             position: 'absolute',
-                            top: '-4px',
-                            right: avatarCount >= 3 ? '4px' : '8px',
+                            top: '-6px',
+                            right: avatarCount >= 3 ? '-4px' : '-2px',
                             height: previewDevice === 'mobile' ? '16px' : '18px',
                             width: 'auto',
                             zIndex: 10,
-                            objectFit: 'contain'
+                            objectFit: 'contain',
+                            transform: 'translateX(50%)'
                           }}
                         />
                       )}
@@ -1356,23 +1387,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                     ) : (
                       <>
                         <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
-                        {badgePosition === 'standard' && (showBadge ? (
-                          <img 
-                            src={verifiedImage} 
-                            alt="Verifiziert" 
-                            style={{
-                              height: previewDevice === 'mobile' ? '13px' : '14px',
-                              maxWidth: 'none',
-                              margin: '0 4px',
-                              verticalAlign: 'baseline',
-                              transform: 'translateY(-1px)',
-                              objectFit: 'contain',
-                              display: 'inline'
-                            }}
-                          />
-                        ) : (
-                          <span style={{ margin: '0 1px' }}> </span>
-                        ))}
+                        {getBadgeOrSpacing(badgePosition, previewDevice === 'mobile')}
                       </>
                     )}
                     <span 

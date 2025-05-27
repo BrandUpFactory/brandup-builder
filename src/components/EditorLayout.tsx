@@ -433,6 +433,8 @@ export default function EditorLayout({
                 onClick={() => {
                   if (onShowTutorial) {
                     onShowTutorial();
+                  } else if (typeof window !== 'undefined' && (window as any).showTutorial) {
+                    (window as any).showTutorial();
                   }
                 }}
                 className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-1.5 transition font-medium border-l border-gray-200"
