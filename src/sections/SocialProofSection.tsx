@@ -136,8 +136,8 @@ export default function SocialProofSection({
   const [useFullWidth, setUseFullWidth] = useState(safeInitialData.useFullWidth !== undefined ? safeInitialData.useFullWidth : true)
   
   // Text wrapping settings
-  const [textWrapDesktop, setTextWrapDesktop] = useState(safeInitialData.textWrapDesktop || 65)
-  const [textWrapMobile, setTextWrapMobile] = useState(safeInitialData.textWrapMobile || 85)
+  const [textWrapDesktop, setTextWrapDesktop] = useState(safeInitialData.textWrapDesktop || 40)
+  const [textWrapMobile, setTextWrapMobile] = useState(safeInitialData.textWrapMobile || 70)
   
   // Padding settings
   const [useSinglePadding, setUseSinglePadding] = useState(true)
@@ -1116,8 +1116,8 @@ export default function SocialProofSection({
               <div className="flex items-center mt-1">
                 <input
                   type="range"
-                  min="50"
-                  max="100"
+                  min="20"
+                  max="85"
                   step="5"
                   value={textWrapDesktop}
                   onChange={(e) => setTextWrapDesktop(parseInt(e.target.value))}
@@ -1134,8 +1134,8 @@ export default function SocialProofSection({
               <div className="flex items-center mt-1">
                 <input
                   type="range"
-                  min="50"
-                  max="100"
+                  min="20"
+                  max="80"
                   step="5"
                   value={textWrapMobile}
                   onChange={(e) => setTextWrapMobile(parseInt(e.target.value))}
@@ -1147,15 +1147,7 @@ export default function SocialProofSection({
               </div>
             </label>
             
-            <div className="bg-blue-50 rounded-lg p-3 border border-blue-200 mt-3">
-              <h5 className="font-medium text-blue-800 mb-2 text-sm">💡 Wie funktioniert der Textumbruch?</h5>
-              <div className="text-xs text-blue-700 space-y-1">
-                <p>• <strong>50%:</strong> Text bricht früh um → mehr Zeilen</p>
-                <p>• <strong>100%:</strong> Text nutzt maximale Breite → weniger Zeilen</p>
-                <p>• Der Text beginnt immer in derselben Zeile wie die Namen</p>
-                <p>• Umbruch erfolgt automatisch bei der gewählten Breite</p>
-              </div>
-            </div>
+            <p className="text-xs text-gray-500 mt-2">Bestimmt ab welcher Breite der Text in die nächste Zeile umbricht. Niedrigere Werte = früher Umbruch.</p>
           </div>
         </div>
       </div>
