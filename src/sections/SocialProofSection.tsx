@@ -646,29 +646,6 @@ export default function SocialProofSection({
               </div>
             </div>
             
-            {showBadge && (
-              <label className="block text-sm text-[#1c2838]">
-                Badge-Bild:
-                <div className="mt-1 flex items-center space-x-2">
-                  {verifiedImage && (
-                    <div className="w-6 h-6 border rounded overflow-hidden bg-white flex-shrink-0">
-                      <img
-                        src={verifiedImage}
-                        alt="Verifizierungsbadge"
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                  )}
-                  <input
-                    type="text"
-                    value={verifiedImage}
-                    onChange={(e) => setVerifiedImage(e.target.value)}
-                    className="flex-1 border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                    placeholder="https://cdn.shopify.com/s/files/1/.../badge.png"
-                  />
-                </div>
-              </label>
-            )}
           </div>
         </div>
       </div>
@@ -958,7 +935,7 @@ export default function SocialProofSection({
         <div style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: ${previewDevice === 'mobile' ? 'block' : 'none'}; width: 100%;">
           <div style="display: block; width: 100%; margin-bottom: 2px;">
             <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : ''}
+${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 4px;"> </span>'}
             <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${getMobileSplit().firstPart}</span>
           </div>
           <div style="display: block; width: 100%;">
@@ -970,7 +947,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
         <div style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: ${previewDevice === 'desktop' ? 'block' : 'none'}; width: 100%;">
           <div style="display: block; width: 100%; margin-bottom: 2px;">
             <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : ''}
+${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 4px;"> </span>'}
             <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${getDesktopSplit().firstPart}</span>
           </div>
           <div style="display: block; width: 100%;">
@@ -983,7 +960,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
 
   // Enhanced Preview with Product Integration and Simple Mobile Simulation
   const preview = (
-    <div className="w-full h-full flex flex-col p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '200px' }}>
+    <div className="w-full h-full flex flex-col p-4" style={{ backgroundColor: 'white', minHeight: '200px' }}>
       {currentPreviewMode === 'product' && (
         <div className="mb-4">
           <input
@@ -1085,7 +1062,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                 <div>
                   <div style={{ display: 'block', width: '100%', marginBottom: '2px' }}>
                     <strong style={{ fontWeight: '600' }}>{getDisplayNames()}</strong>
-                    {showBadge && (
+                    {showBadge ? (
                       <img 
                         src={verifiedImage} 
                         alt="Verifiziert" 
@@ -1099,6 +1076,8 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                           display: 'inline'
                         }}
                       />
+                    ) : (
+                      <span style={{ margin: '0 4px' }}> </span>
                     )}
                     <span 
                       style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}
@@ -1270,7 +1249,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       <div class="desktop-layout">
         <div style="display: block; width: 100%; margin-bottom: 2px;">
           <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 14px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : ''}
+${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 14px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 4px;"> </span>'}
           <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${desktopSplit.firstPart}</span>
         </div>
         <div style="display: block; width: 100%;">
@@ -1282,7 +1261,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 14px
       <div class="mobile-layout">
         <div style="display: block; width: 100%; margin-bottom: 2px;">
           <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 13px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : ''}
+${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 13px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 4px;"> </span>'}
           <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${mobileSplit.firstPart}</span>
         </div>
         <div style="display: block; width: 100%;">
