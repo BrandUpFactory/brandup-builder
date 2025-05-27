@@ -528,7 +528,7 @@ export default function SocialProofSection({
           className="flex min-h-full items-center justify-center p-4"
           onClick={handleOverlayClick}
         >
-          <div className="fixed inset-0 bg-black/50"></div>
+          <div className="fixed inset-0 bg-black/50" onClick={handleOverlayClick}></div>
           <div 
             className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto z-10"
             onClick={(e) => e.stopPropagation()}
@@ -1260,9 +1260,13 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
               }}
             >
               {avatarCount > 0 && (
-                <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, position: 'relative' }}>
+                <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
                   {avatarCount >= 1 && (
-                    <div style={{ position: badgePosition === 'overAvatar' && showBadge && avatarCount === 1 ? 'relative' : 'static' }}>
+                    <div style={{ 
+                      position: badgePosition === 'overAvatar' && showBadge && avatarCount === 1 ? 'relative' : 'static',
+                      marginRight: avatarCount > 1 ? '-8px' : '0',
+                      zIndex: 3
+                    }}>
                       <img 
                         src={avatarImage1} 
                         alt="User 1" 
@@ -1273,8 +1277,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                           border: `2px solid ${avatarBorderColor}`,
                           objectFit: 'cover',
                           flexShrink: 0,
-                          zIndex: 3,
-                          marginRight: avatarCount > 1 ? '-8px' : '0'
+                          display: 'block'
                         }}
                       />
                       {badgePosition === 'overAvatar' && showBadge && avatarCount === 1 && (
@@ -1296,7 +1299,11 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                     </div>
                   )}
                   {avatarCount >= 2 && (
-                    <div style={{ position: badgePosition === 'overAvatar' && showBadge && avatarCount === 2 ? 'relative' : 'static' }}>
+                    <div style={{ 
+                      position: badgePosition === 'overAvatar' && showBadge && avatarCount === 2 ? 'relative' : 'static',
+                      marginRight: avatarCount >= 3 ? '-8px' : '0',
+                      zIndex: 2
+                    }}>
                       <img 
                         src={avatarImage2} 
                         alt="User 2" 
@@ -1307,8 +1314,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                           border: `2px solid ${avatarBorderColor}`,
                           objectFit: 'cover',
                           flexShrink: 0,
-                          zIndex: 2,
-                          marginRight: avatarCount >= 3 ? '-8px' : '0'
+                          display: 'block'
                         }}
                       />
                       {badgePosition === 'overAvatar' && showBadge && avatarCount === 2 && (
@@ -1330,7 +1336,10 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                     </div>
                   )}
                   {avatarCount >= 3 && (
-                    <div style={{ position: badgePosition === 'overAvatar' && showBadge && avatarCount === 3 ? 'relative' : 'static' }}>
+                    <div style={{ 
+                      position: badgePosition === 'overAvatar' && showBadge && avatarCount === 3 ? 'relative' : 'static',
+                      zIndex: 1
+                    }}>
                       <img 
                         src={avatarImage3} 
                         alt="User 3" 
@@ -1341,7 +1350,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                           border: `2px solid ${avatarBorderColor}`,
                           objectFit: 'cover',
                           flexShrink: 0,
-                          zIndex: 1
+                          display: 'block'
                         }}
                       />
                       {badgePosition === 'overAvatar' && showBadge && avatarCount === 3 && (
