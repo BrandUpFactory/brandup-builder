@@ -112,7 +112,7 @@ export default function SocialProofSection({
   const [firstName1, setFirstName1] = useState(safeInitialData.firstName1 || 'Anna')
   const [firstName2, setFirstName2] = useState(safeInitialData.firstName2 || 'Lisa')
   const [firstName3, setFirstName3] = useState(safeInitialData.firstName3 || 'Sarah')
-  const [customText, setCustomText] = useState(safeInitialData.customText || 'und viele andere lieben dieses Produkt')
+  const [customText, setCustomText] = useState(safeInitialData.customText || 'und 12.400+ Kunden nutzen unser Tool erfolgreich')
   const [avatarImage1, setAvatarImage1] = useState(safeInitialData.avatarImage1 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619')
   const [avatarImage2, setAvatarImage2] = useState(safeInitialData.avatarImage2 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098')
   const [avatarImage3, setAvatarImage3] = useState(safeInitialData.avatarImage3 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-1.jpg?v=1738073619')
@@ -345,7 +345,7 @@ export default function SocialProofSection({
     return customText;
   };
   
-  // Einfache aber robuste Funktion für HTML-Text-Splitting
+  // Verbesserte HTML-Text-Splitting Funktion die Formatierung erhält
   const getTextSplit = (htmlText: string, wordsForSecondLine: number) => {
     try {
       // Extrahiere den reinen Text für Word-Counting
@@ -361,17 +361,34 @@ export default function SocialProofSection({
       const firstPartWords = words.slice(0, splitIndex);
       const lastPartWords = words.slice(splitIndex);
       
-      // Einfacher Ansatz: Suche nach den letzten Wörtern im HTML-String
-      const lastWordsText = lastPartWords.join(' ');
+      // Wenn der Text komplett formatiert ist (z.B. <em>ganzer text</em>), 
+      // dann soll die Formatierung auf beide Teile angewendet werden
+      const isCompletelyWrapped = htmlText.match(/^<(\w+)[^>]*>.*<\/\1>$/);
       
-      // Finde letztes Vorkommen der letzten Wörter
-      let searchText = lastWordsText;
-      let splitPosition = htmlText.lastIndexOf(searchText);
+      if (isCompletelyWrapped) {
+        const tagName = isCompletelyWrapped[1];
+        const tagStart = htmlText.match(/^<[^>]+>/)?.[0] || '';
+        const tagEnd = `</${tagName}>`;
+        const innerText = htmlText.replace(/^<[^>]+>|<\/[^>]+>$/g, '');
+        
+        // Teile den inneren Text auf
+        const innerWords = innerText.split(/\s+/);
+        const innerFirstPart = innerWords.slice(0, splitIndex).join(' ');
+        const innerLastPart = innerWords.slice(splitIndex).join(' ');
+        
+        return {
+          firstPart: `${tagStart}${innerFirstPart}${tagEnd}`,
+          lastPart: `${tagStart}${innerLastPart}${tagEnd}`
+        };
+      }
+      
+      // Standard-Approach für gemischten Content
+      const lastWordsText = lastPartWords.join(' ');
+      let splitPosition = htmlText.lastIndexOf(lastWordsText);
       
       // Falls nicht gefunden, versuche es mit dem letzten Wort
       if (splitPosition === -1 && lastPartWords.length > 0) {
-        searchText = lastPartWords[lastPartWords.length - 1];
-        splitPosition = htmlText.lastIndexOf(searchText);
+        splitPosition = htmlText.lastIndexOf(lastPartWords[lastPartWords.length - 1]);
       }
       
       if (splitPosition !== -1) {
@@ -384,7 +401,7 @@ export default function SocialProofSection({
         };
       }
       
-      // Fallback: Split nach Plain-Text
+      // Fallback: Split nach Plain-Text (ohne Formatierung)
       const firstPartText = firstPartWords.join(' ');
       const lastPartText = lastPartWords.join(' ');
       
@@ -784,7 +801,7 @@ export default function SocialProofSection({
                 <RichTextEditor
                   content={customText}
                   onChange={setCustomText}
-                  placeholder="z.B. und viele andere lieben dieses Produkt"
+                  placeholder="z.B. und 12.400+ Kunden nutzen unser Tool erfolgreich"
                   className="w-full"
                 />
                 
