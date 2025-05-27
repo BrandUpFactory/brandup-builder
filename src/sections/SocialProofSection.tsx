@@ -29,10 +29,12 @@ interface SocialProofSectionProps {
     customText?: string;
     selectedStyle?: number;
     fontSizeDesktop?: string;
+    fontSizeTablet?: string;
     fontSizeMobile?: string;
     brandNameBold?: boolean;
     useFullWidth?: boolean;
     textWrapDesktop?: number;
+    textWrapTablet?: number;
     textWrapMobile?: number;
   };
   onDataChange?: (data: any) => void;
@@ -131,12 +133,14 @@ export default function SocialProofSection({
   const [avatarSize, setAvatarSize] = useState(safeInitialData.avatarSize || '32px')
   const [borderRadius, setBorderRadius] = useState(safeInitialData.borderRadius || styleTemplates[0].borderRadius)
   const [fontSizeDesktop, setFontSizeDesktop] = useState(safeInitialData.fontSizeDesktop || '12px')
+  const [fontSizeTablet, setFontSizeTablet] = useState(safeInitialData.fontSizeTablet || '11px')
   const [fontSizeMobile, setFontSizeMobile] = useState(safeInitialData.fontSizeMobile || '9px')
   const [brandNameBold, setBrandNameBold] = useState(safeInitialData.brandNameBold !== undefined ? safeInitialData.brandNameBold : true)
   const [useFullWidth, setUseFullWidth] = useState(safeInitialData.useFullWidth !== undefined ? safeInitialData.useFullWidth : true)
   
   // Text wrapping settings
   const [textWrapDesktop, setTextWrapDesktop] = useState(safeInitialData.textWrapDesktop || 40)
+  const [textWrapTablet, setTextWrapTablet] = useState(safeInitialData.textWrapTablet || 55)
   const [textWrapMobile, setTextWrapMobile] = useState(safeInitialData.textWrapMobile || 70)
   
   // Padding settings
@@ -244,10 +248,12 @@ export default function SocialProofSection({
     customText,
     selectedStyle,
     fontSizeDesktop,
+    fontSizeTablet,
     fontSizeMobile,
     brandNameBold,
     useFullWidth,
     textWrapDesktop,
+    textWrapTablet,
     textWrapMobile
   };
 
@@ -1089,6 +1095,24 @@ export default function SocialProofSection({
             </label>
             
             <label className="block text-sm text-[#1c2838]">
+              Schriftgröße (Tablet):
+              <div className="flex items-center mt-1">
+                <input
+                  type="range"
+                  min="9"
+                  max="19"
+                  step="1"
+                  value={fontSizeTablet.replace('px', '')}
+                  onChange={(e) => setFontSizeTablet(`${e.target.value}px`)}
+                  onClick={handleRangeInput}
+                  onMouseMove={handleRangeInput}
+                  className="w-full accent-[#1c2838]"
+                />
+                <span className="ml-2 text-xs text-gray-500 w-12">{fontSizeTablet}</span>
+              </div>
+            </label>
+            
+            <label className="block text-sm text-[#1c2838]">
               Schriftgröße (Mobil):
               <div className="flex items-center mt-1">
                 <input
@@ -1126,6 +1150,24 @@ export default function SocialProofSection({
                   className="w-full accent-[#1c2838]"
                 />
                 <span className="ml-2 text-xs text-gray-500 w-12">{textWrapDesktop}%</span>
+              </div>
+            </label>
+            
+            <label className="block text-sm text-[#1c2838]">
+              Umbruch Tablet (ab welcher Breite):
+              <div className="flex items-center mt-1">
+                <input
+                  type="range"
+                  min="20"
+                  max="82"
+                  step="5"
+                  value={textWrapTablet}
+                  onChange={(e) => setTextWrapTablet(parseInt(e.target.value))}
+                  onClick={handleRangeInput}
+                  onMouseMove={handleRangeInput}
+                  className="w-full accent-[#1c2838]"
+                />
+                <span className="ml-2 text-xs text-gray-500 w-12">{textWrapTablet}%</span>
               </div>
             </label>
             
@@ -1348,7 +1390,8 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                 width: useFullWidth ? '100%' : 'fit-content',
                 maxWidth: '100%',
                 boxSizing: 'border-box',
-                fontSize: previewDevice === 'mobile' ? fontSizeMobile : fontSizeDesktop,
+                fontSize: previewDevice === 'mobile' ? fontSizeMobile : 
+                          previewDevice === 'tablet' ? fontSizeTablet : fontSizeDesktop,
               }}
             >
               {avatarCount > 0 && (
@@ -1470,7 +1513,8 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                 style={{ 
                   marginLeft: avatarCount > 0 ? '12px' : '0', 
                   lineHeight: 1.4, 
-                  width: previewDevice === 'mobile' ? `${textWrapMobile}%` : `${textWrapDesktop}%`,
+                  width: previewDevice === 'mobile' ? `${textWrapMobile}%` : 
+                        previewDevice === 'tablet' ? `${textWrapTablet}%` : `${textWrapDesktop}%`,
                   flexShrink: 0,
                   wordWrap: 'break-word',
                   overflowWrap: 'break-word'
@@ -1627,7 +1671,16 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       }
     }
     
-    @media (min-width: 768px) {
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .social-proof-text {
+        width: ${textWrapTablet}%;
+      }
+      .social-proof-responsive {
+        font-size: ${fontSizeTablet} !important;
+      }
+    }
+    
+    @media (min-width: 1024px) {
       .social-proof-text {
         width: ${textWrapDesktop}%;
       }
