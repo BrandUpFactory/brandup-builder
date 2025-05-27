@@ -1136,7 +1136,7 @@ export default function SocialProofSection({
             <h4 className="font-medium text-sm text-[#1c2838]">Textumbruch-Einstellungen</h4>
             
             <label className="block text-sm text-[#1c2838]">
-              Umbruch Desktop (ab welcher Breite):
+              Umbruch Desktop:
               <div className="flex items-center mt-1">
                 <input
                   type="range"
@@ -1154,7 +1154,7 @@ export default function SocialProofSection({
             </label>
             
             <label className="block text-sm text-[#1c2838]">
-              Umbruch Tablet (ab welcher Breite):
+              Umbruch Tablet:
               <div className="flex items-center mt-1">
                 <input
                   type="range"
@@ -1172,7 +1172,7 @@ export default function SocialProofSection({
             </label>
             
             <label className="block text-sm text-[#1c2838]">
-              Umbruch Mobil (ab welcher Breite):
+              Umbruch Mobil:
               <div className="flex items-center mt-1">
                 <input
                   type="range"
