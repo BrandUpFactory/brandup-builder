@@ -1078,6 +1078,7 @@ export default function SocialProofSection({
           <div className="space-y-3 mt-4">
             <label className="block text-sm text-[#1c2838]">
               Schriftgröße (Desktop):
+              <div className="text-xs text-gray-400">ab 1024px</div>
               <div className="flex items-center mt-1">
                 <input
                   type="range"
@@ -1096,6 +1097,7 @@ export default function SocialProofSection({
             
             <label className="block text-sm text-[#1c2838]">
               Schriftgröße (Tablet):
+              <div className="text-xs text-gray-400">768px - 1023px</div>
               <div className="flex items-center mt-1">
                 <input
                   type="range"
@@ -1114,6 +1116,7 @@ export default function SocialProofSection({
             
             <label className="block text-sm text-[#1c2838]">
               Schriftgröße (Mobil):
+              <div className="text-xs text-gray-400">bis 767px</div>
               <div className="flex items-center mt-1">
                 <input
                   type="range"
@@ -1137,6 +1140,7 @@ export default function SocialProofSection({
             
             <label className="block text-sm text-[#1c2838]">
               Umbruch Desktop:
+              <div className="text-xs text-gray-400">ab 1024px</div>
               <div className="flex items-center mt-1">
                 <input
                   type="range"
@@ -1155,6 +1159,7 @@ export default function SocialProofSection({
             
             <label className="block text-sm text-[#1c2838]">
               Umbruch Tablet:
+              <div className="text-xs text-gray-400">768px - 1023px</div>
               <div className="flex items-center mt-1">
                 <input
                   type="range"
@@ -1173,6 +1178,7 @@ export default function SocialProofSection({
             
             <label className="block text-sm text-[#1c2838]">
               Umbruch Mobil:
+              <div className="text-xs text-gray-400">bis 767px</div>
               <div className="flex items-center mt-1">
                 <input
                   type="range"
