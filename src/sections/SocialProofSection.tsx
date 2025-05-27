@@ -1520,14 +1520,37 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
     
     return `<style>
     /* Targeted CSS Reset - only override problematic theme styles */
-    .social-proof-box-container * {
-      /* Reset only the most problematic properties */
+    .social-proof-box-container {
+      /* Override common theme interference */
       margin-block: 0 !important;
-      margin-inline: 0 !important;
       margin-block-start: 0 !important;
       margin-block-end: 0 !important;
+      text-decoration: none !important;
+      text-transform: none !important;
+      list-style: none !important;
+      box-sizing: border-box !important;
+    }
+
+    .social-proof-box-container img {
+      /* Override theme img styles that cause problems */
+      margin-block: 0 !important;
+      margin-block-start: 0 !important;
+      margin-block-end: 0 !important;
+      margin-inline: 0 !important;
       margin-inline-start: 0 !important;
       margin-inline-end: 0 !important;
+      text-decoration: none !important;
+      list-style: none !important;
+      box-sizing: border-box !important;
+    }
+
+    .social-proof-box-container span,
+    .social-proof-box-container strong,
+    .social-proof-box-container div {
+      /* Override theme text styles */
+      margin-block: 0 !important;
+      margin-block-start: 0 !important;
+      margin-block-end: 0 !important;
       text-decoration: none !important;
       text-transform: none !important;
       list-style: none !important;
@@ -1543,8 +1566,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       border-radius: ${borderRadius} !important;
       font-family: Arial, sans-serif !important;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-      margin: 0 !important;
-      margin-bottom: 12px !important;
+      margin: 0 0 12px 0 !important;
       color: ${textColor} !important;
       font-weight: 500 !important;
       width: ${useFullWidth ? '100%' : 'fit-content'} !important;
@@ -1568,6 +1590,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       object-fit: cover !important;
       flex-shrink: 0 !important;
       display: block !important;
+      /* Inline styles for width, height, z-index, margin-right will override these */
       margin-top: 0 !important;
       margin-bottom: 0 !important;
     }
@@ -1576,8 +1599,11 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       line-height: 1.4 !important;
       display: block !important;
       width: 100% !important;
-      margin: 0 !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      margin-right: 0 !important;
       padding: 0 !important;
+      /* margin-left is set via inline style for proper avatar-text spacing */
     }
 
     .social-proof-box-container .text-line {
@@ -1588,7 +1614,8 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
     }
 
     .social-proof-box-container .text-line.first {
-      margin-bottom: 2px !important;
+      margin: 0 0 2px 0 !important;
+      padding: 0 !important;
     }
 
     .social-proof-box-container .name-strong {
@@ -1600,7 +1627,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
 
     .social-proof-box-container .badge-img {
       max-width: none !important;
-      margin: 0 4px !important;
+      margin: 0 4px 0 4px !important;
       vertical-align: baseline !important;
       transform: translateY(-1px) !important;
       object-fit: contain !important;
@@ -1619,7 +1646,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
     }
 
     .social-proof-box-container .spacing-span {
-      margin: 0 1px !important;
+      margin: 0 1px 0 1px !important;
       display: inline !important;
       padding: 0 !important;
     }
