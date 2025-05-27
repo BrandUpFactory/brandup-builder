@@ -130,6 +130,7 @@ export default function SocialProofSection({
   
   // Help popup state
   const [showImageHelp, setShowImageHelp] = useState(false)
+  const [showTutorial, setShowTutorial] = useState(false)
   
   // Use external preview mode and product URL if provided
   const currentPreviewMode = previewMode || 'builder'
@@ -415,6 +416,293 @@ export default function SocialProofSection({
     );
   };
 
+  // Tutorial Modal
+  const TutorialModal = () => {
+    if (!showTutorial) return null;
+
+    return (
+      <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-gray-200">
+          <div className="p-6">
+            <div className="flex justify-between items-start mb-6">
+              <h3 className="text-2xl font-bold text-gray-900">
+                🎯 Komplette Anleitung: Social Proof Builder
+              </h3>
+              <button
+                onClick={() => setShowTutorial(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="space-y-8 text-sm text-gray-700">
+              {/* Schritt 1: Überblick */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
+                <h4 className="text-xl font-semibold text-blue-900 mb-4 flex items-center">
+                  <span className="bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">1</span>
+                  Was ist Social Proof?
+                </h4>
+                <div className="space-y-4">
+                  <p className="text-blue-800">
+                    Social Proof zeigt potenziellen Kunden, dass andere bereits von deinem Produkt begeistert sind. 
+                    Dies schafft Vertrauen und erhöht die Conversion-Rate um bis zu 34%.
+                  </p>
+                  <div className="bg-white border border-blue-300 rounded-lg p-4">
+                    <p className="font-medium text-blue-900 mb-2">✨ Beispiel einer fertigen Social Proof Box:</p>
+                    <div className="bg-gray-100 rounded-lg p-3 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <div className="flex -space-x-1">
+                          <div className="w-6 h-6 bg-gradient-to-br from-pink-400 to-red-400 rounded-full border-2 border-white"></div>
+                          <div className="w-6 h-6 bg-gradient-to-br from-green-400 to-blue-500 rounded-full border-2 border-white"></div>
+                        </div>
+                        <span className="font-semibold">Lisa, Anna</span>
+                        <span className="text-blue-600">✓</span>
+                        <span>und <strong>2.847</strong> andere sind begeistert</span>
+                      </div>
+                      <div className="ml-8 mt-1">
+                        <span>von <strong>DeinerMarke</strong></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Schritt 2: Editor Funktionen */}
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6">
+                <h4 className="text-xl font-semibold text-green-900 mb-4 flex items-center">
+                  <span className="bg-green-100 text-green-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">2</span>
+                  Editor-Funktionen im Detail
+                </h4>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="bg-white border border-green-300 rounded-lg p-4">
+                      <h5 className="font-semibold text-green-800 mb-2">🎨 Vordefinierte Stile</h5>
+                      <p>Wähle aus 3 professionellen Designs:</p>
+                      <ul className="list-disc list-inside mt-2 space-y-1 text-xs">
+                        <li><strong>Modern Light:</strong> Helles, cleanes Design</li>
+                        <li><strong>Bold Dark:</strong> Dunkles, kraftvolles Design</li>
+                        <li><strong>Soft Gradient:</strong> Sanfte Farbverläufe</li>
+                      </ul>
+                    </div>
+                    
+                    <div className="bg-white border border-green-300 rounded-lg p-4">
+                      <h5 className="font-semibold text-green-800 mb-2">👥 Avatar-Verwaltung</h5>
+                      <p>Bis zu 3 Benutzer-Avatare oder komplett ohne:</p>
+                      <ul className="list-disc list-inside mt-2 space-y-1 text-xs">
+                        <li>Automatische Überlappung bei mehreren Avataren</li>
+                        <li>Anpassbare Größe und Rahmenfarbe</li>
+                        <li>Fehlerbehandlung bei fehlenden Bildern</li>
+                      </ul>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className="bg-white border border-green-300 rounded-lg p-4">
+                      <h5 className="font-semibold text-green-800 mb-2">✏️ Rich Text Editor</h5>
+                      <p>Erweiterte Textbearbeitung mit:</p>
+                      <ul className="list-disc list-inside mt-2 space-y-1 text-xs">
+                        <li><strong>Fett</strong>, <em>kursiv</em>, <u>unterstrichen</u></li>
+                        <li>Zahlen und Markennamen hervorheben</li>
+                        <li>Intelligente Zeilenumbrüche</li>
+                      </ul>
+                    </div>
+                    
+                    <div className="bg-white border border-green-300 rounded-lg p-4">
+                      <h5 className="font-semibold text-green-800 mb-2">📱 Responsive Design</h5>
+                      <p>Automatische Anpassung:</p>
+                      <ul className="list-disc list-inside mt-2 space-y-1 text-xs">
+                        <li>Desktop: 2 Wörter in zweiter Zeile</li>
+                        <li>Mobile: 3 Wörter in zweiter Zeile</li>
+                        <li>Unterschiedliche Schriftgrößen</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Schritt 3: Bilder Setup */}
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-6">
+                <h4 className="text-xl font-semibold text-purple-900 mb-4 flex items-center">
+                  <span className="bg-purple-100 text-purple-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">3</span>
+                  Bilder richtig einrichten
+                </h4>
+                <div className="space-y-4">
+                  <div className="bg-white border border-purple-300 rounded-lg p-4">
+                    <h5 className="font-semibold text-purple-800 mb-3">📸 Shopify Bilder hochladen (Schritt-für-Schritt):</h5>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <div className="flex items-start space-x-3">
+                          <div className="bg-purple-100 text-purple-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">1</div>
+                          <div>
+                            <p className="font-medium">Shopify Admin öffnen</p>
+                            <p className="text-gray-600 text-xs">Gehe zu "Inhalte" → "Dateien"</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start space-x-3">
+                          <div className="bg-purple-100 text-purple-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">2</div>
+                          <div>
+                            <p className="font-medium">Bild hochladen</p>
+                            <p className="text-gray-600 text-xs">Klicke "Dateien hochladen" und wähle dein Bild</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start space-x-3">
+                          <div className="bg-purple-100 text-purple-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">3</div>
+                          <div>
+                            <p className="font-medium">URL kopieren</p>
+                            <p className="text-gray-600 text-xs">Rechtsklick auf Bild → "Link kopieren"</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-3">
+                        <p className="text-yellow-800 font-medium mb-2">💡 Pro-Tipps:</p>
+                        <ul className="text-yellow-700 text-xs space-y-1">
+                          <li>• Quadratische Bilder (1:1) für Avatare</li>
+                          <li>• Mindestens 100x100px Auflösung</li>
+                          <li>• JPG oder PNG Format</li>
+                          <li>• Dateigröße unter 500KB</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Schritt 4: Integration */}
+              <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-6">
+                <h4 className="text-xl font-semibold text-orange-900 mb-4 flex items-center">
+                  <span className="bg-orange-100 text-orange-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">4</span>
+                  Integration in Shopify
+                </h4>
+                <div className="space-y-4">
+                  <div className="bg-white border border-orange-300 rounded-lg p-4">
+                    <h5 className="font-semibold text-orange-800 mb-3">🔧 Code-Integration:</h5>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <span className="bg-orange-100 text-orange-800 rounded px-2 py-1 text-xs font-semibold">1</span>
+                          <span className="text-sm">Code aus Editor kopieren</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="bg-orange-100 text-orange-800 rounded px-2 py-1 text-xs font-semibold">2</span>
+                          <span className="text-sm">Shopify Theme Editor öffnen</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="bg-orange-100 text-orange-800 rounded px-2 py-1 text-xs font-semibold">3</span>
+                          <span className="text-sm">Code in Template einfügen</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="bg-orange-100 text-orange-800 rounded px-2 py-1 text-xs font-semibold">4</span>
+                          <span className="text-sm">Speichern & Testen</span>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-blue-50 border border-blue-300 rounded-lg p-3">
+                        <p className="text-blue-800 font-medium mb-2">📍 Beste Positionen:</p>
+                        <ul className="text-blue-700 text-xs space-y-1">
+                          <li>• Direkt unter Produkttitel</li>
+                          <li>• Über "In den Warenkorb" Button</li>
+                          <li>• In der Produktbeschreibung</li>
+                          <li>• Am Ende der Seite</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Schritt 5: Optimierung */}
+              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-lg p-6">
+                <h4 className="text-xl font-semibold text-indigo-900 mb-4 flex items-center">
+                  <span className="bg-indigo-100 text-indigo-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">5</span>
+                  Performance & Optimierung
+                </h4>
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="bg-white border border-indigo-300 rounded-lg p-4">
+                    <h5 className="font-semibold text-indigo-800 mb-2">🎯 A/B Testing</h5>
+                    <ul className="text-xs space-y-1">
+                      <li>• Verschiedene Texte testen</li>
+                      <li>• Avatar-Anzahl variieren</li>
+                      <li>• Farbschemas vergleichen</li>
+                      <li>• Positionen experimentieren</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-white border border-indigo-300 rounded-lg p-4">
+                    <h5 className="font-semibold text-indigo-800 mb-2">📊 Conversion-Tipps</h5>
+                    <ul className="text-xs space-y-1">
+                      <li>• Echte Zahlen verwenden</li>
+                      <li>• Realistische Namen wählen</li>
+                      <li>• Konsistente Markensprache</li>
+                      <li>• Mobile Optimierung prüfen</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-white border border-indigo-300 rounded-lg p-4">
+                    <h5 className="font-semibold text-indigo-800 mb-2">⚡ Performance</h5>
+                    <ul className="text-xs space-y-1">
+                      <li>• Bilder komprimieren</li>
+                      <li>• CDN URLs nutzen</li>
+                      <li>• Lazy Loading</li>
+                      <li>• Page Speed testen</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* FAQ */}
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">❓ Häufige Fragen (FAQ)</h4>
+                <div className="space-y-3">
+                  <details className="bg-white border border-gray-300 rounded-lg">
+                    <summary className="p-3 font-medium cursor-pointer hover:bg-gray-50">
+                      Wie oft sollte ich die Social Proof Box aktualisieren?
+                    </summary>
+                    <div className="p-3 pt-0 text-sm text-gray-600">
+                      Empfehlung: Monatlich die Zahlen aktualisieren und alle 3 Monate neue Avatare/Namen hinzufügen, um Authentizität zu wahren.
+                    </div>
+                  </details>
+                  
+                  <details className="bg-white border border-gray-300 rounded-lg">
+                    <summary className="p-3 font-medium cursor-pointer hover:bg-gray-50">
+                      Kann ich echte Kundendaten verwenden?
+                    </summary>
+                    <div className="p-3 pt-0 text-sm text-gray-600">
+                      Ja, aber beachte die DSGVO. Am besten: Anonymisierte Vornamen + echte Gesamtzahlen aus Analytics/Shopify verwenden.
+                    </div>
+                  </details>
+                  
+                  <details className="bg-white border border-gray-300 rounded-lg">
+                    <summary className="p-3 font-medium cursor-pointer hover:bg-gray-50">
+                      Funktioniert es auf allen Themes?
+                    </summary>
+                    <div className="p-3 pt-0 text-sm text-gray-600">
+                      Ja! Der generierte Code ist universell kompatibel und funktioniert in allen Shopify Themes. Responsive Design ist bereits integriert.
+                    </div>
+                  </details>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={() => setShowTutorial(false)}
+                className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-3 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-semibold shadow-lg"
+              >
+                ✨ Los geht's - Jetzt Social Proof erstellen!
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const settings = (
     <div className="space-y-6">
       {/* Style Templates */}
@@ -546,15 +834,26 @@ export default function SocialProofSection({
       <div className="border-b pb-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-[#1c2838]">Bilder</h3>
-          <button
-            onClick={() => setShowImageHelp(true)}
-            className="text-blue-600 hover:text-blue-800 text-xs flex items-center space-x-1 transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Wie lade ich Bilder hoch?</span>
-          </button>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setShowImageHelp(true)}
+              className="text-blue-600 hover:text-blue-800 text-xs flex items-center space-x-1 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Wie lade ich Bilder hoch?</span>
+            </button>
+            <button
+              onClick={() => setShowTutorial(true)}
+              className="text-green-600 hover:text-green-800 text-xs flex items-center space-x-1 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              <span>Anleitung</span>
+            </button>
+          </div>
         </div>
         <div className="space-y-4">
           {avatarCount >= 1 && (
@@ -935,7 +1234,7 @@ export default function SocialProofSection({
         <div style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: ${previewDevice === 'mobile' ? 'block' : 'none'}; width: 100%;">
           <div style="display: block; width: 100%; margin-bottom: 2px;">
             <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 4px;"> </span>'}
+${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 2px;"> </span>'}
             <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${getMobileSplit().firstPart}</span>
           </div>
           <div style="display: block; width: 100%;">
@@ -947,7 +1246,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
         <div style="margin-left: ${avatarCount > 0 ? '12px' : '0'}; line-height: 1.4; display: ${previewDevice === 'desktop' ? 'block' : 'none'}; width: 100%;">
           <div style="display: block; width: 100%; margin-bottom: 2px;">
             <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 4px;"> </span>'}
+${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${currentBadgeSize}; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 2px;"> </span>'}
             <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${getDesktopSplit().firstPart}</span>
           </div>
           <div style="display: block; width: 100%;">
@@ -1077,7 +1376,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                         }}
                       />
                     ) : (
-                      <span style={{ margin: '0 4px' }}> </span>
+                      <span style={{ margin: '0 2px' }}> </span>
                     )}
                     <span 
                       style={{ fontWeight: '400', wordSpacing: '0.1em', letterSpacing: '0.01em' }}
@@ -1249,7 +1548,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       <div class="desktop-layout">
         <div style="display: block; width: 100%; margin-bottom: 2px;">
           <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 14px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 4px;"> </span>'}
+${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 14px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 2px;"> </span>'}
           <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${desktopSplit.firstPart}</span>
         </div>
         <div style="display: block; width: 100%;">
@@ -1261,7 +1560,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 14px
       <div class="mobile-layout">
         <div style="display: block; width: 100%; margin-bottom: 2px;">
           <strong style="display: inline; font-weight: 600;">${getDisplayNames()}</strong>
-${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 13px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 4px;"> </span>'}
+${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 13px; max-width: none; margin: 0 4px; vertical-align: baseline; transform: translateY(-1px); object-fit: contain; display: inline;" onerror="this.style.display='none'">` : '<span style="margin: 0 2px;"> </span>'}
           <span style="font-weight: 400; word-spacing: 0.1em; letter-spacing: 0.01em; display: inline;">${mobileSplit.firstPart}</span>
         </div>
         <div style="display: block; width: 100%;">
@@ -1293,6 +1592,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 13px
       <>
         {settings}
         <ImageHelpModal />
+        <TutorialModal />
       </>
     ), 
     preview, 
