@@ -275,22 +275,22 @@ export default function SocialProofSection({
     switch(avatarCount) {
       case 1:
         if (position === 'afterFirst') {
-          return `${firstName1}${badgeElement}`;
+          return `${firstName1}${badgeElement}<span style="margin: 0 1px;"> </span>`;
         }
         return firstName1;
       case 2:
         if (position === 'afterFirst') {
-          return `${firstName1}${badgeElement}, ${firstName2}`;
+          return `${firstName1}${badgeElement}, ${firstName2}<span style="margin: 0 1px;"> </span>`;
         }
         return `${firstName1}, ${firstName2}`;
       case 3:
         if (position === 'afterFirst') {
-          return `${firstName1}${badgeElement}, ${firstName2}, ${firstName3}`;
+          return `${firstName1}${badgeElement}, ${firstName2}, ${firstName3}<span style="margin: 0 1px;"> </span>`;
         }
         return `${firstName1}, ${firstName2}, ${firstName3}`;
       default:
         if (position === 'afterFirst') {
-          return `${firstName1}${badgeElement}, ${firstName2}`;
+          return `${firstName1}${badgeElement}, ${firstName2}<span style="margin: 0 1px;"> </span>`;
         }
         return `${firstName1}, ${firstName2}`;
     }
