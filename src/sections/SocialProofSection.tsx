@@ -1518,90 +1518,23 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
     const desktopSplit = getTextSplit(customText, 2);
     const mobileSplit = getTextSplit(customText, 3);
     
-    return `<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Social Proof Box</title>
-  <style>
-    /* CSS Reset and Isolation for Social Proof Box */
-    .social-proof-box-container,
-    .social-proof-box-container *,
-    .social-proof-box-container *::before,
-    .social-proof-box-container *::after {
-      /* Reset all properties that might be affected by theme CSS */
-      margin: 0 !important;
-      padding: 0 !important;
-      border: 0 !important;
-      outline: 0 !important;
-      background: transparent !important;
+    return `<style>
+    /* Targeted CSS Reset - only override problematic theme styles */
+    .social-proof-box-container * {
+      /* Reset only the most problematic properties */
+      margin-block: 0 !important;
+      margin-inline: 0 !important;
+      margin-block-start: 0 !important;
+      margin-block-end: 0 !important;
+      margin-inline-start: 0 !important;
+      margin-inline-end: 0 !important;
       text-decoration: none !important;
       text-transform: none !important;
-      letter-spacing: normal !important;
-      word-spacing: normal !important;
-      text-align: left !important;
-      vertical-align: baseline !important;
-      line-height: normal !important;
-      box-sizing: border-box !important;
-      display: initial !important;
-      flex: initial !important;
-      grid: initial !important;
-      position: static !important;
-      top: auto !important;
-      right: auto !important;
-      bottom: auto !important;
-      left: auto !important;
-      z-index: auto !important;
-      transform: none !important;
-      transition: none !important;
-      animation: none !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      overflow: visible !important;
-      width: auto !important;
-      height: auto !important;
-      min-width: 0 !important;
-      min-height: 0 !important;
-      max-width: none !important;
-      max-height: none !important;
-      float: none !important;
-      clear: none !important;
-      resize: none !important;
-      content: normal !important;
-      quotes: none !important;
-      counter-reset: none !important;
-      counter-increment: none !important;
-      page-break-before: auto !important;
-      page-break-after: auto !important;
-      page-break-inside: auto !important;
-      orphans: 2 !important;
-      widows: 2 !important;
-      font: initial !important;
-      font-family: Arial, sans-serif !important;
-      font-size: inherit !important;
-      font-weight: normal !important;
-      font-style: normal !important;
-      font-variant: normal !important;
-      text-indent: 0 !important;
-      text-shadow: none !important;
-      color: inherit !important;
-      white-space: normal !important;
-      word-wrap: normal !important;
-      word-break: normal !important;
-      hyphens: none !important;
-      box-shadow: none !important;
-      border-radius: 0 !important;
-      cursor: auto !important;
       list-style: none !important;
-      caption-side: top !important;
-      border-collapse: separate !important;
-      border-spacing: 0 !important;
-      empty-cells: show !important;
-      table-layout: auto !important;
+      box-sizing: border-box !important;
     }
 
-    /* Apply specific styles after reset */
+    /* Main container styles */
     .social-proof-box-container {
       display: flex !important;
       align-items: center !important;
@@ -1610,6 +1543,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       border-radius: ${borderRadius} !important;
       font-family: Arial, sans-serif !important;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+      margin: 0 !important;
       margin-bottom: 12px !important;
       color: ${textColor} !important;
       font-weight: 500 !important;
@@ -1617,12 +1551,15 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       max-width: 100% !important;
       box-sizing: border-box !important;
       font-size: ${fontSizeDesktop} !important;
+      line-height: 1.4 !important;
     }
 
     .social-proof-box-container .avatar-container {
       display: flex !important;
       align-items: center !important;
       flex-shrink: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
     .social-proof-box-container .avatar-img {
@@ -1631,17 +1568,23 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       object-fit: cover !important;
       flex-shrink: 0 !important;
       display: block !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
     }
 
     .social-proof-box-container .text-container {
       line-height: 1.4 !important;
       display: block !important;
       width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
     .social-proof-box-container .text-line {
       display: block !important;
       width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
     .social-proof-box-container .text-line.first {
@@ -1651,6 +1594,8 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
     .social-proof-box-container .name-strong {
       display: inline !important;
       font-weight: 600 !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
     .social-proof-box-container .badge-img {
@@ -1660,6 +1605,8 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       transform: translateY(-1px) !important;
       object-fit: contain !important;
       display: inline !important;
+      border: none !important;
+      border-radius: 0 !important;
     }
 
     .social-proof-box-container .text-span {
@@ -1667,11 +1614,14 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       word-spacing: 0.1em !important;
       letter-spacing: 0.01em !important;
       display: inline !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
 
     .social-proof-box-container .spacing-span {
       margin: 0 1px !important;
       display: inline !important;
+      padding: 0 !important;
     }
 
     /* Responsive font sizes */
@@ -1690,7 +1640,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       }
     }
     
-    /* Mobile responsive text layout - hide desktop layout */
+    /* Mobile responsive text layout */
     @media (max-width: 767px) {
       .social-proof-box-container .desktop-layout {
         display: none !important;
@@ -1700,7 +1650,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       }
     }
     
-    /* Desktop layout - hide mobile layout */
+    /* Desktop layout */
     @media (min-width: 768px) {
       .social-proof-box-container .mobile-layout {
         display: none !important;
@@ -1710,8 +1660,6 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       }
     }
   </style>
-</head>
-<body>
   <div class="social-proof-box-container">
     ${avatarCount > 0 ? `
     <div class="avatar-container">
@@ -1744,9 +1692,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" class="badge-img" o
         </div>
       </div>
     </div>
-  </div>
-</body>
-</html>`;
+  </div>`;
   })();
 
 
