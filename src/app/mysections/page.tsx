@@ -23,145 +23,74 @@ const formatDate = (dateString: string) => {
   return `${day}.${month}.${year} ${hours}:${minutes}`;
 };
 
-// Component for Section Preview - generates preview based on section type and data
+// Component for Section Preview - simple and working preview
 const SectionPreview = ({ sectionData }: { sectionData: any }) => {
   let data;
   try {
     data = typeof sectionData === 'string' ? JSON.parse(sectionData) : sectionData;
-  } catch {
+    console.log('Preview data:', data); // Debug
+  } catch (error) {
+    console.log('Preview parse error:', error);
     data = {};
   }
 
-
-  // Check if it's a social proof section
-  if (data.sectionType === 'socialproof' || data.type === 'socialproof') {
-    const {
-      names = 'Anna, Lisa',
-      additionalText = 'und 12.400+ Kunden nutzen unser Tool erfolgreich',
-      backgroundColor = '#f7f7f7',
-      textColor = '#000000',
-      images = []
-    } = data;
-
-    return (
-      <div className="w-full h-full relative overflow-hidden flex items-center justify-center p-2">
-        <div 
-          className="flex items-center rounded-lg p-2 shadow-sm"
-          style={{ 
-            backgroundColor: backgroundColor,
-            fontSize: '6px',
-            transform: 'scale(0.8)'
-          }}
-        >
-          {/* Profile Images */}
-          <div className="flex items-center mr-2">
-            {images.slice(0, 2).map((img: any, index: number) => (
-              <div
-                key={index}
-                className="w-4 h-4 rounded-full border border-white bg-gray-200 flex items-center justify-center text-[4px] -mr-1"
-                style={{ zIndex: 10 - index }}
-              >
-                {img.url ? (
-                  <img 
-                    src={img.url} 
-                    alt="User" 
-                    className="w-full h-full rounded-full object-cover"
-                  />
-                ) : (
-                  '👤'
-                )}
-              </div>
-            ))}
-          </div>
-          
-          {/* Text Content */}
-          <div style={{ color: textColor, lineHeight: '1.2' }}>
-            <strong>{names}</strong> {additionalText}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Hero Section Preview
-  const {
-    title = 'Hero Section',
-    subtitle = 'Beispiel Subtitle',
-    color = '#f5f7fa',
-    buttonText = 'Button',
-    imageUrl = '/BG_Card_55.jpg',
-    textColor = '#ffffff',
-    showButton = true,
-    alignment = 'center'
-  } = data;
-
-  const alignmentClass = alignment === 'left' ? 'text-left' : alignment === 'right' ? 'text-right' : 'text-center';
+  // Extract data with defaults
+  const title = data.title || 'Section';
+  const subtitle = data.subtitle || '';
+  const backgroundColor = data.color || '#f5f7fa';
+  const textColor = data.textColor || '#ffffff';
+  const buttonText = data.buttonText || '';
+  const showButton = data.showButton !== false;
+  const imageUrl = data.imageUrl || '';
 
   return (
-    <div className="w-full h-full relative overflow-hidden">
+    <div className="w-full h-full bg-white flex items-center justify-center overflow-hidden">
       <div 
-        className="relative w-full h-full flex items-center justify-center"
-        style={{ backgroundColor: color }}
+        className="w-full h-full flex flex-col items-center justify-center p-3 relative"
+        style={{ backgroundColor }}
       >
         {/* Background Image */}
-        {imageUrl && imageUrl !== '' && (
-          <div className="absolute inset-0">
+        {imageUrl && (
+          <div className="absolute inset-0 opacity-30">
             <img 
               src={imageUrl} 
-              alt="Preview" 
+              alt="" 
               className="w-full h-full object-cover"
-              style={{ opacity: 0.3 }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
+              onError={(e) => (e.target as HTMLElement).style.display = 'none'}
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/30"></div>
           </div>
         )}
         
-        {/* Content Container */}
-        <div 
-          className={`relative z-10 px-2 py-1 max-w-[90%] ${alignmentClass}`}
-        >
+        {/* Content */}
+        <div className="relative z-10 text-center">
           {/* Title */}
-          <h1 
-            className="font-bold leading-tight mb-1"
-            style={{ 
-              color: textColor,
-              fontSize: '7px',
-              textShadow: textColor === '#ffffff' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'
-            }}
+          <div 
+            className="font-bold mb-1 text-[6px] leading-tight"
+            style={{ color: textColor }}
           >
             {title}
-          </h1>
+          </div>
           
           {/* Subtitle */}
-          {subtitle && subtitle.trim() !== '' && (
-            <p 
-              className="opacity-90 leading-tight mb-2"
-              style={{ 
-                color: textColor,
-                fontSize: '5px',
-                textShadow: textColor === '#ffffff' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'
-              }}
+          {subtitle && (
+            <div 
+              className="text-[4px] mb-2 opacity-80 leading-tight"
+              style={{ color: textColor }}
             >
-              {subtitle.length > 50 ? subtitle.substring(0, 50) + '...' : subtitle}
-            </p>
+              {subtitle.substring(0, 30)}{subtitle.length > 30 ? '...' : ''}
+            </div>
           )}
           
           {/* Button */}
-          {showButton && buttonText && buttonText.trim() !== '' && (
-            <div
-              className="inline-block px-1.5 py-0.5 rounded shadow-sm font-medium"
+          {showButton && buttonText && (
+            <div 
+              className="inline-block px-1 py-0.5 rounded text-[3px] font-medium"
               style={{
                 backgroundColor: textColor === '#ffffff' ? '#1c2838' : '#ffffff',
-                color: textColor === '#ffffff' ? '#ffffff' : '#1c2838',
-                fontSize: '4px',
-                minWidth: '20px',
-                textAlign: 'center'
+                color: textColor === '#ffffff' ? '#ffffff' : '#1c2838'
               }}
             >
-              {buttonText.length > 15 ? buttonText.substring(0, 15) + '...' : buttonText}
+              {buttonText.substring(0, 10)}{buttonText.length > 10 ? '...' : ''}
             </div>
           )}
         </div>
