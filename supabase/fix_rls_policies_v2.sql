@@ -1,6 +1,6 @@
--- Fix RLS Policies für Admin-Zugriff
+-- Fix RLS Policies für Admin-Zugriff - Version 2
 
--- 1. Admin-Funktion erstellen
+-- 1. Admin-Funktionen erstellen
 CREATE OR REPLACE FUNCTION is_admin_user(user_id UUID DEFAULT auth.uid())
 RETURNS BOOLEAN AS $$
 BEGIN
@@ -13,7 +13,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Funktion um zu prüfen ob User authentifiziert ist
 CREATE OR REPLACE FUNCTION is_authenticated()
 RETURNS BOOLEAN AS $$
 BEGIN
@@ -21,46 +20,47 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 2. Licenses Policies korrigieren
-DROP POLICY IF EXISTS "Lizenzen nur vom Besitzer lesbar" ON licenses;
+-- 2. Alle existierenden Policies löschen und neu erstellen
 
--- Benutzer können eigene Lizenzen lesen ODER Admins können alle lesen
+-- Licenses Policies
+DROP POLICY IF EXISTS "Lizenzen lesbar" ON licenses;
+DROP POLICY IF EXISTS "Lizenzen admin insert" ON licenses;
+DROP POLICY IF EXISTS "Lizenzen admin update" ON licenses;
+DROP POLICY IF EXISTS "Lizenzen admin delete" ON licenses;
+
 CREATE POLICY "Lizenzen lesbar" ON licenses
   FOR SELECT USING (
     auth.uid() = user_id OR is_admin_user()
   );
 
--- Admin kann Lizenzen erstellen
 CREATE POLICY "Lizenzen admin insert" ON licenses
   FOR INSERT WITH CHECK (is_admin_user());
 
--- Admin kann Lizenzen aktualisieren
 CREATE POLICY "Lizenzen admin update" ON licenses
   FOR UPDATE USING (is_admin_user());
 
--- Admin kann Lizenzen löschen
 CREATE POLICY "Lizenzen admin delete" ON licenses
   FOR DELETE USING (is_admin_user());
 
--- 3. Templates Policies erweitern
--- Admin kann Templates erstellen
+-- Templates Policies (Templates sollten für alle lesbar bleiben)
+DROP POLICY IF EXISTS "Templates admin insert" ON templates;
+DROP POLICY IF EXISTS "Templates admin update" ON templates;
+DROP POLICY IF EXISTS "Templates admin delete" ON templates;
+
 CREATE POLICY "Templates admin insert" ON templates
   FOR INSERT WITH CHECK (is_admin_user());
 
--- Admin kann Templates aktualisieren
 CREATE POLICY "Templates admin update" ON templates
   FOR UPDATE USING (is_admin_user());
 
--- Admin kann Templates löschen
 CREATE POLICY "Templates admin delete" ON templates
   FOR DELETE USING (is_admin_user());
 
--- 4. Sections Policies erweitern
--- Sections können nur vom eigenen Benutzer gelesen/bearbeitet werden ODER von Admins
-DROP POLICY IF EXISTS "Sections nur vom Besitzer lesbar" ON sections;
-DROP POLICY IF EXISTS "Sections nur vom Besitzer bearbeitbar" ON sections;
-DROP POLICY IF EXISTS "Sections nur vom Besitzer erstellbar" ON sections;
-DROP POLICY IF EXISTS "Sections nur vom Besitzer löschbar" ON sections;
+-- Sections Policies
+DROP POLICY IF EXISTS "Sections lesbar" ON sections;
+DROP POLICY IF EXISTS "Sections bearbeitbar" ON sections;
+DROP POLICY IF EXISTS "Sections erstellbar" ON sections;
+DROP POLICY IF EXISTS "Sections löschbar" ON sections;
 
 CREATE POLICY "Sections lesbar" ON sections
   FOR SELECT USING (auth.uid() = user_id OR is_admin_user());
@@ -74,9 +74,8 @@ CREATE POLICY "Sections erstellbar" ON sections
 CREATE POLICY "Sections löschbar" ON sections
   FOR DELETE USING (auth.uid() = user_id OR is_admin_user());
 
--- 5. Product Template Mapping Policy korrigieren (falls vorhanden)
-DROP POLICY IF EXISTS "Product mapping modifiable by admins" ON product_template_mapping;
+-- Product Template Mapping Policies
+DROP POLICY IF EXISTS "Product mapping admin access" ON product_template_mapping;
 
--- Erstelle korrekte Admin Policy für Product Template Mapping
 CREATE POLICY "Product mapping admin access" ON product_template_mapping
   FOR ALL USING (is_admin_user());
