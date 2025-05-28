@@ -23,7 +23,7 @@ const formatDate = (dateString: string) => {
   return `${day}.${month}.${year} ${hours}:${minutes}`;
 };
 
-// Component for Section Preview - renders HTML output at scale
+// Component for Section Preview - generates preview based on section type and data
 const SectionPreview = ({ sectionData }: { sectionData: any }) => {
   let data;
   try {
@@ -32,23 +32,59 @@ const SectionPreview = ({ sectionData }: { sectionData: any }) => {
     data = {};
   }
 
-  // If we have HTML output, use that
-  if (data.htmlOutput) {
+  console.log('Section data for preview:', data); // Debug log
+
+  // Check if it's a social proof section
+  if (data.sectionType === 'socialproof' || data.type === 'socialproof') {
+    const {
+      names = 'Anna, Lisa',
+      additionalText = 'und 12.400+ Kunden nutzen unser Tool erfolgreich',
+      backgroundColor = '#f7f7f7',
+      textColor = '#000000',
+      images = []
+    } = data;
+
     return (
       <div className="w-full h-full relative overflow-hidden flex items-center justify-center p-2">
         <div 
-          className="w-full max-w-full scale-75 origin-center"
-          dangerouslySetInnerHTML={{ __html: data.htmlOutput }}
+          className="flex items-center rounded-lg p-2 shadow-sm"
           style={{ 
-            transform: 'scale(0.4)',
-            transformOrigin: 'center center'
+            backgroundColor: backgroundColor,
+            fontSize: '6px',
+            transform: 'scale(0.8)'
           }}
-        />
+        >
+          {/* Profile Images */}
+          <div className="flex items-center mr-2">
+            {images.slice(0, 2).map((img: any, index: number) => (
+              <div
+                key={index}
+                className="w-4 h-4 rounded-full border border-white bg-gray-200 flex items-center justify-center text-[4px] -mr-1"
+                style={{ zIndex: 10 - index }}
+              >
+                {img.url ? (
+                  <img 
+                    src={img.url} 
+                    alt="User" 
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  '👤'
+                )}
+              </div>
+            ))}
+          </div>
+          
+          {/* Text Content */}
+          <div style={{ color: textColor, lineHeight: '1.2' }}>
+            <strong>{names}</strong> {additionalText}
+          </div>
+        </div>
       </div>
     );
   }
 
-  // Fallback to generated preview
+  // Hero Section Preview
   const {
     title = 'Hero Section',
     subtitle = 'Beispiel Subtitle',
