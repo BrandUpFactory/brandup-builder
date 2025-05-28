@@ -23,74 +23,98 @@ const formatDate = (dateString: string) => {
   return `${day}.${month}.${year} ${hours}:${minutes}`;
 };
 
-// Component for Section Preview - simple and working preview
+// Component for Section Preview - working preview for any section
 const SectionPreview = ({ sectionData }: { sectionData: any }) => {
   let data;
   try {
     data = typeof sectionData === 'string' ? JSON.parse(sectionData) : sectionData;
-    console.log('Preview data:', data); // Debug
   } catch (error) {
-    console.log('Preview parse error:', error);
     data = {};
   }
 
-  // Extract data with defaults
+  // Extract all possible data
   const title = data.title || 'Section';
   const subtitle = data.subtitle || '';
-  const backgroundColor = data.color || '#f5f7fa';
+  const backgroundColor = data.color || data.backgroundColor || '#f5f7fa';
   const textColor = data.textColor || '#ffffff';
   const buttonText = data.buttonText || '';
   const showButton = data.showButton !== false;
   const imageUrl = data.imageUrl || '';
+  const alignment = data.alignment || 'center';
+
+  // Determine text alignment
+  const textAlign = alignment === 'left' ? 'left' : alignment === 'right' ? 'right' : 'center';
 
   return (
-    <div className="w-full h-full bg-white flex items-center justify-center overflow-hidden">
+    <div className="w-full h-full overflow-hidden rounded-lg">
       <div 
-        className="w-full h-full flex flex-col items-center justify-center p-3 relative"
-        style={{ backgroundColor }}
+        className="w-full h-full relative flex items-center justify-center"
+        style={{ 
+          backgroundColor,
+          minHeight: '100%'
+        }}
       >
         {/* Background Image */}
-        {imageUrl && (
-          <div className="absolute inset-0 opacity-30">
+        {imageUrl && imageUrl.trim() !== '' && (
+          <div className="absolute inset-0">
             <img 
               src={imageUrl} 
               alt="" 
               className="w-full h-full object-cover"
-              onError={(e) => (e.target as HTMLElement).style.display = 'none'}
+              style={{ opacity: 0.25 }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
             />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/5 to-black/20"></div>
           </div>
         )}
         
         {/* Content */}
-        <div className="relative z-10 text-center">
+        <div 
+          className="relative z-10 p-2 w-full max-w-[90%]"
+          style={{ textAlign }}
+        >
           {/* Title */}
           <div 
-            className="font-bold mb-1 text-[6px] leading-tight"
-            style={{ color: textColor }}
+            className="font-bold leading-tight mb-1"
+            style={{ 
+              color: textColor,
+              fontSize: '8px',
+              textShadow: textColor === '#ffffff' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
+              wordBreak: 'break-word'
+            }}
           >
             {title}
           </div>
           
           {/* Subtitle */}
-          {subtitle && (
+          {subtitle && subtitle.trim() !== '' && (
             <div 
-              className="text-[4px] mb-2 opacity-80 leading-tight"
-              style={{ color: textColor }}
+              className="opacity-90 leading-tight mb-2"
+              style={{ 
+                color: textColor,
+                fontSize: '5px',
+                textShadow: textColor === '#ffffff' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
+                wordBreak: 'break-word'
+              }}
             >
-              {subtitle.substring(0, 30)}{subtitle.length > 30 ? '...' : ''}
+              {subtitle.length > 60 ? subtitle.substring(0, 60) + '...' : subtitle}
             </div>
           )}
           
           {/* Button */}
-          {showButton && buttonText && (
-            <div 
-              className="inline-block px-1 py-0.5 rounded text-[3px] font-medium"
+          {showButton && buttonText && buttonText.trim() !== '' && (
+            <div
+              className="inline-block px-2 py-1 rounded font-medium shadow-sm"
               style={{
                 backgroundColor: textColor === '#ffffff' ? '#1c2838' : '#ffffff',
-                color: textColor === '#ffffff' ? '#ffffff' : '#1c2838'
+                color: textColor === '#ffffff' ? '#ffffff' : '#1c2838',
+                fontSize: '4px',
+                border: `1px solid ${textColor === '#ffffff' ? '#1c2838' : '#cccccc'}`
               }}
             >
-              {buttonText.substring(0, 10)}{buttonText.length > 10 ? '...' : ''}
+              {buttonText.length > 12 ? buttonText.substring(0, 12) + '...' : buttonText}
             </div>
           )}
         </div>
