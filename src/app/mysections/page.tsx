@@ -23,7 +23,7 @@ const formatDate = (dateString: string) => {
   return `${day}.${month}.${year} ${hours}:${minutes}`;
 };
 
-// Component for Section Preview - renders actual section layout in miniature
+// Component for Section Preview - renders HTML output at scale
 const SectionPreview = ({ sectionData }: { sectionData: any }) => {
   let data;
   try {
@@ -32,6 +32,23 @@ const SectionPreview = ({ sectionData }: { sectionData: any }) => {
     data = {};
   }
 
+  // If we have HTML output, use that
+  if (data.htmlOutput) {
+    return (
+      <div className="w-full h-full relative overflow-hidden flex items-center justify-center p-2">
+        <div 
+          className="w-full max-w-full scale-75 origin-center"
+          dangerouslySetInnerHTML={{ __html: data.htmlOutput }}
+          style={{ 
+            transform: 'scale(0.4)',
+            transformOrigin: 'center center'
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Fallback to generated preview
   const {
     title = 'Hero Section',
     subtitle = 'Beispiel Subtitle',
@@ -40,23 +57,14 @@ const SectionPreview = ({ sectionData }: { sectionData: any }) => {
     imageUrl = '/BG_Card_55.jpg',
     textColor = '#ffffff',
     showButton = true,
-    alignment = 'center',
-    padding = '80px'
+    alignment = 'center'
   } = data;
 
-  // Convert padding to scale
-  const paddingValue = parseInt(padding) || 80;
-  const scaledPadding = Math.max(4, paddingValue / 20); // Scale down for preview
-
   return (
-    <div className="w-full h-full relative overflow-hidden">
-      {/* Actual Section Layout - Scaled Down */}
+    <div className="w-full h-full relative overflow-hidden flex items-center justify-center">
       <div 
-        className="relative w-full h-full flex items-center"
-        style={{ 
-          backgroundColor: color,
-          padding: `${scaledPadding}px`
-        }}
+        className="relative w-full h-full flex items-center justify-center p-2"
+        style={{ backgroundColor: color }}
       >
         {/* Background Image */}
         {imageUrl && (
@@ -73,44 +81,30 @@ const SectionPreview = ({ sectionData }: { sectionData: any }) => {
         
         {/* Content Container */}
         <div 
-          className={`relative z-10 w-full ${
-            alignment === 'left' ? 'text-left' : 
-            alignment === 'right' ? 'text-right' : 
-            'text-center'
-          }`}
+          className={`relative z-10 text-center max-w-[80%]`}
         >
-          {/* Title */}
           <h1 
-            className="font-bold mb-1 leading-tight"
-            style={{ 
-              color: textColor,
-              fontSize: '10px'
-            }}
+            className="font-bold mb-1 leading-tight text-[8px]"
+            style={{ color: textColor }}
           >
             {title}
           </h1>
           
-          {/* Subtitle */}
           {subtitle && (
             <p 
-              className="mb-2 opacity-90 leading-relaxed"
-              style={{ 
-                color: textColor,
-                fontSize: '6px'
-              }}
+              className="mb-2 opacity-90 leading-relaxed text-[6px]"
+              style={{ color: textColor }}
             >
               {subtitle}
             </p>
           )}
           
-          {/* Button */}
           {showButton && buttonText && (
             <div
-              className="inline-block px-2 py-1 rounded font-medium transition-all duration-300 shadow-sm"
+              className="inline-block px-2 py-1 rounded text-[4px] font-medium"
               style={{
                 backgroundColor: textColor === '#ffffff' ? '#1c2838' : '#ffffff',
-                color: textColor === '#ffffff' ? '#ffffff' : '#1c2838',
-                fontSize: '5px'
+                color: textColor === '#ffffff' ? '#ffffff' : '#1c2838'
               }}
             >
               {buttonText}
@@ -596,14 +590,17 @@ export default function MySectionsPage() {
                                   </>
                                 )}
                                 
-                                {/* Hover Overlay - Fix z-index */}
-                                <div className="absolute inset-0 bg-[#1c2838]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20 pointer-events-none">
-                                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 pointer-events-auto">
+                                {/* Hover Overlay - Clickable edit button */}
+                                <Link
+                                  href={`/editor/${section.template_id}?id=${section.id}`}
+                                  className="absolute inset-0 bg-[#1c2838]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20"
+                                >
+                                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 hover:bg-white transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#1c2838]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                   </div>
-                                </div>
+                                </Link>
                               </div>
                               
                               {/* Section Info */}
@@ -627,7 +624,7 @@ export default function MySectionsPage() {
                                         setActiveDropdown(activeDropdown === section.id ? null : section.id);
                                       }}
                                     >
-                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                                       </svg>
                                     </button>
@@ -635,7 +632,7 @@ export default function MySectionsPage() {
                                     {activeDropdown === section.id && (
                                       <div className="absolute top-full right-0 mt-1 w-40 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
                                         <button 
-                                          className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 transition-colors flex items-center space-x-2"
+                                          className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 transition-colors flex items-center space-x-2 text-gray-700"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             setSectionToRename(section);
@@ -643,7 +640,7 @@ export default function MySectionsPage() {
                                             setActiveDropdown(null);
                                           }}
                                         >
-                                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                           </svg>
                                           <span>Umbenennen</span>
