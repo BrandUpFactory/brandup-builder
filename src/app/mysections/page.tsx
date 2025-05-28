@@ -23,7 +23,7 @@ const formatDate = (dateString: string) => {
   return `${day}.${month}.${year} ${hours}:${minutes}`;
 };
 
-// Component for Section Preview
+// Component for Section Preview - renders actual section layout in miniature
 const SectionPreview = ({ sectionData }: { sectionData: any }) => {
   let data;
   try {
@@ -39,15 +39,24 @@ const SectionPreview = ({ sectionData }: { sectionData: any }) => {
     buttonText = 'Button',
     imageUrl = '/BG_Card_55.jpg',
     textColor = '#ffffff',
-    showButton = true
+    showButton = true,
+    alignment = 'center',
+    padding = '80px'
   } = data;
 
+  // Convert padding to scale
+  const paddingValue = parseInt(padding) || 80;
+  const scaledPadding = Math.max(4, paddingValue / 20); // Scale down for preview
+
   return (
-    <div className="w-full h-full relative overflow-hidden rounded-lg">
-      {/* Mini Hero Section Preview */}
+    <div className="w-full h-full relative overflow-hidden">
+      {/* Actual Section Layout - Scaled Down */}
       <div 
-        className="absolute inset-0 flex items-center justify-center p-2"
-        style={{ backgroundColor: color }}
+        className="relative w-full h-full flex items-center"
+        style={{ 
+          backgroundColor: color,
+          padding: `${scaledPadding}px`
+        }}
       >
         {/* Background Image */}
         {imageUrl && (
@@ -55,29 +64,55 @@ const SectionPreview = ({ sectionData }: { sectionData: any }) => {
             <img 
               src={imageUrl} 
               alt="Preview" 
-              className="w-full h-full object-cover opacity-30"
+              className="w-full h-full object-cover"
+              style={{ opacity: 0.4 }}
             />
+            <div className="absolute inset-0 bg-black/20"></div>
           </div>
         )}
         
-        {/* Content */}
-        <div className="relative z-10 text-center">
-          <h3 
-            className="text-xs font-bold mb-1 truncate"
-            style={{ color: textColor }}
+        {/* Content Container */}
+        <div 
+          className={`relative z-10 w-full ${
+            alignment === 'left' ? 'text-left' : 
+            alignment === 'right' ? 'text-right' : 
+            'text-center'
+          }`}
+        >
+          {/* Title */}
+          <h1 
+            className="font-bold mb-1 leading-tight"
+            style={{ 
+              color: textColor,
+              fontSize: '10px'
+            }}
           >
             {title}
-          </h3>
+          </h1>
+          
+          {/* Subtitle */}
           {subtitle && (
             <p 
-              className="text-[8px] mb-1 opacity-80 truncate max-w-[120px]"
-              style={{ color: textColor }}
+              className="mb-2 opacity-90 leading-relaxed"
+              style={{ 
+                color: textColor,
+                fontSize: '6px'
+              }}
             >
               {subtitle}
             </p>
           )}
+          
+          {/* Button */}
           {showButton && buttonText && (
-            <div className="inline-block bg-white/20 backdrop-blur-sm rounded text-[6px] px-1 py-0.5 mt-1">
+            <div
+              className="inline-block px-2 py-1 rounded font-medium transition-all duration-300 shadow-sm"
+              style={{
+                backgroundColor: textColor === '#ffffff' ? '#1c2838' : '#ffffff',
+                color: textColor === '#ffffff' ? '#ffffff' : '#1c2838',
+                fontSize: '5px'
+              }}
+            >
               {buttonText}
             </div>
           )}
@@ -418,9 +453,10 @@ export default function MySectionsPage() {
                 <h1 className="text-3xl lg:text-4xl font-bold text-[#1c2838] tracking-tight">Meine Sections</h1>
                 <p className="text-gray-600 mt-1">Hier findest du alle gespeicherten Varianten deiner bearbeiteten Templates.</p>
                 <p className="text-orange-500 mt-2 text-xs">
-                  Meine Section wird nicht angezeigt? {' '}
                   <a 
-                    href="mailto:support@brandupfactory.com" 
+                    href="https://www.brandupfactory.com/help-center" 
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="underline hover:text-orange-600 transition-colors"
                   >
                     Hilfe anfordern
@@ -560,9 +596,9 @@ export default function MySectionsPage() {
                                   </>
                                 )}
                                 
-                                {/* Hover Overlay */}
-                                <div className="absolute inset-0 bg-[#1c2838]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-3">
+                                {/* Hover Overlay - Fix z-index */}
+                                <div className="absolute inset-0 bg-[#1c2838]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20 pointer-events-none">
+                                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 pointer-events-auto">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#1c2838]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
