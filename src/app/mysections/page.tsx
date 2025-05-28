@@ -32,7 +32,6 @@ const SectionPreview = ({ sectionData }: { sectionData: any }) => {
     data = {};
   }
 
-  console.log('Section data for preview:', data); // Debug log
 
   // Check if it's a social proof section
   if (data.sectionType === 'socialproof' || data.type === 'socialproof') {
@@ -96,54 +95,73 @@ const SectionPreview = ({ sectionData }: { sectionData: any }) => {
     alignment = 'center'
   } = data;
 
+  const alignmentClass = alignment === 'left' ? 'text-left' : alignment === 'right' ? 'text-right' : 'text-center';
+
   return (
-    <div className="w-full h-full relative overflow-hidden flex items-center justify-center">
+    <div className="w-full h-full relative overflow-hidden">
       <div 
-        className="relative w-full h-full flex items-center justify-center p-2"
+        className="relative w-full h-full flex items-center justify-center"
         style={{ backgroundColor: color }}
       >
         {/* Background Image */}
-        {imageUrl && (
+        {imageUrl && imageUrl !== '' && (
           <div className="absolute inset-0">
             <img 
               src={imageUrl} 
               alt="Preview" 
               className="w-full h-full object-cover"
-              style={{ opacity: 0.4 }}
+              style={{ opacity: 0.3 }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
             />
-            <div className="absolute inset-0 bg-black/20"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/10 to-black/30"></div>
           </div>
         )}
         
         {/* Content Container */}
         <div 
-          className={`relative z-10 text-center max-w-[80%]`}
+          className={`relative z-10 px-2 py-1 max-w-[90%] ${alignmentClass}`}
         >
+          {/* Title */}
           <h1 
-            className="font-bold mb-1 leading-tight text-[8px]"
-            style={{ color: textColor }}
+            className="font-bold leading-tight mb-1"
+            style={{ 
+              color: textColor,
+              fontSize: '7px',
+              textShadow: textColor === '#ffffff' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'
+            }}
           >
             {title}
           </h1>
           
-          {subtitle && (
+          {/* Subtitle */}
+          {subtitle && subtitle.trim() !== '' && (
             <p 
-              className="mb-2 opacity-90 leading-relaxed text-[6px]"
-              style={{ color: textColor }}
+              className="opacity-90 leading-tight mb-2"
+              style={{ 
+                color: textColor,
+                fontSize: '5px',
+                textShadow: textColor === '#ffffff' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'
+              }}
             >
-              {subtitle}
+              {subtitle.length > 50 ? subtitle.substring(0, 50) + '...' : subtitle}
             </p>
           )}
           
-          {showButton && buttonText && (
+          {/* Button */}
+          {showButton && buttonText && buttonText.trim() !== '' && (
             <div
-              className="inline-block px-2 py-1 rounded text-[4px] font-medium"
+              className="inline-block px-1.5 py-0.5 rounded shadow-sm font-medium"
               style={{
                 backgroundColor: textColor === '#ffffff' ? '#1c2838' : '#ffffff',
-                color: textColor === '#ffffff' ? '#ffffff' : '#1c2838'
+                color: textColor === '#ffffff' ? '#ffffff' : '#1c2838',
+                fontSize: '4px',
+                minWidth: '20px',
+                textAlign: 'center'
               }}
             >
-              {buttonText}
+              {buttonText.length > 15 ? buttonText.substring(0, 15) + '...' : buttonText}
             </div>
           )}
         </div>
