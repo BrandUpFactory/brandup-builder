@@ -111,7 +111,7 @@ export default function Home() {
           <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-[#8dbbda]/10 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 xl:py-28 relative z-10">
+        <div className="max-w-7xl mx-auto px-0 py-16 md:py-24 xl:py-28 relative z-10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-10">
             <div className="max-w-2xl">
               <div className="flex items-center mb-6">
