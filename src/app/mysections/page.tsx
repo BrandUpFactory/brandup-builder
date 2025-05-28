@@ -212,13 +212,14 @@ export default function MySectionsPage() {
 
   if (checkingAuth) {
     return (
-      <div className="flex items-center justify-center h-screen text-gray-500 text-sm">
-        🔄 Authentifizierung wird geprüft...
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-gray-50 to-white">
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1c2838]"></div>
+          <p className="mt-4 text-gray-600 text-sm">Authentifizierung wird geprüft...</p>
+        </div>
       </div>
     )
   }
-
-  // We're now using allTemplatesWithSections instead of groupedSections
 
   // Handle rename
   const handleRename = async (newName: string) => {
@@ -320,7 +321,14 @@ export default function MySectionsPage() {
   };
 
   return (
-    <div className="p-6 md:p-10 h-screen bg-[#f9f9f9]" style={{ overflow: 'visible' }}>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#8dbbda]/5 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-[#1c2838]/3 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#8dbbda]/3 rounded-full blur-3xl"></div>
+      </div>
+
       {/* Rename Dialog */}
       <RenameDialog
         isOpen={renameDialogOpen}
@@ -330,98 +338,187 @@ export default function MySectionsPage() {
         title="Version umbenennen"
       />
       
-      <div className="bg-white shadow rounded-xl p-6 md:p-8 w-full max-w-5xl mx-auto" style={{ overflow: 'visible' }}>
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-[#1c2838] mb-1">Meine Sections</h1>
-            <p className="text-sm text-gray-600">
-              Hier findest du alle gespeicherten Varianten deiner bearbeiteten Templates.
-            </p>
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
+        {/* Header Section */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-10">
+          <div className="mb-6 lg:mb-0">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1c2838] to-[#263545] flex items-center justify-center mr-4 shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-3xl lg:text-4xl font-bold text-[#1c2838] tracking-tight">Meine Sections</h1>
+                <p className="text-gray-600 mt-1">Hier findest du alle gespeicherten Varianten deiner bearbeiteten Templates.</p>
+              </div>
+            </div>
           </div>
-          <Link href="/templates" className="bg-[#1c2838] text-white px-4 py-2 text-sm rounded-lg hover:opacity-90 transition cursor-pointer">
-            Neue Section erstellen
-          </Link>
+          
+          <div className="flex items-center space-x-4">
+            <div className="bg-white/60 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-2 shadow-sm">
+              <span className="text-sm text-gray-600">Templates: </span>
+              <span className="font-semibold text-[#1c2838]">{templates.length}</span>
+            </div>
+            <Link 
+              href="/templates" 
+              className="group bg-gradient-to-r from-[#1c2838] to-[#263545] text-white px-6 py-3 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center space-x-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <span>Neue Section erstellen</span>
+            </Link>
+          </div>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-8">
           {loading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+            <div className="flex justify-center items-center py-20">
+              <div className="flex flex-col items-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#1c2838]"></div>
+                <p className="mt-6 text-gray-600 text-lg">Lade deine Templates...</p>
+              </div>
             </div>
           ) : templates.length === 0 ? (
-            <div className="text-center py-16 bg-gray-50 rounded-xl border border-gray-100">
-              <div className="text-5xl mb-4">💾</div>
-              <h3 className="text-lg font-medium text-gray-700 mb-2">Keine Templates verfügbar</h3>
-              <p className="text-gray-500 mb-6 max-w-md mx-auto">
-                Es sind aktuell keine Templates verfügbar.
+            <div className="text-center py-20 bg-white/50 backdrop-blur-sm rounded-3xl border border-white/20 shadow-lg">
+              <div className="text-6xl mb-6">🎨</div>
+              <h3 className="text-2xl font-bold text-gray-700 mb-4">Keine Templates verfügbar</h3>
+              <p className="text-gray-500 mb-8 max-w-md mx-auto text-lg">
+                Es sind aktuell keine Templates verfügbar. Besuche unseren Shop, um Templates zu erwerben.
               </p>
+              <Link 
+                href="/templates" 
+                className="inline-flex items-center px-6 py-3 bg-[#1c2838] text-white rounded-xl hover:bg-[#263545] transition-colors"
+              >
+                Templates entdecken
+              </Link>
             </div>
           ) : (
-            <div className="space-y-8" style={{ overflow: 'visible' }}>
+            <div className="space-y-12">
               {Object.entries(allTemplatesWithSections).map(([templateId, { template, sections }]) => (
-                <div key={templateId} className="bg-gray-50 rounded-xl p-4 border border-gray-100" style={{ overflow: 'visible' }}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center overflow-hidden">
-                      {template?.image_url ? (
+                <div key={templateId} className="bg-white/60 backdrop-blur-sm rounded-3xl border border-white/20 shadow-lg overflow-hidden">
+                  {/* Template Header with Large Image */}
+                  <div className="relative h-48 lg:h-32 bg-gradient-to-r from-gray-100 to-gray-50 overflow-hidden">
+                    {/* Background Image */}
+                    {template?.image_url && (
+                      <div className="absolute inset-0">
                         <img 
                           src={template.image_url} 
                           alt={template.name} 
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover opacity-20"
                         />
-                      ) : (
-                        <span className="text-gray-400 text-lg">📄</span>
-                      )}
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#1c2838]/60 to-[#1c2838]/30"></div>
+                      </div>
+                    )}
+                    
+                    {/* Template Info */}
+                    <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center h-full p-6 lg:p-8">
+                      <div className="flex items-center space-x-4 flex-1">
+                        {/* Large Template Image */}
+                        <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-2xl overflow-hidden shadow-xl border-4 border-white/50 flex-shrink-0 bg-white">
+                          {template?.image_url ? (
+                            <img 
+                              src={template.image_url} 
+                              alt={template.name} 
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Template Details */}
+                        <div className="text-white">
+                          <h2 className="text-2xl lg:text-3xl font-bold mb-2">
+                            {template?.name || `Template ${templateId}`}
+                          </h2>
+                          <p className="text-white/80 text-sm lg:text-base">
+                            {sections.length} {sections.length === 1 ? 'Version' : 'Versionen'} erstellt
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Template Stats */}
+                      <div className="mt-4 lg:mt-0 flex items-center space-x-6 text-white/90">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold">{sections.length}</div>
+                          <div className="text-xs uppercase tracking-wider">Versionen</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold">{5 - sections.length}</div>
+                          <div className="text-xs uppercase tracking-wider">Verfügbar</div>
+                        </div>
+                      </div>
                     </div>
-                    <h2 className="font-medium text-[#1c2838]">
-                      {template?.name || `Template ${templateId}`}
-                    </h2>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" style={{ overflow: 'visible' }}>
-                    {sections.length > 0 ? (
-                      <>
-                        {sections.map((section) => (
-                          <div
-                            key={section.id}
-                            className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition"
-                            style={{ overflow: 'visible' }}
-                          >
-                            <div className="p-4">
-                              <div className="flex justify-between items-start mb-3">
-                                <div>
-                                  <h3 className="font-medium text-[#1c2838] mb-1">
-                                    {section.title || 'Version ' + (sections.indexOf(section) + 1)}
-                                  </h3>
-                                  <p className="text-xs text-gray-500">
-                                    Bearbeitet: {formatDate(section.updated_at || section.created_at)}
-                                  </p>
+                  {/* Sections Grid */}
+                  <div className="p-6 lg:p-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {sections.length > 0 ? (
+                        <>
+                          {sections.map((section) => (
+                            <div
+                              key={section.id}
+                              className="group bg-white rounded-2xl border border-gray-100 hover:border-[#8dbbda]/30 hover:shadow-xl transition-all duration-300 overflow-hidden"
+                            >
+                              {/* Section Preview */}
+                              <div className="aspect-video bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-br from-[#1c2838]/5 to-[#8dbbda]/5"></div>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <div className="text-center text-gray-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <span className="text-sm">Section Preview</span>
+                                  </div>
+                                </div>
+                                
+                                {/* Hover Overlay */}
+                                <div className="absolute inset-0 bg-[#1c2838]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                  <div className="bg-white/90 backdrop-blur-sm rounded-full p-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#1c2838]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                  </div>
                                 </div>
                               </div>
                               
-                              <div className="flex justify-between mt-4">
-                                <Link
-                                  href={`/editor/${section.template_id}?id=${section.id}`}
-                                  className="bg-[#1c2838] text-white px-3 py-2 text-xs rounded-lg hover:opacity-90 transition flex-grow text-center mr-2 shadow-sm cursor-pointer"
-                                >
-                                  Bearbeiten
-                                </Link>
-                                <div className="relative" style={{ overflow: 'visible' }}>
-                                  <button 
-                                    className="bg-[#1c2838] text-white px-3 py-2 text-xs rounded-lg hover:opacity-90 transition shadow-sm cursor-pointer"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setActiveDropdown(activeDropdown === section.id ? null : section.id);
-                                    }}
-                                  >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                                    </svg>
-                                  </button>
-                                  {activeDropdown === section.id && (
-                                    <div className="absolute top-full right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-[100]">
-                                      <div className="py-1">
+                              {/* Section Info */}
+                              <div className="p-5">
+                                <div className="flex justify-between items-start mb-3">
+                                  <div className="flex-1 min-w-0">
+                                    <h3 className="font-semibold text-[#1c2838] mb-1 truncate">
+                                      {section.title || 'Version ' + (sections.indexOf(section) + 1)}
+                                    </h3>
+                                    <p className="text-xs text-gray-500">
+                                      Bearbeitet: {formatDate(section.updated_at || section.created_at)}
+                                    </p>
+                                  </div>
+                                  
+                                  {/* Dropdown Menu */}
+                                  <div className="relative ml-2">
+                                    <button 
+                                      className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setActiveDropdown(activeDropdown === section.id ? null : section.id);
+                                      }}
+                                    >
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                                      </svg>
+                                    </button>
+                                    
+                                    {activeDropdown === section.id && (
+                                      <div className="absolute top-full right-0 mt-1 w-40 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
                                         <button 
-                                          className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 rounded-t-lg text-gray-700 transition flex items-center cursor-pointer"
+                                          className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 transition-colors flex items-center space-x-2"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             setSectionToRename(section);
@@ -429,86 +526,103 @@ export default function MySectionsPage() {
                                             setActiveDropdown(null);
                                           }}
                                         >
-                                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                           </svg>
-                                          Umbenennen
+                                          <span>Umbenennen</span>
                                         </button>
                                         <button 
-                                          className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 text-red-600 rounded-b-lg transition flex items-center cursor-pointer"
+                                          className="w-full text-left px-4 py-3 text-sm hover:bg-red-50 text-red-600 transition-colors flex items-center space-x-2"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             if (confirm('Möchtest du diese Version wirklich löschen?')) {
-                                            // Implementiere das tatsächliche Löschen
-                                            const deleteSection = async () => {
-                                              try {
-                                                const { error } = await supabase
-                                                  .from('sections')
-                                                  .delete()
-                                                  .eq('id', section.id);
-                                                
-                                                if (error) {
-                                                  throw error;
+                                              const deleteSection = async () => {
+                                                try {
+                                                  const { error } = await supabase
+                                                    .from('sections')
+                                                    .delete()
+                                                    .eq('id', section.id);
+                                                  
+                                                  if (error) {
+                                                    throw error;
+                                                  }
+                                                  
+                                                  setSections(sections.filter(s => s.id !== section.id));
+                                                  const updatedSections = {...allTemplatesWithSections};
+                                                  updatedSections[templateId].sections = updatedSections[templateId].sections.filter(s => s.id !== section.id);
+                                                  setAllTemplatesWithSections(updatedSections);
+                                                  
+                                                } catch (error) {
+                                                  console.error('Fehler beim Löschen:', error);
+                                                  alert('Fehler beim Löschen. Bitte versuche es erneut.');
                                                 }
-                                                
-                                                // Aktualisiere die lokale Ansicht ohne Neuladen
-                                                setSections(sections.filter(s => s.id !== section.id));
-                                                // Also update the allTemplatesWithSections state
-                                                const updatedSections = {...allTemplatesWithSections};
-                                                updatedSections[templateId].sections = updatedSections[templateId].sections.filter(s => s.id !== section.id);
-                                                setAllTemplatesWithSections(updatedSections);
-                                                
-                                                alert('Version wurde erfolgreich gelöscht!');
-                                              } catch (error) {
-                                                console.error('Fehler beim Löschen:', error);
-                                                alert('Fehler beim Löschen. Bitte versuche es erneut.');
-                                              }
-                                            };
-                                            deleteSection();
-                                          }
-                                        }}
-                                      >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                        Löschen
-                                      </button>
+                                              };
+                                              deleteSection();
+                                            }
+                                            setActiveDropdown(null);
+                                          }}
+                                        >
+                                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                          </svg>
+                                          <span>Löschen</span>
+                                        </button>
                                       </div>
-                                    </div>
-                                  )}
+                                    )}
+                                  </div>
                                 </div>
+                                
+                                {/* Action Button */}
+                                <Link
+                                  href={`/editor/${section.template_id}?id=${section.id}`}
+                                  className="block w-full bg-gradient-to-r from-[#1c2838] to-[#263545] text-white text-center py-3 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105 font-medium"
+                                >
+                                  Bearbeiten
+                                </Link>
                               </div>
                             </div>
-                          </div>
-                        ))}
-                      </>
-                    ) : (
-                      <div className="col-span-full text-center p-8 bg-white rounded-lg border border-gray-100">
-                        <div className="mb-3 text-4xl">🎨</div>
-                        <h3 className="text-lg font-medium text-[#1c2838] mb-2">Keine Versionen für dieses Template</h3>
-                        <p className="text-gray-500 text-sm mb-4">
-                          Erstelle deine erste Version, um mit diesem Template zu arbeiten.
-                        </p>
-                      </div>
-                    )}
-                    
-                    {/* Neue Version erstellen, wenn weniger als 5 Versionen */}
-                    {sections.length < 5 && (
-                      <div
-                        className="bg-white rounded-lg border border-dashed border-gray-300 p-4 flex flex-col items-center justify-center h-40 hover:bg-gray-50 cursor-pointer transition group shadow-sm hover:shadow-md"
-                        onClick={() => createNewSection(templateId)}
-                      >
-                        <div className="bg-[#1c2838] rounded-full p-3 mb-3 group-hover:scale-110 transition-transform">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                          </svg>
+                          ))}
+                        </>
+                      ) : (
+                        <div className="col-span-full text-center p-12 bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-200">
+                          <div className="mb-4 text-5xl">🎨</div>
+                          <h3 className="text-xl font-semibold text-[#1c2838] mb-2">Keine Versionen für dieses Template</h3>
+                          <p className="text-gray-500 text-sm mb-6">
+                            Erstelle deine erste Version, um mit diesem Template zu arbeiten.
+                          </p>
                         </div>
-                        <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
-                          {sections.length === 0 ? 'Erste Version erstellen' : 'Neue Version erstellen'}
-                        </span>
-                        <span className="text-xs text-gray-500 mt-1">({5 - sections.length} von 5 verfügbar)</span>
-                      </div>
-                    )}
+                      )}
+                      
+                      {/* Create New Version Card */}
+                      {sections.length < 5 && (
+                        <div
+                          className="group bg-gradient-to-br from-gray-50 to-white rounded-2xl border-2 border-dashed border-gray-300 hover:border-[#8dbbda] hover:from-[#8dbbda]/5 hover:to-[#8dbbda]/10 transition-all duration-300 cursor-pointer"
+                          onClick={() => createNewSection(templateId)}
+                        >
+                          <div className="aspect-video flex items-center justify-center">
+                            <div className="text-center">
+                              <div className="w-16 h-16 mx-auto mb-4 bg-[#1c2838] rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                              </div>
+                              <h3 className="text-lg font-semibold text-[#1c2838] mb-1">
+                                {sections.length === 0 ? 'Erste Version' : 'Neue Version'}
+                              </h3>
+                              <p className="text-sm text-gray-500">
+                                {5 - sections.length} von 5 verfügbar
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="p-5">
+                            <div className="w-full bg-[#8dbbda]/20 text-[#1c2838] text-center py-3 rounded-xl font-medium group-hover:bg-[#8dbbda]/30 transition-colors">
+                              Erstellen
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
