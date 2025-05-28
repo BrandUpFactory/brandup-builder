@@ -23,7 +23,7 @@ const formatDate = (dateString: string) => {
   return `${day}.${month}.${year} ${hours}:${minutes}`;
 };
 
-// Component for Section Preview - working preview for any section
+// Component for Section Preview - renders actual HTML output from sections
 const SectionPreview = ({ sectionData }: { sectionData: any }) => {
   let data;
   try {
@@ -32,93 +32,109 @@ const SectionPreview = ({ sectionData }: { sectionData: any }) => {
     data = {};
   }
 
-  // Extract all possible data
-  const title = data.title || 'Section';
-  const subtitle = data.subtitle || '';
-  const backgroundColor = data.color || data.backgroundColor || '#f5f7fa';
-  const textColor = data.textColor || '#ffffff';
-  const buttonText = data.buttonText || '';
-  const showButton = data.showButton !== false;
-  const imageUrl = data.imageUrl || '';
-  const alignment = data.alignment || 'center';
-
-  // Determine text alignment
-  const textAlign = alignment === 'left' ? 'left' : alignment === 'right' ? 'right' : 'center';
-
-  return (
-    <div className="w-full h-full overflow-hidden rounded-lg">
-      <div 
-        className="w-full h-full relative flex items-center justify-center"
-        style={{ 
-          backgroundColor,
-          minHeight: '100%'
-        }}
-      >
-        {/* Background Image */}
-        {imageUrl && imageUrl.trim() !== '' && (
-          <div className="absolute inset-0">
-            <img 
-              src={imageUrl} 
-              alt="" 
-              className="w-full h-full object-cover"
-              style={{ opacity: 0.25 }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/5 to-black/20"></div>
-          </div>
-        )}
-        
-        {/* Content */}
+  // If there's HTML output stored, use that
+  if (data.htmlOutput && data.htmlOutput.trim() !== '') {
+    return (
+      <div className="w-full h-full overflow-hidden bg-white flex items-center justify-center p-1">
         <div 
-          className="relative z-10 p-2 w-full max-w-[90%]"
-          style={{ textAlign }}
-        >
-          {/* Title */}
-          <div 
-            className="font-bold leading-tight mb-1"
-            style={{ 
-              color: textColor,
-              fontSize: '8px',
-              textShadow: textColor === '#ffffff' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
-              wordBreak: 'break-word'
-            }}
-          >
-            {title}
+          className="w-full h-full flex items-center justify-center"
+          style={{ 
+            transform: 'scale(0.3)',
+            transformOrigin: 'center center'
+          }}
+          dangerouslySetInnerHTML={{ __html: data.htmlOutput }}
+        />
+      </div>
+    );
+  }
+
+  // If there's generated HTML code, use that
+  if (data.generatedHtml && data.generatedHtml.trim() !== '') {
+    return (
+      <div className="w-full h-full overflow-hidden bg-white flex items-center justify-center p-1">
+        <div 
+          className="w-full h-full flex items-center justify-center"
+          style={{ 
+            transform: 'scale(0.3)',
+            transformOrigin: 'center center'
+          }}
+          dangerouslySetInnerHTML={{ __html: data.generatedHtml }}
+        />
+      </div>
+    );
+  }
+
+  // Generate the exact Social Proof HTML like from the builder
+  const generateSocialProofHtml = () => {
+    const {
+      names = 'Anna, Lisa',
+      additionalText = 'und 12.400+ Kunden nutzen unser Tool erfolgreich',
+      backgroundColor = '#f7f7f7',
+      textColor = '#000000',
+      images = [
+        'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619',
+        'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098'
+      ]
+    } = data;
+
+    return `
+      <style>
+        .social-proof-isolated {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+        }
+        .social-proof-isolated *,
+        .social-proof-isolated *::before,
+        .social-proof-isolated *::after {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+        }
+        .social-proof-isolated img {
+          border: none;
+          vertical-align: middle;
+          max-width: 100%;
+        }
+        .social-proof-text {
+          margin-left: 12px;
+          line-height: 1.4;
+          flex-shrink: 0;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+        }
+      </style>
+      <div class="social-proof-isolated" style="display: flex !important; align-items: center !important; background-color: ${backgroundColor} !important; padding: 12px !important; border-radius: 12px !important; font-family: Arial, sans-serif !important; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important; margin: 0 0 12px 0 !important; color: ${textColor} !important; font-weight: 500 !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; font-size: 12px !important; line-height: 1.4 !important;">
+        <div style="display: flex !important; align-items: center !important; flex-shrink: 0 !important;">
+          <div style="margin: 0 -8px 0 0 !important; z-index: 3 !important;">
+            <img src="${images[0] || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619'}" alt="User 1" style="width: 32px !important; height: 32px !important; border-radius: 50% !important; border: 2px solid #ffffff !important; object-fit: cover !important; flex-shrink: 0 !important; display: block !important; margin: 0 !important; padding: 0 !important;" onerror="this.style.display='none'">
           </div>
-          
-          {/* Subtitle */}
-          {subtitle && subtitle.trim() !== '' && (
-            <div 
-              className="opacity-90 leading-tight mb-2"
-              style={{ 
-                color: textColor,
-                fontSize: '5px',
-                textShadow: textColor === '#ffffff' ? '0 1px 2px rgba(0,0,0,0.5)' : 'none',
-                wordBreak: 'break-word'
-              }}
-            >
-              {subtitle.length > 60 ? subtitle.substring(0, 60) + '...' : subtitle}
-            </div>
-          )}
-          
-          {/* Button */}
-          {showButton && buttonText && buttonText.trim() !== '' && (
-            <div
-              className="inline-block px-2 py-1 rounded font-medium shadow-sm"
-              style={{
-                backgroundColor: textColor === '#ffffff' ? '#1c2838' : '#ffffff',
-                color: textColor === '#ffffff' ? '#ffffff' : '#1c2838',
-                fontSize: '4px',
-                border: `1px solid ${textColor === '#ffffff' ? '#1c2838' : '#cccccc'}`
-              }}
-            >
-              {buttonText.length > 12 ? buttonText.substring(0, 12) + '...' : buttonText}
-            </div>
-          )}
+          <div style="margin: 0 0 0 0 !important; z-index: 2 !important;">
+            <img src="${images[1] || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098'}" alt="User 2" style="width: 32px !important; height: 32px !important; border-radius: 50% !important; border: 2px solid #ffffff !important; object-fit: cover !important; flex-shrink: 0 !important; display: block !important; margin: 0 !important; padding: 0 !important;" onerror="this.style.display='none'">
+          </div>
+        </div>
+        <div class="social-proof-text" style="padding: 0 !important;">
+          <span style="display: inline !important;">
+            <strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${names}</strong>
+            <img src="https://cdn.shopify.com/s/files/1/0818/2123/7577/files/insta-blue.png?v=1738073828" alt="Verifiziert" style="height: 14px !important; max-width: none !important; margin: 0 1px !important; vertical-align: baseline !important; transform: translateY(-1px) !important; object-fit: contain !important; display: inline !important; padding: 0 !important; border: none !important;" onerror="this.style.display='none'">
+            <span style="font-weight: 400 !important; word-spacing: 0.1em !important; letter-spacing: 0.01em !important; display: inline !important; margin: 0 !important; padding: 0 !important;">${additionalText}</span>
+          </span>
         </div>
       </div>
+    `;
+  };
+
+  // For now, generate Social Proof as example (you can extend this for other section types)
+  return (
+    <div className="w-full h-full overflow-hidden bg-white flex items-center justify-center p-1">
+      <div 
+        className="w-full h-full flex items-center justify-center"
+        style={{ 
+          transform: 'scale(0.4)',
+          transformOrigin: 'center center'
+        }}
+        dangerouslySetInnerHTML={{ __html: generateSocialProofHtml() }}
+      />
     </div>
   );
 };
