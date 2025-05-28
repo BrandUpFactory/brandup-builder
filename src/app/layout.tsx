@@ -5,17 +5,16 @@ import Navbar from '../components/Navbar'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [isMobile, setIsMobile] = useState(false)
-  const [isHomepage, setIsHomepage] = useState(false)
+  const pathname = usePathname()
+  const isHomepage = pathname === '/'
 
   useEffect(() => {
     // Prüfen der Bildschirmgröße und Setzen des Mobile-Status
     const checkIfMobile = () => setIsMobile(window.innerWidth < 1024)
-    
-    // Check if we're on the homepage
-    setIsHomepage(window.location.pathname === '/' || window.location.pathname === '')
     
     // Initial Check
     checkIfMobile()
