@@ -186,7 +186,7 @@ export default function EditorLayout({
       
       {activeTab === 'code' && (
         <div className="border rounded-xl p-4 bg-[#f9f9f9] mb-4">
-          <h2 className="text-lg font-semibold mb-2">Liquid Code</h2>
+          <h2 className="text-lg font-semibold mb-2">Code</h2>
           <div className="text-sm whitespace-pre-wrap">
             {code}
           </div>
@@ -266,7 +266,7 @@ export default function EditorLayout({
 
             {/* Code Output */}
             <div className="border rounded-xl p-4 bg-[#f9f9f9] overflow-auto">
-              <h2 className="text-lg font-semibold mb-2">Liquid Code</h2>
+              <h2 className="text-lg font-semibold mb-2">Code</h2>
               <div className="text-sm whitespace-pre-wrap">
                 {code}
               </div>
