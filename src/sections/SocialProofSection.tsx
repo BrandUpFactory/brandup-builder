@@ -57,7 +57,7 @@ const styleTemplates = [
     padding: '15px',
     avatarCount: 2,
     badgePosition: 'overAvatar',
-    customText: 'und 12.400+ weitere Kunden nutzen unser Tool erfolgreich',
+    customText: 'und <strong>12.400+ weitere Kunden</strong>, <strong>Tool erfolgreich</strong>',
     avatarImage1: '/Sections/Social_Proof/1.jpg',
     avatarImage2: '/Sections/Social_Proof/3.jpg',
   },
@@ -70,7 +70,7 @@ const styleTemplates = [
     padding: '15px',
     avatarCount: 3,
     badgePosition: 'standard',
-    customText: 'und 22.910+ weitere Kunden nutzen unsere Sections',
+    customText: 'und <strong>22.910+ weitere Kunden</strong>, <strong>Sections</strong>',
     avatarImage1: '/Sections/Social_Proof/1.jpg',
     avatarImage2: '/Sections/Social_Proof/2.jpg',
     avatarImage3: '/Sections/Social_Proof/3.jpg',
@@ -85,7 +85,7 @@ const styleTemplates = [
     padding: '15px',
     avatarCount: 1,
     badgePosition: 'overAvatar',
-    customText: 'und 1.100+ Kunden nutzen unsere Sections',
+    customText: 'und <strong>1.100+ Kunden</strong>, <strong>Sections</strong>',
     avatarImage1: '/Sections/Social_Proof/1.jpg',
   }
 ];
@@ -133,9 +133,10 @@ export default function SocialProofSection({
   const [firstName1, setFirstName1] = useState(safeInitialData.firstName1 || 'Tim')
   const [firstName2, setFirstName2] = useState(safeInitialData.firstName2 || 'Stephan')
   const [firstName3, setFirstName3] = useState(safeInitialData.firstName3 || 'Ben')
-  const [customText, setCustomText] = useState(safeInitialData.customText || 'und 12.400+ weitere Kunden nutzen unser Tool erfolgreich')
+  const [customText, setCustomText] = useState(safeInitialData.customText || 'und <strong>12.400+ weitere Kunden</strong>, <strong>Tool erfolgreich</strong>')
+  // Style 1 by default uses avatar 1 and 3
   const [avatarImage1, setAvatarImage1] = useState(safeInitialData.avatarImage1 || '/Sections/Social_Proof/1.jpg')
-  const [avatarImage2, setAvatarImage2] = useState(safeInitialData.avatarImage2 || '/Sections/Social_Proof/2.jpg')
+  const [avatarImage2, setAvatarImage2] = useState(safeInitialData.avatarImage2 || '/Sections/Social_Proof/3.jpg')
   const [avatarImage3, setAvatarImage3] = useState(safeInitialData.avatarImage3 || '/Sections/Social_Proof/3.jpg')
   const [verifiedImage, setVerifiedImage] = useState(safeInitialData.verifiedImage || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/insta-blue.png?v=1738073828')
   const [showBadge, setShowBadge] = useState(safeInitialData.showBadge !== undefined ? safeInitialData.showBadge : true)
@@ -970,7 +971,7 @@ export default function SocialProofSection({
                   value={avatarImage1}
                   onChange={(e) => setAvatarImage1(e.target.value)}
                   className="flex-1 border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                  placeholder="https://cdn.shopify.com/s/files/1/.../avatar1.jpg"
+                  placeholder="https://cdn.shopify.com/s/files/1/.../dein-bild.jpg"
                 />
               </div>
             </label>
@@ -994,7 +995,7 @@ export default function SocialProofSection({
                   value={avatarImage2}
                   onChange={(e) => setAvatarImage2(e.target.value)}
                   className="flex-1 border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                  placeholder="https://cdn.shopify.com/s/files/1/.../avatar2.jpg"
+                  placeholder="https://cdn.shopify.com/s/files/1/.../dein-bild.jpg"
                 />
               </div>
             </label>
@@ -1018,7 +1019,7 @@ export default function SocialProofSection({
                   value={avatarImage3}
                   onChange={(e) => setAvatarImage3(e.target.value)}
                   className="flex-1 border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
-                  placeholder="https://cdn.shopify.com/s/files/1/.../avatar3.jpg"
+                  placeholder="https://cdn.shopify.com/s/files/1/.../dein-bild.jpg"
                 />
               </div>
             </label>
@@ -1088,50 +1089,44 @@ export default function SocialProofSection({
       <div className="border-b pb-4">
         <h3 className="text-sm font-semibold mb-3 text-[#1c2838]">Styling</h3>
         <div className="space-y-3">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center">
-              <button
-                type="button"
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowBackground(!showBackground); }}
-                className="flex items-center cursor-pointer bg-transparent border-none p-0 m-0 focus:outline-none"
-              >
-                <div className={`relative w-9 h-5 ${showBackground ? 'bg-[#1c2838]' : 'bg-gray-200'} rounded-full transition-colors`}>
-                  <div className={`absolute top-[2px] ${showBackground ? 'right-[2px] translate-x-0' : 'left-[2px] translate-x-0'} bg-white border rounded-full h-4 w-4 transition-all`}></div>
-                </div>
-                <span className="ml-2 text-sm text-gray-600">Hintergrund anzeigen</span>
-              </button>
-              <HelpTooltip text="Schaltet den Hintergrund der Social Proof Box ein oder aus." />
-            </div>
-          </div>
-          
-          <div className={`space-y-3 ${showBackground ? '' : 'opacity-50 pointer-events-none'}`}>
+          <div className="space-y-3">
             <label className="block text-sm text-[#1c2838]">
               Hintergrundfarbe:
-              <div className="flex items-center mt-1">
-                <input
-                  type="color"
-                  value={backgroundColor}
-                  onChange={(e) => setBackgroundColor(e.target.value)}
-                  className="w-8 h-6 border rounded mr-2"
-                />
-                <span className="text-xs text-gray-500">{backgroundColor}</span>
+              <div className="space-y-2 mt-1">
+                <div className="flex items-center">
+                  <input
+                    type="color"
+                    value={backgroundColor}
+                    onChange={(e) => setBackgroundColor(e.target.value)}
+                    className="w-8 h-6 border rounded mr-2"
+                  />
+                  <span className="text-xs text-gray-500">{backgroundColor}</span>
+                </div>
+                
+                <div className="flex flex-col space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500">Deckkraft:</span>
+                    <span className="text-xs text-gray-500 w-8 text-right">{backgroundOpacity}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={backgroundOpacity}
+                    onChange={(e) => {
+                      setBackgroundOpacity(parseInt(e.target.value));
+                      if (parseInt(e.target.value) > 0 && !showBackground) {
+                        setShowBackground(true);
+                      } else if (parseInt(e.target.value) === 0 && showBackground) {
+                        setShowBackground(false);
+                      }
+                    }}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    onMouseDown={handleRangeInput}
+                  />
+                </div>
               </div>
-            </label>
-            
-            <label className="block text-sm text-[#1c2838]">
-              Deckkraft:
-              <div className="flex items-center space-x-2 mt-1">
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={backgroundOpacity}
-                  onChange={(e) => setBackgroundOpacity(parseInt(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                  onMouseDown={handleRangeInput}
-                />
-                <span className="text-xs text-gray-500 w-8 text-right">{backgroundOpacity}%</span>
-              </div>
+              <p className="text-xs text-gray-500 mt-1">0% = Transparent (kein Hintergrund)</p>
             </label>
           </div>
           
