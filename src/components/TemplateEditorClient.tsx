@@ -104,22 +104,13 @@ export default function TemplateEditorClient({
         template_id: section.template_id
       });
       
-      // Force create a clean object with exactly the properties we need
-      const cleanData = {
-        title: newData.title || "Untitled Hero Section",
-        subtitle: newData.subtitle || "",
-        color: newData.color || "#f5f7fa",
-        buttonText: newData.buttonText || "Button",
-        buttonLink: newData.buttonLink || "#",
-        imageUrl: newData.imageUrl || "/BG_Card_55.jpg",
-        alignment: newData.alignment || "center",
-        textColor: newData.textColor || "#ffffff",
-        padding: newData.padding || "80px",
-        showButton: newData.showButton !== undefined ? newData.showButton : true
-      };
+      // Use newData directly instead of forcing a HeroSection structure
+      // This allows different section types to save their own format
+      const cleanData = newData;
       
       // Ensure we're storing stringified JSON data
       const dataToSave = JSON.stringify(cleanData);
+      console.log("⚡ SaveSection: Saving full data of type:", cleanData.selectedStyle !== undefined ? "SocialProof" : "HeroSection");
       
       console.log("⚡ SaveSection: Saving section with ID:", section.id);
       console.log("⚡ SaveSection: Clean data being saved:", cleanData);
@@ -348,19 +339,36 @@ export default function TemplateEditorClient({
         return;
       }
       
-      // Default section data
-      const defaultData = {
-        title: "Hero Section",
-        subtitle: "Erstelle professionelle Shopify-Sektionen mit unserem intuitiven Builder.",
-        color: "#f5f7fa",
-        buttonText: "Jetzt entdecken",
-        buttonLink: "#",
-        imageUrl: "/BG_Card_55.jpg",
-        alignment: "center",
-        textColor: "#ffffff",
-        padding: "80px",
-        showButton: true
-      };
+      // Default section data - based on template type
+      let defaultData;
+      
+      if (templateId === 'socialproof') {
+        defaultData = {
+          firstName1: "Steffi",
+          firstName2: "Daniela",
+          backgroundColor: "#f7f7f7",
+          avatarImage1: "/Sections/Social_Proof/1.jpg",
+          avatarImage2: "/Sections/Social_Proof/2.jpg",
+          avatarCount: 2,
+          customText: "und <strong>12.400+</strong> weitere Kunden nutzen unser <strong>Tool erfolgreich</strong>",
+          selectedStyle: 0,
+          styleSettings: {}
+        };
+      } else {
+        // Default Hero section
+        defaultData = {
+          title: "Hero Section",
+          subtitle: "Erstelle professionelle Shopify-Sektionen mit unserem intuitiven Builder.",
+          color: "#f5f7fa",
+          buttonText: "Jetzt entdecken",
+          buttonLink: "#",
+          imageUrl: "/BG_Card_55.jpg",
+          alignment: "center",
+          textColor: "#ffffff",
+          padding: "80px",
+          showButton: true
+        };
+      }
       
       const userId = user.id;
       const templateId = template.id;
