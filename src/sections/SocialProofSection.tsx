@@ -108,7 +108,7 @@ export default function SocialProofSection({
   // State to store style-specific settings
   const [styleSettings, setStyleSettings] = useState<{
     [key: number]: any
-  }>({})
+  }>(safeInitialData.styleSettings || {})
   
   // Stable tutorial opener using useCallback
   const handleShowTutorial = useCallback(() => {
@@ -133,9 +133,17 @@ export default function SocialProofSection({
   
   // Load saved style settings if available
   useEffect(() => {
+    console.log('🔄 SocialProof: Initial load with data', safeInitialData);
+    
     if (safeInitialData.styleSettings) {
       setStyleSettings(safeInitialData.styleSettings);
     }
+    
+    // Mark component as loaded after a short delay to prevent premature saving
+    setTimeout(() => {
+      setIsLoaded(true);
+      console.log('🔄 SocialProof: Component marked as loaded');
+    }, 500);
   }, []);
   
   // Helper for range sliders - we don't prevent default to allow slider functionality
@@ -195,17 +203,22 @@ export default function SocialProofSection({
   const [marginBottom, setMarginBottom] = useState(safeInitialData.marginBottom || '12')
   const [marginLeft, setMarginLeft] = useState(safeInitialData.marginLeft || '0')
   
-  // Create a useEffect to load style-specific settings when style changes
+  // Initialize component and apply correct template based on selected style
   useEffect(() => {
-    // Apply the template when the component is loaded
-    if (selectedStyle !== undefined) {
-      // Small delay to ensure styleSettings is loaded from initialData
-      const timer = setTimeout(() => {
-        applyStyleTemplate(null, selectedStyle);
-      }, 10);
+    console.log('🔄 SocialProof: Initial style application', { selectedStyle, initialData: !!safeInitialData });
+    
+    // Apply the template with a short delay to ensure all state is initialized
+    const timer = setTimeout(() => {
+      applyStyleTemplate(null, selectedStyle);
       
-      return () => clearTimeout(timer);
-    }
+      // Mark component as fully loaded after style is applied
+      setTimeout(() => {
+        setIsLoaded(true);
+        console.log('🔄 SocialProof: Component marked as fully loaded');
+      }, 200);
+    }, 50);
+    
+    return () => clearTimeout(timer);
   }, []);
   
   // Preview device state - use external device if provided, otherwise internal state
@@ -238,6 +251,9 @@ export default function SocialProofSection({
   
   // Function to save current settings for a specific style
   const saveStyleSettings = (styleIndex: number) => {
+    // Skip saving if we're in initial loading
+    if (!isLoaded) return;
+    
     // Create a copy of the current settings for the style
     const styleData = {
       backgroundColor,
@@ -279,14 +295,35 @@ export default function SocialProofSection({
     };
     
     // Update the style settings
-    setStyleSettings(prev => ({
-      ...prev,
-      [styleIndex]: styleData
-    }));
+    setStyleSettings(prev => {
+      const newSettings = {...prev};
+      newSettings[styleIndex] = styleData;
+      return newSettings;
+    });
+    
+    // Trigger data update to parent immediately if not triggered by effect
+    if (!isEffectTriggered) {
+      setTimeout(() => {
+        if (onDataChange) {
+          const updatedSectionData = {
+            ...sectionData,
+            styleSettings: {...styleSettings, [styleIndex]: styleData}
+          };
+          onDataChange(updatedSectionData);
+          console.log('🔄 SocialProof: Immediate save triggered for style', styleIndex + 1);
+        }
+      }, 50);
+    }
   };
   
   // Reset a style to its default settings
-  const resetStyleToDefault = (styleIndex: number) => {
+  const resetStyleToDefault = (styleIndex: number, e?: React.MouseEvent) => {
+    // Prevent default propagation
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    // Get the template defaults
     const template = styleTemplates[styleIndex];
     
     // Remove custom settings for this style
@@ -298,6 +335,21 @@ export default function SocialProofSection({
     
     // Apply the default template
     applyStyleTemplate(null, styleIndex, true);
+    
+    // Notify user
+    alert('Die Einstellungen für Stil ' + (styleIndex + 1) + ' wurden auf Standard zurückgesetzt.');
+    
+    // Trigger immediate save
+    setTimeout(() => {
+      if (onDataChange) {
+        const updatedData = {
+          ...sectionData,
+          styleSettings: styleSettings
+        };
+        onDataChange(updatedData);
+        console.log('🔄 SocialProof: Reset to defaults triggered for style', styleIndex + 1);
+      }
+    }, 100);
   };
 
   // Apply style template
@@ -305,52 +357,57 @@ export default function SocialProofSection({
     // Prevent default to avoid scrolling if event exists
     if (e) e.preventDefault();
     
+    console.log('🔄 SocialProof: Applying template', { index: index + 1, isReset, hasSettings: !!styleSettings[index] });
+    
     // Save current style settings before switching
-    if (!isReset && selectedStyle !== index) {
+    if (!isReset && selectedStyle !== index && isLoaded) {
       saveStyleSettings(selectedStyle);
+      console.log('💾 SocialProof: Saved settings for previous style', selectedStyle + 1);
     }
     
     // Check if we have saved settings for this style
     const savedSettings = styleSettings[index];
     
     if (savedSettings && !isReset) {
-      // Apply saved settings
-      setBackgroundColor(savedSettings.backgroundColor);
-      setBackgroundOpacity(savedSettings.backgroundOpacity);
-      setTextColor(savedSettings.textColor);
-      setAvatarBorderColor(savedSettings.avatarBorderColor);
-      setBorderRadius(savedSettings.borderRadius);
-      setPadding(savedSettings.padding);
-      setPaddingTop(savedSettings.paddingTop);
-      setPaddingRight(savedSettings.paddingRight);
-      setPaddingBottom(savedSettings.paddingBottom);
-      setPaddingLeft(savedSettings.paddingLeft);
+      // Apply saved settings with fallbacks to prevent errors
+      setBackgroundColor(savedSettings.backgroundColor || styleTemplates[index].backgroundColor);
+      setBackgroundOpacity(savedSettings.backgroundOpacity || 100);
+      setTextColor(savedSettings.textColor || (index === 2 ? '#ffffff' : '#000000'));
+      setAvatarBorderColor(savedSettings.avatarBorderColor || styleTemplates[index].avatarBorderColor);
+      setBorderRadius(savedSettings.borderRadius || styleTemplates[index].borderRadius);
+      setPadding(savedSettings.padding || styleTemplates[index].padding);
+      setPaddingTop(savedSettings.paddingTop || '15');
+      setPaddingRight(savedSettings.paddingRight || '15');
+      setPaddingBottom(savedSettings.paddingBottom || '15');
+      setPaddingLeft(savedSettings.paddingLeft || '15');
       setMarginTop(savedSettings.marginTop || '0');
       setMarginRight(savedSettings.marginRight || '0');
       setMarginBottom(savedSettings.marginBottom || '12');
       setMarginLeft(savedSettings.marginLeft || '0');
-      setShowBackground(savedSettings.showBackground);
-      setShowBreakOnLarge(savedSettings.showBreakOnLarge);
-      setAvatarSize(savedSettings.avatarSize);
-      setAvatarCount(savedSettings.avatarCount);
-      setBadgePosition(savedSettings.badgePosition);
-      setShowBadge(savedSettings.showBadge);
-      setFontSizeDesktop(savedSettings.fontSizeDesktop);
-      setFontSizeTablet(savedSettings.fontSizeTablet);
-      setFontSizeMobile(savedSettings.fontSizeMobile);
-      setTextWrapDesktop(savedSettings.textWrapDesktop);
-      setTextWrapTablet(savedSettings.textWrapTablet);
-      setTextWrapMobile(savedSettings.textWrapMobile);
-      setCustomText(savedSettings.customText);
-      setFirstName1(savedSettings.firstName1);
-      setFirstName2(savedSettings.firstName2);
-      setFirstName3(savedSettings.firstName3);
-      setAvatarImage1(savedSettings.avatarImage1);
-      setAvatarImage2(savedSettings.avatarImage2);
-      setAvatarImage3(savedSettings.avatarImage3);
-      setBrandNameBold(savedSettings.brandNameBold);
-      setNamesFormatBold(savedSettings.namesFormatBold);
-      setUseFullWidth(savedSettings.useFullWidth);
+      setShowBackground(savedSettings.showBackground !== undefined ? savedSettings.showBackground : (index !== 1));
+      setShowBreakOnLarge(savedSettings.showBreakOnLarge !== undefined ? savedSettings.showBreakOnLarge : true);
+      setAvatarSize(savedSettings.avatarSize || '32px');
+      setAvatarCount(savedSettings.avatarCount || styleTemplates[index].avatarCount || 2);
+      setBadgePosition(savedSettings.badgePosition || styleTemplates[index].badgePosition || 'standard');
+      setShowBadge(savedSettings.showBadge !== undefined ? savedSettings.showBadge : true);
+      setFontSizeDesktop(savedSettings.fontSizeDesktop || '12px');
+      setFontSizeTablet(savedSettings.fontSizeTablet || '11px');
+      setFontSizeMobile(savedSettings.fontSizeMobile || '9px');
+      setTextWrapDesktop(savedSettings.textWrapDesktop || (index === 2 ? 75 : 40));
+      setTextWrapTablet(savedSettings.textWrapTablet || 55);
+      setTextWrapMobile(savedSettings.textWrapMobile || 70);
+      setCustomText(savedSettings.customText || styleTemplates[index].customText || 'und <strong>12.400+</strong> weitere Kunden nutzen unser <strong>Tool erfolgreich</strong>');
+      setFirstName1(savedSettings.firstName1 || 'Tim');
+      setFirstName2(savedSettings.firstName2 || (index === 1 ? 'Anna' : 'Stephan'));
+      setFirstName3(savedSettings.firstName3 || 'Ben');
+      setAvatarImage1(savedSettings.avatarImage1 || styleTemplates[index].avatarImage1 || '/Sections/Social_Proof/1.jpg');
+      setAvatarImage2(savedSettings.avatarImage2 || styleTemplates[index].avatarImage2 || '/Sections/Social_Proof/2.jpg');
+      setAvatarImage3(savedSettings.avatarImage3 || styleTemplates[index].avatarImage3 || '/Sections/Social_Proof/3.jpg');
+      setBrandNameBold(savedSettings.brandNameBold !== undefined ? savedSettings.brandNameBold : true);
+      setNamesFormatBold(savedSettings.namesFormatBold !== undefined ? savedSettings.namesFormatBold : true);
+      setUseFullWidth(savedSettings.useFullWidth !== undefined ? savedSettings.useFullWidth : true);
+      
+      console.log('🔄 SocialProof: Loaded saved settings for style', index + 1);
     } else {
       // Apply default template
       const template = styleTemplates[index];
@@ -533,6 +590,12 @@ export default function SocialProofSection({
   //
   // This ensures that the background is only shown when showBackground is true
 
+  // Flag to track if data change is triggered by effect
+  const [isEffectTriggered, setIsEffectTriggered] = useState(false);
+  
+  // Flag to track if component is fully loaded
+  const [isLoaded, setIsLoaded] = useState(false);
+  
   // Function to manually trigger data update to parent
   const triggerDataUpdate = useCallback(() => {
     // Save current style settings before triggering update
@@ -545,6 +608,7 @@ export default function SocialProofSection({
         styleSettings: styleSettings
       };
       onDataChange(updatedData);
+      console.log('🔄 SocialProof: Data update triggered', updatedData);
     }
   }, [onDataChange, sectionData, selectedStyle, styleSettings]);
 
@@ -562,12 +626,33 @@ export default function SocialProofSection({
   
   // Save current style settings whenever any style-related state changes
   useEffect(() => {
+    if (!isLoaded) return;
+    
+    // Set effect flag to prevent duplicate updates
+    setIsEffectTriggered(true);
+    
     // Small delay to avoid too many updates
     const timer = setTimeout(() => {
       saveStyleSettings(selectedStyle);
-    }, 300);
+      
+      if (onDataChange) {
+        // Include style settings in the data update
+        const updatedData = {
+          ...sectionData,
+          styleSettings: styleSettings
+        };
+        onDataChange(updatedData);
+        console.log('⚡ SocialProof: Auto-save triggered', selectedStyle);
+      }
+      
+      // Reset effect flag
+      setIsEffectTriggered(false);
+    }, 500);
     
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      setIsEffectTriggered(false);
+    };
   }, [
     backgroundColor, textColor, avatarBorderColor, borderRadius, padding, 
     paddingTop, paddingRight, paddingBottom, paddingLeft,
@@ -1017,15 +1102,15 @@ export default function SocialProofSection({
         <div className="flex justify-between items-center">
           <p className="text-xs text-gray-500">Wähle einen vordefinierten Stil als Ausgangspunkt.</p>
           <button
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); resetStyleToDefault(selectedStyle); }}
-            className="text-xs bg-white border border-gray-300 rounded px-2 py-1 hover:bg-gray-50 transition-colors flex items-center"
+            onClick={(e) => resetStyleToDefault(selectedStyle, e)}
+            className="text-xs bg-[#1c2838] text-white rounded px-3 py-1.5 hover:bg-[#364860] transition-colors flex items-center"
+            aria-label="Reset zu Standard"
+            title="Auf Standardeinstellungen zurücksetzen"
           >
-            <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M2 12C2 7.28595 5.28595 4 10 4C14.714 4 18 7.28595 18 12C18 16.714 14.714 20 10 20C5.28595 20 2 16.714 2 12Z" stroke="currentColor" strokeWidth="1.5"/>
-              <path d="M15 12C15 9.79086 13.2091 8 11 8C8.79086 8 7 9.79086 7 12C7 14.2091 8.79086 16 11 16C13.2091 16 15 14.2091 15 12Z" stroke="currentColor" strokeWidth="1.5"/>
-              <path d="M22 12C22 10.1166 21.0609 8.23466 19.1924 6.8497C17.3239 5.46474 14.714 5 12 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            <svg className="w-3.5 h-3.5 mr-1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 12C22 17.52 17.52 22 12 22C6.48 22 3.11 16.44 3.11 16.44M3.11 16.44H7.63M3.11 16.44V21.44M2 12C2 6.48 6.44 2 12 2C18.67 2 22 7.56 22 7.56M22 7.56V2.56M22 7.56H17.56" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            Standard
+            Auf Standard zurücksetzen
           </button>
         </div>
       </div>
