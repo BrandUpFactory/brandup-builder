@@ -23,222 +23,6 @@ const formatDate = (dateString: string) => {
   return `${day}.${month}.${year} ${hours}:${minutes}`;
 };
 
-// Component for Section Preview - renders actual HTML output from sections
-const SectionPreview = ({ sectionData }: { sectionData: any }) => {
-  let data;
-  try {
-    data = typeof sectionData === 'string' ? JSON.parse(sectionData) : sectionData;
-  } catch (error) {
-    data = {};
-  }
-
-  // If there's HTML output stored, use that (highest priority)
-  if (data.htmlOutput && data.htmlOutput.trim() !== '') {
-    return (
-      <div className="w-full h-full overflow-hidden bg-white rounded-lg">
-        <div 
-          className="w-full h-full flex items-center justify-center overflow-hidden"
-          style={{ 
-            transform: 'scale(0.65)',
-            transformOrigin: 'center center',
-            maxWidth: '100%',
-            maxHeight: '100%'
-          }}
-          dangerouslySetInnerHTML={{ __html: data.htmlOutput }}
-        />
-      </div>
-    );
-  }
-
-  // If there's generated HTML code, use that
-  if (data.generatedHtml && data.generatedHtml.trim() !== '') {
-    return (
-      <div className="w-full h-full overflow-hidden bg-white rounded-lg">
-        <div 
-          className="w-full h-full flex items-center justify-center overflow-hidden"
-          style={{ 
-            transform: 'scale(0.65)',
-            transformOrigin: 'center center',
-            maxWidth: '100%',
-            maxHeight: '100%'
-          }}
-          dangerouslySetInnerHTML={{ __html: data.generatedHtml }}
-        />
-      </div>
-    );
-  }
-
-  // Generate appropriate HTML based on the section data
-  const generateSectionHtml = () => {
-    // Check if this is a Feature Section based on specific properties
-    if (data.column_count || (data.blocks && Array.isArray(data.blocks))) {
-      // Prepare feature blocks
-      const featureBlocks = Array.isArray(data.blocks) 
-        ? data.blocks 
-        : [
-            { title: 'Feature 1', description: 'Feature Beschreibung 1' },
-            { title: 'Feature 2', description: 'Feature Beschreibung 2' },
-            { title: 'Feature 3', description: 'Feature Beschreibung 3' }
-          ];
-      
-      const {
-        title = 'Feature Section',
-        subtitle = 'Erstelle professionelle Shopify-Sektionen mit unserem intuitiven Builder.',
-        column_count = 3,
-        background_color = '#ffffff',
-        text_color = '#1c2838',
-        padding = 80
-      } = data;
-
-      // Generate the feature blocks HTML
-      const featuresHTML = featureBlocks.map(block => `
-        <div style="padding: 16px; border-radius: 8px; border: 1px solid #f0f0f0; background-color: white; transition: box-shadow 0.3s; margin-bottom: 16px;">
-          <div style="margin-bottom: 16px;">
-            <div style="width: 48px; height: 48px; background-color: #f7f7f7; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-              <span style="color: #888; font-size: 20px;">?</span>
-            </div>
-          </div>
-          <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #1c2838;">${block.title || 'Feature Titel'}</h3>
-          <p style="font-size: 14px; color: #666; opacity: 0.8;">${block.description || 'Feature Beschreibung'}</p>
-        </div>
-      `).join('');
-
-      return `
-        <div style="font-family: Arial, sans-serif; width: 400px; max-width: 400px; background-color: ${background_color}; color: ${text_color}; padding: 40px 20px; position: relative; overflow: hidden;">
-          <div style="text-align: center; margin-bottom: 32px;">
-            <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 12px; color: #1c2838;">${title}</h2>
-            <p style="font-size: 14px; opacity: 0.8; max-width: 320px; margin: 0 auto; color: #444;">${subtitle}</p>
-          </div>
-          
-          <div style="display: grid; grid-template-columns: repeat(${column_count}, 1fr); gap: 16px;">
-            ${featuresHTML}
-          </div>
-        </div>
-      `;
-    }
-    
-    // Check if this is a Social Proof section based on the data structure
-    if (data.names || data.additionalText || data.images) {
-      // Use the exact social proof HTML that was provided
-      return `
-      <style>
-        /* Clean CSS reset for social proof section */
-        .social-proof-isolated {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-        }
-        
-        .social-proof-isolated *,
-        .social-proof-isolated *::before,
-        .social-proof-isolated *::after {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-        }
-        
-        .social-proof-isolated img {
-          border: none;
-          vertical-align: middle;
-          max-width: 100%;
-        }
-    
-        /* Responsive text container with automatic line breaking */
-        .social-proof-text {
-          margin-left: 12px;
-          line-height: 1.4;
-          flex-shrink: 0;
-          word-wrap: break-word;
-          overflow-wrap: break-word;
-        }
-        
-        @media (max-width: 767px) {
-          .social-proof-text {
-            width: 70%;
-          }
-          .social-proof-responsive {
-            font-size: 9px !important;
-          }
-        }
-        
-        @media (min-width: 768px) and (max-width: 1299px) {
-          .social-proof-text {
-            width: 55%;
-          }
-          .social-proof-responsive {
-            font-size: 11px !important;
-          }
-        }
-        
-        @media (min-width: 1300px) {
-          .social-proof-text {
-            width: 40%;
-          }
-        }
-      </style>
-      <div class="social-proof-isolated social-proof-responsive" style="display: flex !important; align-items: center !important; background-color: ${data.backgroundColor || '#f7f7f7'} !important; padding: 12px !important; border-radius: 12px !important; font-family: Arial, sans-serif !important; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important; margin: 0 0 12px 0 !important; color: ${data.textColor || '#000000'} !important; font-weight: 500 !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; font-size: 12px !important; line-height: 1.4 !important;">
-        
-        <div style="display: flex !important; align-items: center !important; flex-shrink: 0 !important;">
-          
-            <div style="margin: 0 -8px 0 0 !important; z-index: 3 !important;">
-              <img src="${data.images?.[0] || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619'}" alt="User 1" style="width: 32px !important; height: 32px !important; border-radius: 50% !important; border: 2px solid #ffffff !important; object-fit: cover !important; flex-shrink: 0 !important; display: block !important; margin: 0 !important; padding: 0 !important;" onerror="this.style.display='none'">
-              
-            </div>
-          
-            <div style="margin: 0 0 0 0 !important; z-index: 2 !important;">
-              <img src="${data.images?.[1] || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098'}" alt="User 2" style="width: 32px !important; height: 32px !important; border-radius: 50% !important; border: 2px solid #ffffff !important; object-fit: cover !important; flex-shrink: 0 !important; display: block !important; margin: 0 !important; padding: 0 !important;" onerror="this.style.display='none'">
-              
-            </div>
-          
-        </div>
-        <div class="social-proof-text" style="padding: 0 !important;">
-          <span style="display: inline !important;">
-            <strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${data.names || 'Anna, Lisa'}</strong>
-               <img src="https://cdn.shopify.com/s/files/1/0818/2123/7577/files/insta-blue.png?v=1738073828" alt="Verifiziert" style="height: 14px !important; max-width: none !important; margin: 0 1px !important; vertical-align: baseline !important; transform: translateY(-1px) !important; object-fit: contain !important; display: inline !important; padding: 0 !important; border: none !important;" onerror="this.style.display='none'">
-            <span style="font-weight: 400 !important; word-spacing: 0.1em !important; letter-spacing: 0.01em !important; display: inline !important; margin: 0 !important; padding: 0 !important;">${data.additionalText || 'und 12.400+ Kunden nutzen unser Tool erfolgreich'}</span>
-          </span>
-        </div>
-      </div>
-      `;
-    }
-
-    // Hero section fallback (based on common Hero data structure)
-    const {
-      title = 'Hero Section',
-      subtitle = 'Erstelle professionelle Shopify-Sektionen',
-      buttonText = 'Jetzt entdecken',
-      imageUrl = '/BG_Card_55.jpg',
-      textColor = '#ffffff',
-      color = '#1c2838'
-    } = data;
-
-    return `
-      <div style="font-family: Arial, sans-serif; width: 400px; max-width: 400px; background: linear-gradient(135deg, ${color}, ${color}dd); color: ${textColor}; padding: 40px 30px; text-align: center; border-radius: 12px; position: relative; overflow: hidden;">
-        <div style="position: relative; z-index: 2;">
-          <h1 style="font-size: 28px; font-weight: bold; margin-bottom: 16px; line-height: 1.2; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${title}</h1>
-          <p style="font-size: 16px; margin-bottom: 24px; opacity: 0.9; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${subtitle}</p>
-          <button style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: ${textColor}; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; backdrop-filter: blur(10px);">${buttonText}</button>
-        </div>
-      </div>
-    `;
-  };
-
-  return (
-    <div className="w-full h-full overflow-hidden bg-white rounded-lg flex items-center justify-center">
-      <div 
-        className="flex items-center justify-center"
-        style={{ 
-          transform: 'scale(0.65)',
-          transformOrigin: 'center center',
-          maxWidth: '100%',
-          maxHeight: '100%',
-          overflow: 'hidden'
-        }}
-        dangerouslySetInnerHTML={{ __html: generateSectionHtml() }}
-      />
-    </div>
-  );
-};
 
 interface SectionEntry {
   id: number
@@ -696,23 +480,51 @@ export default function MySectionsPage() {
                               key={section.id}
                               className="group bg-white rounded-2xl border border-gray-100 hover:border-[#8dbbda]/30 hover:shadow-xl transition-all duration-300 overflow-hidden"
                             >
-                              {/* Section Preview */}
+                              {/* Stylish Section Type Visual */}
                               <div className="aspect-video bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
-                                {section.data ? (
-                                  <SectionPreview sectionData={section.data} />
-                                ) : (
-                                  <>
-                                    <div className="absolute inset-0 bg-gradient-to-br from-[#1c2838]/5 to-[#8dbbda]/5"></div>
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                      <div className="text-center text-gray-400">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
+                                  {/* Template Image/Icon */}
+                                  {template?.image_url ? (
+                                    <div className="relative mb-4">
+                                      <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-white shadow-lg">
+                                        <img 
+                                          src={template.image_url} 
+                                          alt={template.name} 
+                                          className="w-full h-full object-cover"
+                                        />
+                                      </div>
+                                      <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#8dbbda] rounded-full flex items-center justify-center shadow-md border border-white">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                         </svg>
-                                        <span className="text-sm">Section Preview</span>
                                       </div>
                                     </div>
-                                  </>
-                                )}
+                                  ) : (
+                                    <div className="w-16 h-16 bg-[#1c2838] rounded-xl flex items-center justify-center mb-4 shadow-lg">
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                                      </svg>
+                                    </div>
+                                  )}
+                                  
+                                  {/* Section Info */}
+                                  <h3 className="text-lg font-bold text-[#1c2838] mb-1 text-center">{section.title}</h3>
+                                  <div className="flex items-center justify-center mb-2">
+                                    <span className="text-xs bg-[#1c2838]/10 text-[#1c2838] px-2 py-1 rounded-full font-medium">
+                                      {template?.name || "Template"}
+                                    </span>
+                                  </div>
+                                  
+                                  {/* Status Badge */}
+                                  <div className="mt-2 flex items-center">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full mr-1.5"></div>
+                                    <span className="text-xs text-gray-600">Bereit für Export</span>
+                                  </div>
+                                </div>
+                                
+                                {/* Design Elements */}
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-[#8dbbda]/10 rounded-full transform translate-x-1/2 -translate-y-1/2 blur-2xl"></div>
+                                <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#1c2838]/5 rounded-full transform -translate-x-1/2 translate-y-1/2 blur-2xl"></div>
                                 
                                 {/* Hover Overlay - Clickable edit button */}
                                 <Link
