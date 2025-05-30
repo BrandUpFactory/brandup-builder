@@ -25,6 +25,10 @@ interface SocialProofSectionProps {
     paddingRight?: string;
     paddingBottom?: string;
     paddingLeft?: string;
+    marginTop?: string;
+    marginRight?: string;
+    marginBottom?: string;
+    marginLeft?: string;
     avatarCount?: number;
     customText?: string;
     selectedStyle?: number;
@@ -173,6 +177,12 @@ export default function SocialProofSection({
   const [paddingRight, setPaddingRight] = useState(safeInitialData.paddingRight || '15')
   const [paddingBottom, setPaddingBottom] = useState(safeInitialData.paddingBottom || '15')
   const [paddingLeft, setPaddingLeft] = useState(safeInitialData.paddingLeft || '15')
+  
+  // Margin settings
+  const [marginTop, setMarginTop] = useState(safeInitialData.marginTop || '0')
+  const [marginRight, setMarginRight] = useState(safeInitialData.marginRight || '0')
+  const [marginBottom, setMarginBottom] = useState(safeInitialData.marginBottom || '12')
+  const [marginLeft, setMarginLeft] = useState(safeInitialData.marginLeft || '0')
   
   // Preview device state - use external device if provided, otherwise internal state
   const [internalPreviewDevice, setInternalPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
@@ -325,6 +335,10 @@ export default function SocialProofSection({
     paddingRight,
     paddingBottom,
     paddingLeft,
+    marginTop,
+    marginRight,
+    marginBottom,
+    marginLeft,
     avatarCount,
     customText,
     selectedStyle,
@@ -1358,7 +1372,7 @@ export default function SocialProofSection({
       </div>
       
       {/* Advanced Settings - Padding with visual UI */}
-      <div>
+      <div className="border-b pb-4">
         <h3 className="text-sm font-semibold mb-3 text-[#1c2838]">Innenabstand (Padding)</h3>
         
         <div className="flex gap-3 mb-3">
@@ -1395,62 +1409,90 @@ export default function SocialProofSection({
           </div>
         ) : (
           <div className="space-y-2">
-            <div className="border border-gray-300 rounded-lg p-4 bg-gray-50 relative hover:border-[#1c2838]/30 transition">
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-2/3 h-2/3 border-2 border-dashed border-[#1c2838]/20 rounded flex items-center justify-center bg-white/80">
-                  <span className="text-xs text-[#1c2838]/70 font-medium">Inhalt</span>
-                </div>
-              </div>
-              
-              {/* Top padding input */}
-              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
-                <div className="text-[10px] text-gray-500 mb-1">oben</div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="col-span-1">
+                <label className="block text-sm text-[#1c2838] mb-1">Oben:</label>
                 <input
                   type="text"
                   value={paddingTop}
                   onChange={(e) => setPaddingTop(e.target.value)}
-                  className="w-12 h-6 text-xs border border-gray-300 text-center rounded focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+                  className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                 />
               </div>
-              
-              {/* Right padding input */}
-              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center">
-                <div className="text-[10px] text-gray-500 mr-1">rechts</div>
+              <div className="col-span-1">
+                <label className="block text-sm text-[#1c2838] mb-1">Rechts:</label>
                 <input
                   type="text"
                   value={paddingRight}
                   onChange={(e) => setPaddingRight(e.target.value)}
-                  className="w-12 h-6 text-xs border border-gray-300 text-center rounded focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+                  className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                 />
               </div>
-              
-              {/* Bottom padding input */}
-              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+              <div className="col-span-1">
+                <label className="block text-sm text-[#1c2838] mb-1">Unten:</label>
                 <input
                   type="text"
                   value={paddingBottom}
                   onChange={(e) => setPaddingBottom(e.target.value)}
-                  className="w-12 h-6 text-xs border border-gray-300 text-center rounded focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+                  className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                 />
-                <div className="text-[10px] text-gray-500 mt-1">unten</div>
               </div>
-              
-              {/* Left padding input */}
-              <div className="absolute left-2 top-1/2 transform -translate-y-1/2 flex items-center">
+              <div className="col-span-1">
+                <label className="block text-sm text-[#1c2838] mb-1">Links:</label>
                 <input
                   type="text"
                   value={paddingLeft}
                   onChange={(e) => setPaddingLeft(e.target.value)}
-                  className="w-12 h-6 text-xs border border-gray-300 text-center rounded focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+                  className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
                 />
-                <div className="text-[10px] text-gray-500 ml-1">links</div>
               </div>
-              
-              <div className="h-40"></div>
             </div>
-            <p className="text-xs text-gray-500">Gib für jede Seite den gewünschten Abstand ein.</p>
           </div>
         )}
+      </div>
+      
+      {/* Margin Settings */}
+      <div>
+        <h3 className="text-sm font-semibold mb-3 text-[#1c2838]">Außenabstand (Margin)</h3>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="col-span-1">
+            <label className="block text-sm text-[#1c2838] mb-1">Oben:</label>
+            <input
+              type="text"
+              value={marginTop}
+              onChange={(e) => setMarginTop(e.target.value)}
+              className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+            />
+          </div>
+          <div className="col-span-1">
+            <label className="block text-sm text-[#1c2838] mb-1">Rechts:</label>
+            <input
+              type="text"
+              value={marginRight}
+              onChange={(e) => setMarginRight(e.target.value)}
+              className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+            />
+          </div>
+          <div className="col-span-1">
+            <label className="block text-sm text-[#1c2838] mb-1">Unten:</label>
+            <input
+              type="text"
+              value={marginBottom}
+              onChange={(e) => setMarginBottom(e.target.value)}
+              className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+            />
+          </div>
+          <div className="col-span-1">
+            <label className="block text-sm text-[#1c2838] mb-1">Links:</label>
+            <input
+              type="text"
+              value={marginLeft}
+              onChange={(e) => setMarginLeft(e.target.value)}
+              className="w-full border px-3 py-1.5 rounded-md text-sm border-gray-300 focus:border-[#1c2838] focus:ring focus:ring-[#1c2838]/20 focus:outline-none transition"
+            />
+          </div>
+        </div>
+        <p className="text-xs text-gray-500 mt-2">Gib für jeden Außenabstand einen Wert ein (z.B. 0, 10, 15)</p>
       </div>
     </div>
   )
@@ -1474,7 +1516,7 @@ export default function SocialProofSection({
     const getDesktopSplit = () => getTextSplit(customText, 2);
     
     return `
-      <div style="display: flex; align-items: center; background-color: ${backgroundColor}; padding: ${getEffectivePadding()}; border-radius: ${borderRadius}; font-family: Arial, sans-serif; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-bottom: 12px; color: ${textColor}; font-weight: 500; width: ${useFullWidth ? '100%' : 'fit-content'}; max-width: 100%; box-sizing: border-box; font-size: ${currentFontSize};">
+      <div style="display: flex; align-items: center; background-color: ${backgroundColor}; padding: ${getEffectivePadding()}; border-radius: ${borderRadius}; font-family: Arial, sans-serif; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin: ${marginTop}px ${marginRight}px ${marginBottom}px ${marginLeft}px; color: ${textColor}; font-weight: 500; width: ${useFullWidth ? '100%' : 'fit-content'}; max-width: 100%; box-sizing: border-box; font-size: ${currentFontSize};">
         ${avatarCount > 0 ? `
         <div style="display: flex; align-items: center; flex-shrink: 0;">
           ${avatarCount >= 1 ? `<img src="${avatarImage1}" alt="User 1" style="width: ${avatarSize}; height: ${avatarSize}; border-radius: 50%; border: 2px solid ${avatarBorderColor}; object-fit: cover; flex-shrink: 0; z-index: 3; margin-right: ${avatarCount > 1 ? '-8px' : '0'};" onerror="this.style.display='none'">` : ''}
@@ -1547,7 +1589,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                 borderRadius,
                 fontFamily: 'Arial, sans-serif',
                 boxShadow: showBackground ? '0 2px 4px rgba(0, 0, 0, 0.1)' : 'none',
-                marginBottom: '12px',
+                margin: `${marginTop}px ${marginRight}px ${marginBottom}px ${marginLeft}px`,
                 color: textColor,
                 fontWeight: 500,
                 width: useFullWidth ? '100%' : 'fit-content',
@@ -1816,33 +1858,61 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
   // Platform code switcher
   const CodeSwitcher = () => {
     return (
-      <div className="flex justify-between items-center mb-2">
-        <div className="text-sm font-semibold text-[#1c2838]">Plattform-Code:</div>
-        <div className="flex border rounded-md overflow-hidden">
-          <button 
-            className={`px-3 py-1.5 text-xs ${platform === 'shopify' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
-            onClick={() => setPlatform('shopify')}
-          >
-            Shopify
-          </button>
-          <button 
-            className={`px-3 py-1.5 text-xs border-l ${platform === 'shopware' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
-            onClick={() => setPlatform('shopware')}
-          >
-            Shopware 6
-          </button>
-          <button 
-            className={`px-3 py-1.5 text-xs border-l ${platform === 'wordpress' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
-            onClick={() => setPlatform('wordpress')}
-          >
-            WordPress
-          </button>
+      <div className="flex flex-col mb-3">
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-sm font-semibold text-[#1c2838]">Plattform</div>
+          <div className="flex items-center space-x-2">
+            <div className="flex bg-gray-100 rounded-lg p-0.5">
+              <button 
+                className={`px-3 py-1.5 text-xs rounded-md transition-all ${platform === 'shopify' ? 'bg-white text-[#1c2838] shadow-sm' : 'text-gray-600 hover:bg-white/50'}`}
+                onClick={() => setPlatform('shopify')}
+              >
+                <div className="flex items-center">
+                  <svg className="w-3.5 h-3.5 mr-1" viewBox="0 0 109.5 124.5" xmlns="http://www.w3.org/2000/svg"><path d="M74.7,14.8c0.1-0.7,0.2-1.5,0.2-2.2c0-2.3-0.3-4.1-0.9-5.5c-2.3,0.1-4.7,0.8-7.2,1.9c-0.2-0.6-0.5-1.2-0.8-1.9 c-1.2-2.5-2.8-4.3-4.7-5.4c-0.5,0.9-1,1.9-1.4,2.9c-1.3,3.4-1.4,6.8-0.4,10.2L45.2,25.1L41.6,14c-0.1-0.3-0.2-0.6-0.4-0.9 c-0.2,0.3-0.4,0.5-0.6,0.8c-1.8,2.3-3.1,5.2-3.7,8.3l-8.6,2.6c0,0-2.5,0.8-2.5,3.4c0,0.3,0.2,1.5,0.2,1.5l3.8,29.7 c-5.8,1.8-9.7,3.2-9.8,3.2c-3,1-3.1,1-3.4,3.7C16.4,67,8,120,8,120l70.1,12V13.2C76.9,13.9,75.8,14.4,74.7,14.8z M58.4,21.5 c0,0-1.4,0.4-3.5,1.1l1.9-4.5C58,19.1,58.4,20.3,58.4,21.5z M53.1,16.6l-1.8,4.3l-1.5,0.5C48.7,16.9,50.2,15.5,53.1,16.6z  M32.8,31l10-3.1c0,0.5,0.6,3.6,1.3,6.8l-15,4.6L32.8,31z" fill={platform === 'shopify' ? '#1c2838' : '#95a7bc'} /><path d="M97.5,92.5c-8.1-0.8-11-0.9-11-0.9s-8.4-8.5-9.4-9.4c-0.3-0.3-0.6-0.5-1-0.6l-1.1-32.8c0,0,0.9-0.5,1.2-0.7 c3.8-2.4,6.3-5.9,8.4-9c4.2-6.1,7.2-14.2,6.4-21.2c-0.1-0.7-0.6-1.4-1.3-1.5c-0.5-0.1-7.3-0.9-7.3-0.9s-4.7-4.8-5.1-5.2 c-0.4-0.4-1.2-0.3-1.5-0.2c-0.1,0-1.2,0.4-3.1,1C72.6,4.8,70.4,0,66,0c-0.6,0-1.2,0.1-1.9,0.2C62.2,0.3,60.6,0,59,0 c-9.2,0-14.6,11.6-16,17.4c-3.8,1.2-6.6,2.1-6.9,2.2c-2.1,0.7-2.2,0.7-2.5,2.7c-0.2,1.5-5.6,43.3-5.6,43.3L76,77.1l1.1,0.1 c0,0-0.4,0.4-1.2,1.1c-1.2,1.2-3.6,3.7-6.4,6.4c-1.4-0.4-3.1-0.6-5.1-0.6c-3.5,0-6.4,1-8.6,2.9c-4.4,3.8-4.8,9.3-4.4,11.4 c0.3,1.3,1.5,7.8,2.5,12.9L99,119.5C98.9,119.4,97.6,92.5,97.5,92.5z M74.9,15l-5.2,1.6c0-1.5-0.2-3-0.5-4.5 C72.1,13.5,73.9,14.4,74.9,15z M66,3c1,0,1.8,0.3,2.5,1c-6.3,2-13.6,4.2-20.5,6.4C50,6,54.3,3,59,3C61.4,3,64.2,3,66,3z  M33.1,32.5l5.6-1.7c0.6-0.2,1-0.7,1.1-1.3c1.2-6.8,4.3-10.3,7.1-12c3.9,0,5,0.9,7.6,3.3c2.5,2.3,6.6,2.2,6.6,2.2 c2.2,0,4-1.8,4-4c0-0.1,0-0.2,0-0.4l11-3.4c-0.5,1.3-0.7,2.9-0.7,4.7c0,2.4,0.4,4.3,1.4,5.9c-3,1-6.2,2-9.3,2.9 c-5,1.6-10.3,3.2-15,4.7L33.1,32.5L33.1,32.5z" fill={platform === 'shopify' ? '#1c2838' : '#95a7bc'} /></svg>
+                  <span>Shopify</span>
+                </div>
+              </button>
+              <button 
+                className={`px-3 py-1.5 text-xs rounded-md transition-all ${platform === 'shopware' ? 'bg-white text-[#1c2838] shadow-sm' : 'text-gray-600 hover:bg-white/50'}`}
+                onClick={() => setPlatform('shopware')}
+              >
+                <div className="flex items-center">
+                  <svg className="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.75C6.89 2.75 2.75 6.89 2.75 12C2.75 17.11 6.89 21.25 12 21.25C17.11 21.25 21.25 17.11 21.25 12C21.25 6.89 17.11 2.75 12 2.75Z" stroke={platform === 'shopware' ? '#1c2838' : '#95a7bc'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M12 2.75V21.25" stroke={platform === 'shopware' ? '#1c2838' : '#95a7bc'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M17.2998 7.25C15.8998 8.65 13.9998 9.5 11.9998 9.5C9.9998 9.5 8.0998 8.65 6.6998 7.25" stroke={platform === 'shopware' ? '#1c2838' : '#95a7bc'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M6.6998 16.75C8.0998 15.35 9.9998 14.5 11.9998 14.5C13.9998 14.5 15.8998 15.35 17.2998 16.75" stroke={platform === 'shopware' ? '#1c2838' : '#95a7bc'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  <span>Shopware</span>
+                </div>
+              </button>
+              <button 
+                className={`px-3 py-1.5 text-xs rounded-md transition-all ${platform === 'wordpress' ? 'bg-white text-[#1c2838] shadow-sm' : 'text-gray-600 hover:bg-white/50'}`}
+                onClick={() => setPlatform('wordpress')}
+              >
+                <div className="flex items-center">
+                  <svg className="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.49 2 2 6.49 2 12C2 17.51 6.49 22 12 22C17.51 22 22 17.51 22 12C22 6.49 17.51 2 12 2ZM3.5 12C3.5 7.31 7.31 3.5 12 3.5C16.69 3.5 20.5 7.31 20.5 12C20.5 16.69 16.69 20.5 12 20.5C7.31 20.5 3.5 16.69 3.5 12Z" fill={platform === 'wordpress' ? '#1c2838' : '#95a7bc'}/><path d="M12 4.5C8.41 4.5 5.5 7.41 5.5 11C5.5 14.59 8.41 17.5 12 17.5C15.59 17.5 18.5 14.59 18.5 11C18.5 7.41 15.59 4.5 12 4.5ZM12 16C9.24 16 7 13.76 7 11C7 8.24 9.24 6 12 6C14.76 6 17 8.24 17 11C17 13.76 14.76 16 12 16Z" fill={platform === 'wordpress' ? '#1c2838' : '#95a7bc'}/><path d="M12 8.75C11.59 8.75 11.25 8.41 11.25 8V6C11.25 5.59 11.59 5.25 12 5.25C12.41 5.25 12.75 5.59 12.75 6V8C12.75 8.41 12.41 8.75 12 8.75Z" fill={platform === 'wordpress' ? '#1c2838' : '#95a7bc'}/><path d="M12 18.75C11.59 18.75 11.25 18.41 11.25 18V16C11.25 15.59 11.59 15.25 12 15.25C12.41 15.25 12.75 15.59 12.75 16V18C12.75 18.41 12.41 18.75 12 18.75Z" fill={platform === 'wordpress' ? '#1c2838' : '#95a7bc'}/><path d="M8.75 12C8.75 12.41 8.41 12.75 8 12.75H6C5.59 12.75 5.25 12.41 5.25 12C5.25 11.59 5.59 11.25 6 11.25H8C8.41 11.25 8.75 11.59 8.75 12Z" fill={platform === 'wordpress' ? '#1c2838' : '#95a7bc'}/><path d="M18.75 12C18.75 12.41 18.41 12.75 18 12.75H16C15.59 12.75 15.25 12.41 15.25 12C15.25 11.59 15.59 11.25 16 11.25H18C18.41 11.25 18.75 11.59 18.75 12Z" fill={platform === 'wordpress' ? '#1c2838' : '#95a7bc'}/></svg>
+                  <span>WordPress</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-1">
+            <svg className="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22H15C20 22 22 20 22 15V13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M16.04 3.02001L8.16 10.9C7.86 11.2 7.56 11.79 7.5 12.22L7.07 15.23C6.91 16.32 7.68 17.08 8.77 16.93L11.78 16.5C12.2 16.44 12.79 16.14 13.1 15.84L20.98 7.96001C22.34 6.60001 22.98 5.02001 20.98 3.02001C18.98 1.02001 17.4 1.66001 16.04 3.02001Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/><path d="M14.91 4.14999C15.58 6.53999 17.45 8.40999 19.85 9.08999" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <span className="text-xs text-gray-500">Der Code passt sich automatisch an die gewählte Plattform an</span>
+          </div>
+          <div>
+            <button 
+              className="text-xs text-[#1c2838] hover:text-[#364860] border border-gray-200 rounded-md px-2 py-1 bg-white hover:bg-gray-50 transition-colors flex items-center"
+              onClick={() => navigator.clipboard.writeText(code)}
+            >
+              <svg className="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 12.9V17.1C16 20.6 14.6 22 11.1 22H6.9C3.4 22 2 20.6 2 17.1V12.9C2 9.4 3.4 8 6.9 8H11.1C14.6 8 16 9.4 16 12.9Z" fill="currentColor"/><path d="M17.1 2H12.9C9.45455 2 8.04783 3.35135 8.00435 6.75676H11.1C15.3 6.75676 17.25 8.70676 17.25 12.9V16C20.65 16 22 14.5946 22 11.15V6.9C22 3.4 20.6 2 17.1 2Z" fill="currentColor"/></svg>
+              Kopieren
+            </button>
+          </div>
         </div>
       </div>
     );
   };
 
-  // Self-contained HTML code that works standalone without Shopify
+  // Self-contained HTML code that works on multiple platforms
   const standaloneCode = (() => {
     return `<style>
     /* Clean CSS reset for social proof section */
@@ -1899,7 +1969,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       }
     }
   </style>
-  <div class="social-proof-isolated social-proof-responsive ${getSocialProofClass()}" style="display: flex !important; align-items: center !important; ${showBackground ? `background-color: ${backgroundColor} !important;` : ''} padding: ${getEffectivePadding()} !important; border-radius: ${borderRadius} !important; font-family: Arial, sans-serif !important; ${showBackground ? 'box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;' : ''} margin: 0 0 12px 0 !important; color: ${textColor} !important; font-weight: 500 !important; width: ${useFullWidth ? '100%' : 'fit-content'} !important; max-width: 100% !important; box-sizing: border-box !important; font-size: ${fontSizeDesktop} !important; line-height: 1.4 !important;">
+  <div class="social-proof-isolated social-proof-responsive ${getSocialProofClass()}" style="display: flex !important; align-items: center !important; ${showBackground ? `background-color: ${backgroundColor} !important;` : ''} padding: ${getEffectivePadding()} !important; border-radius: ${borderRadius} !important; font-family: Arial, sans-serif !important; ${showBackground ? 'box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;' : ''} margin: ${marginTop}px ${marginRight}px ${marginBottom}px ${marginLeft}px !important; color: ${textColor} !important; font-weight: 500 !important; width: ${useFullWidth ? '100%' : 'fit-content'} !important; max-width: 100% !important; box-sizing: border-box !important; font-size: ${fontSizeDesktop} !important; line-height: 1.4 !important;">
     ${avatarCount > 0 ? `
     <div style="display: flex !important; align-items: center !important; flex-shrink: 0 !important;">
       ${avatarCount >= 1 ? `
@@ -1966,12 +2036,16 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
   
   // Complete code display with the switcher
   const codeDisplay = (
-    <>
-      <CodeSwitcher />
-      <pre className="whitespace-pre-wrap text-xs font-mono bg-gray-50 p-4 rounded-md overflow-x-auto">
-        {code}
-      </pre>
-    </>
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-gray-50 p-3 border-b">
+        <CodeSwitcher />
+      </div>
+      <div className="p-4">
+        <pre className="whitespace-pre-wrap text-xs font-mono bg-gray-50 p-4 rounded-md overflow-x-auto">
+          {code}
+        </pre>
+      </div>
+    </div>
   )
 
   return { 
