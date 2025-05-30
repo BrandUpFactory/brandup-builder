@@ -57,7 +57,9 @@ const styleTemplates = [
     padding: '15px',
     avatarCount: 2,
     badgePosition: 'overAvatar',
-    customText: 'Tim, Stephan und 12.400+ weitere Kunden nutzen unser Tool erfolgreich',
+    customText: 'und 12.400+ weitere Kunden nutzen unser Tool erfolgreich',
+    avatarImage1: '/Sections/Social_Proof/1.jpg',
+    avatarImage2: '/Sections/Social_Proof/2.jpg',
   },
   {
     name: 'Style 2',
@@ -68,7 +70,10 @@ const styleTemplates = [
     padding: '15px',
     avatarCount: 3,
     badgePosition: 'standard',
-    customText: 'Tim, Anna, Ben und 22.910+ weitere Kunden nutzen unsere Sections',
+    customText: 'und 22.910+ weitere Kunden nutzen unsere Sections',
+    avatarImage1: '/Sections/Social_Proof/1.jpg',
+    avatarImage2: '/Sections/Social_Proof/2.jpg',
+    avatarImage3: '/Sections/Social_Proof/3.jpg',
   },
   {
     name: 'Style 3',
@@ -79,7 +84,8 @@ const styleTemplates = [
     padding: '15px',
     avatarCount: 1,
     badgePosition: 'overAvatar',
-    customText: 'Tim und 1.100+ Kunden nutzen unsere Sections',
+    customText: 'und 1.100+ Kunden nutzen unsere Sections',
+    avatarImage1: '/Sections/Social_Proof/1.jpg',
   }
 ];
 
@@ -123,13 +129,13 @@ export default function SocialProofSection({
   const [selectedStyle, setSelectedStyle] = useState<number>(0);
   
   // Section content
-  const [firstName1, setFirstName1] = useState(safeInitialData.firstName1 || 'Anna')
-  const [firstName2, setFirstName2] = useState(safeInitialData.firstName2 || 'Lisa')
-  const [firstName3, setFirstName3] = useState(safeInitialData.firstName3 || 'Sarah')
-  const [customText, setCustomText] = useState(safeInitialData.customText || 'und 12.400+ Kunden nutzen unser Tool erfolgreich')
-  const [avatarImage1, setAvatarImage1] = useState(safeInitialData.avatarImage1 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619')
-  const [avatarImage2, setAvatarImage2] = useState(safeInitialData.avatarImage2 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098')
-  const [avatarImage3, setAvatarImage3] = useState(safeInitialData.avatarImage3 || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-1.jpg?v=1738073619')
+  const [firstName1, setFirstName1] = useState(safeInitialData.firstName1 || 'Tim')
+  const [firstName2, setFirstName2] = useState(safeInitialData.firstName2 || 'Stephan')
+  const [firstName3, setFirstName3] = useState(safeInitialData.firstName3 || 'Ben')
+  const [customText, setCustomText] = useState(safeInitialData.customText || 'und 12.400+ weitere Kunden nutzen unser Tool erfolgreich')
+  const [avatarImage1, setAvatarImage1] = useState(safeInitialData.avatarImage1 || '/Sections/Social_Proof/1.jpg')
+  const [avatarImage2, setAvatarImage2] = useState(safeInitialData.avatarImage2 || '/Sections/Social_Proof/2.jpg')
+  const [avatarImage3, setAvatarImage3] = useState(safeInitialData.avatarImage3 || '/Sections/Social_Proof/3.jpg')
   const [verifiedImage, setVerifiedImage] = useState(safeInitialData.verifiedImage || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/insta-blue.png?v=1738073828')
   const [showBadge, setShowBadge] = useState(safeInitialData.showBadge !== undefined ? safeInitialData.showBadge : true)
   const [badgePosition, setBadgePosition] = useState(safeInitialData.badgePosition || 'standard')
@@ -253,6 +259,17 @@ export default function SocialProofSection({
         break;
     }
     
+    // Set avatar images if provided in the template
+    if (template.avatarImage1) {
+      setAvatarImage1(template.avatarImage1);
+    }
+    if (template.avatarImage2) {
+      setAvatarImage2(template.avatarImage2);
+    }
+    if (template.avatarImage3) {
+      setAvatarImage3(template.avatarImage3);
+    }
+    
     // Always update both single padding and individual padding values
     // This ensures consistent state across all padding-related variables
     const paddingValue = template.padding.replace('px', '');
@@ -301,18 +318,25 @@ export default function SocialProofSection({
     showBackground
   };
   
-  // IMPORTANT: When generating the HTML preview and final output code,
-  // make sure to respect the showBackground option:
-  // 1. If showBackground is true, include the background-color style with backgroundColor value
-  // 2. If showBackground is false, don't include the background-color style
+  // This function conditionally applies background styles based on showBackground setting
+  const getBackgroundStyles = (isImportant = false) => {
+    if (!showBackground) return '';
+    
+    const important = isImportant ? ' !important' : '';
+    return `
+      background-color: ${backgroundColor}${important};
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)${important};
+    `;
+  };
+  
+  // NOTE: This function should be used in all HTML generation for consistent styling
+  // Usage example in preview:
+  // <div style="... ${getBackgroundStyles(true)} ...">
   //
-  // Example for the preview HTML:
-  // <div style="... ${showBackground ? `background-color: ${backgroundColor} !important;` : ''} ...">
+  // Usage example in output HTML:
+  // <div style="... ${getBackgroundStyles(false)} ...">
   //
-  // Example for the output HTML:
-  // <div style="... ${showBackground ? `background-color: ${backgroundColor};` : ''} ...">
-  //
-  // This change should be applied to all places where the background-color is set for the social proof component.
+  // This ensures that the background is only shown when showBackground is true
 
   // Function to manually trigger data update to parent
   const triggerDataUpdate = useCallback(() => {
