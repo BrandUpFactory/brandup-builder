@@ -70,37 +70,135 @@ const SectionPreview = ({ sectionData }: { sectionData: any }) => {
 
   // Generate appropriate HTML based on the section data
   const generateSectionHtml = () => {
-    // Check if this is a Social Proof section based on the data structure
-    if (data.names || data.additionalText || data.images) {
+    // Check if this is a Feature Section based on specific properties
+    if (data.column_count || (data.blocks && Array.isArray(data.blocks))) {
+      // Prepare feature blocks
+      const featureBlocks = Array.isArray(data.blocks) 
+        ? data.blocks 
+        : [
+            { title: 'Feature 1', description: 'Feature Beschreibung 1' },
+            { title: 'Feature 2', description: 'Feature Beschreibung 2' },
+            { title: 'Feature 3', description: 'Feature Beschreibung 3' }
+          ];
+      
       const {
-        names = 'Anna, Lisa',
-        additionalText = 'und 12.400+ Kunden nutzen unser Tool erfolgreich',
-        backgroundColor = '#f7f7f7',
-        textColor = '#000000',
-        images = [
-          'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619',
-          'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098'
-        ]
+        title = 'Feature Section',
+        subtitle = 'Erstelle professionelle Shopify-Sektionen mit unserem intuitiven Builder.',
+        column_count = 3,
+        background_color = '#ffffff',
+        text_color = '#1c2838',
+        padding = 80
       } = data;
 
-      return `
-        <div style="font-family: Arial, sans-serif; padding: 20px; background: white; width: 400px; max-width: 400px;">
-          <div style="display: flex; align-items: center; background-color: ${backgroundColor}; padding: 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); color: ${textColor}; font-weight: 500; font-size: 14px; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-            <div style="display: flex; align-items: center; flex-shrink: 0; margin-right: 12px;">
-              <div style="margin-right: -8px; z-index: 3;">
-                <img src="${images[0] || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619'}" alt="User 1" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #ffffff; object-fit: cover; display: block;" onerror="this.style.display='none'">
-              </div>
-              <div style="z-index: 2;">
-                <img src="${images[1] || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098'}" alt="User 2" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #ffffff; object-fit: cover; display: block;" onerror="this.style.display='none'">
-              </div>
-            </div>
-            <div style="flex: 1; overflow: hidden;">
-              <span style="font-weight: 700;">${names}</span>
-              <img src="https://cdn.shopify.com/s/files/1/0818/2123/7577/files/insta-blue.png?v=1738073828" alt="Verifiziert" style="height: 16px; margin: 0 2px; vertical-align: baseline; transform: translateY(-1px);" onerror="this.style.display='none'">
-              <span style="font-weight: 400;">${additionalText}</span>
+      // Generate the feature blocks HTML
+      const featuresHTML = featureBlocks.map(block => `
+        <div style="padding: 16px; border-radius: 8px; border: 1px solid #f0f0f0; background-color: white; transition: box-shadow 0.3s; margin-bottom: 16px;">
+          <div style="margin-bottom: 16px;">
+            <div style="width: 48px; height: 48px; background-color: #f7f7f7; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+              <span style="color: #888; font-size: 20px;">?</span>
             </div>
           </div>
+          <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #1c2838;">${block.title || 'Feature Titel'}</h3>
+          <p style="font-size: 14px; color: #666; opacity: 0.8;">${block.description || 'Feature Beschreibung'}</p>
         </div>
+      `).join('');
+
+      return `
+        <div style="font-family: Arial, sans-serif; width: 400px; max-width: 400px; background-color: ${background_color}; color: ${text_color}; padding: 40px 20px; position: relative; overflow: hidden;">
+          <div style="text-align: center; margin-bottom: 32px;">
+            <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 12px; color: #1c2838;">${title}</h2>
+            <p style="font-size: 14px; opacity: 0.8; max-width: 320px; margin: 0 auto; color: #444;">${subtitle}</p>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(${column_count}, 1fr); gap: 16px;">
+            ${featuresHTML}
+          </div>
+        </div>
+      `;
+    }
+    
+    // Check if this is a Social Proof section based on the data structure
+    if (data.names || data.additionalText || data.images) {
+      // Use the exact social proof HTML that was provided
+      return `
+      <style>
+        /* Clean CSS reset for social proof section */
+        .social-proof-isolated {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+        }
+        
+        .social-proof-isolated *,
+        .social-proof-isolated *::before,
+        .social-proof-isolated *::after {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+        }
+        
+        .social-proof-isolated img {
+          border: none;
+          vertical-align: middle;
+          max-width: 100%;
+        }
+    
+        /* Responsive text container with automatic line breaking */
+        .social-proof-text {
+          margin-left: 12px;
+          line-height: 1.4;
+          flex-shrink: 0;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+        }
+        
+        @media (max-width: 767px) {
+          .social-proof-text {
+            width: 70%;
+          }
+          .social-proof-responsive {
+            font-size: 9px !important;
+          }
+        }
+        
+        @media (min-width: 768px) and (max-width: 1299px) {
+          .social-proof-text {
+            width: 55%;
+          }
+          .social-proof-responsive {
+            font-size: 11px !important;
+          }
+        }
+        
+        @media (min-width: 1300px) {
+          .social-proof-text {
+            width: 40%;
+          }
+        }
+      </style>
+      <div class="social-proof-isolated social-proof-responsive" style="display: flex !important; align-items: center !important; background-color: ${data.backgroundColor || '#f7f7f7'} !important; padding: 12px !important; border-radius: 12px !important; font-family: Arial, sans-serif !important; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important; margin: 0 0 12px 0 !important; color: ${data.textColor || '#000000'} !important; font-weight: 500 !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; font-size: 12px !important; line-height: 1.4 !important;">
+        
+        <div style="display: flex !important; align-items: center !important; flex-shrink: 0 !important;">
+          
+            <div style="margin: 0 -8px 0 0 !important; z-index: 3 !important;">
+              <img src="${data.images?.[0] || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-2.jpg?v=1738073619'}" alt="User 1" style="width: 32px !important; height: 32px !important; border-radius: 50% !important; border: 2px solid #ffffff !important; object-fit: cover !important; flex-shrink: 0 !important; display: block !important; margin: 0 !important; padding: 0 !important;" onerror="this.style.display='none'">
+              
+            </div>
+          
+            <div style="margin: 0 0 0 0 !important; z-index: 2 !important;">
+              <img src="${data.images?.[1] || 'https://cdn.shopify.com/s/files/1/0818/2123/7577/files/Profil-4.jpg?v=1738083098'}" alt="User 2" style="width: 32px !important; height: 32px !important; border-radius: 50% !important; border: 2px solid #ffffff !important; object-fit: cover !important; flex-shrink: 0 !important; display: block !important; margin: 0 !important; padding: 0 !important;" onerror="this.style.display='none'">
+              
+            </div>
+          
+        </div>
+        <div class="social-proof-text" style="padding: 0 !important;">
+          <span style="display: inline !important;">
+            <strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${data.names || 'Anna, Lisa'}</strong>
+               <img src="https://cdn.shopify.com/s/files/1/0818/2123/7577/files/insta-blue.png?v=1738073828" alt="Verifiziert" style="height: 14px !important; max-width: none !important; margin: 0 1px !important; vertical-align: baseline !important; transform: translateY(-1px) !important; object-fit: contain !important; display: inline !important; padding: 0 !important; border: none !important;" onerror="this.style.display='none'">
+            <span style="font-weight: 400 !important; word-spacing: 0.1em !important; letter-spacing: 0.01em !important; display: inline !important; margin: 0 !important; padding: 0 !important;">${data.additionalText || 'und 12.400+ Kunden nutzen unser Tool erfolgreich'}</span>
+          </span>
+        </div>
+      </div>
       `;
     }
 
