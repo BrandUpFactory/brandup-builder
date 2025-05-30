@@ -507,8 +507,7 @@ export default function MySectionsPage() {
                                     </div>
                                   )}
                                   
-                                  {/* Section Info */}
-                                  <h3 className="text-lg font-bold text-[#1c2838] mb-1 text-center">{section.title}</h3>
+                                  {/* Template Type Badge */}
                                   <div className="flex items-center justify-center mb-2">
                                     <span className="text-xs bg-[#1c2838]/10 text-[#1c2838] px-2 py-1 rounded-full font-medium">
                                       {template?.name || "Template"}
