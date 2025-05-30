@@ -62,7 +62,7 @@ const styleTemplates = [
     borderRadius: '12px',
     padding: '15px',
     avatarCount: 2,
-    badgePosition: 'overAvatar',
+    badgePosition: 'overAvatar', // Badge is positioned over avatar by default
     customText: 'und <strong>12.400+</strong> weitere Kunden nutzen unser <strong>Tool erfolgreich</strong>',
     avatarImage1: '/Sections/Social_Proof/1.jpg',
     avatarImage2: '/Sections/Social_Proof/2.jpg',
@@ -105,6 +105,10 @@ export default function SocialProofSection({
   onPreviewModeChange,
   onProductUrlChange
 }: SocialProofSectionProps) {
+  // State to store style-specific settings
+  const [styleSettings, setStyleSettings] = useState<{
+    [key: number]: any
+  }>({})
   
   // Stable tutorial opener using useCallback
   const handleShowTutorial = useCallback(() => {
@@ -127,13 +131,20 @@ export default function SocialProofSection({
   // Ensure initialData is an object
   const safeInitialData = initialData || {};
   
+  // Load saved style settings if available
+  useEffect(() => {
+    if (safeInitialData.styleSettings) {
+      setStyleSettings(safeInitialData.styleSettings);
+    }
+  }, []);
+  
   // Helper for range sliders - we don't prevent default to allow slider functionality
   const handleRangeInput = (e: React.MouseEvent) => {
     e.stopPropagation();  // Only stop propagation, not preventDefault
   };
   
   // Style template selection - force style 0 as default
-  const [selectedStyle, setSelectedStyle] = useState<number>(0);
+  const [selectedStyle, setSelectedStyle] = useState<number>(safeInitialData.selectedStyle !== undefined ? safeInitialData.selectedStyle : 0);
   
   // Section content
   const [firstName1, setFirstName1] = useState(safeInitialData.firstName1 || 'Tim')
@@ -184,6 +195,19 @@ export default function SocialProofSection({
   const [marginBottom, setMarginBottom] = useState(safeInitialData.marginBottom || '12')
   const [marginLeft, setMarginLeft] = useState(safeInitialData.marginLeft || '0')
   
+  // Create a useEffect to load style-specific settings when style changes
+  useEffect(() => {
+    // Apply the template when the component is loaded
+    if (selectedStyle !== undefined) {
+      // Small delay to ensure styleSettings is loaded from initialData
+      const timer = setTimeout(() => {
+        applyStyleTemplate(null, selectedStyle);
+      }, 10);
+      
+      return () => clearTimeout(timer);
+    }
+  }, []);
+  
   // Preview device state - use external device if provided, otherwise internal state
   const [internalPreviewDevice, setInternalPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
   const previewDevice = externalPreviewDevice || internalPreviewDevice
@@ -212,104 +236,222 @@ export default function SocialProofSection({
     return previewDevice === 'mobile' ? fontSizeMobile : fontSizeDesktop;
   };
   
+  // Function to save current settings for a specific style
+  const saveStyleSettings = (styleIndex: number) => {
+    // Create a copy of the current settings for the style
+    const styleData = {
+      backgroundColor,
+      backgroundOpacity,
+      textColor,
+      avatarBorderColor,
+      borderRadius,
+      padding,
+      paddingTop,
+      paddingRight,
+      paddingBottom,
+      paddingLeft,
+      marginTop,
+      marginRight,
+      marginBottom,
+      marginLeft,
+      showBackground,
+      showBreakOnLarge,
+      avatarSize,
+      avatarCount,
+      badgePosition,
+      showBadge,
+      fontSizeDesktop,
+      fontSizeTablet,
+      fontSizeMobile,
+      textWrapDesktop,
+      textWrapTablet,
+      textWrapMobile,
+      customText,
+      firstName1,
+      firstName2,
+      firstName3,
+      avatarImage1,
+      avatarImage2,
+      avatarImage3,
+      brandNameBold,
+      namesFormatBold,
+      useFullWidth,
+    };
+    
+    // Update the style settings
+    setStyleSettings(prev => ({
+      ...prev,
+      [styleIndex]: styleData
+    }));
+  };
+  
+  // Reset a style to its default settings
+  const resetStyleToDefault = (styleIndex: number) => {
+    const template = styleTemplates[styleIndex];
+    
+    // Remove custom settings for this style
+    setStyleSettings(prev => {
+      const newSettings = {...prev};
+      delete newSettings[styleIndex];
+      return newSettings;
+    });
+    
+    // Apply the default template
+    applyStyleTemplate(null, styleIndex, true);
+  };
+
   // Apply style template
-  const applyStyleTemplate = (e: React.MouseEvent, index: number) => {
-    // Prevent default to avoid scrolling
-    e.preventDefault();
+  const applyStyleTemplate = (e: React.MouseEvent | null, index: number, isReset = false) => {
+    // Prevent default to avoid scrolling if event exists
+    if (e) e.preventDefault();
     
-    // Always update the style index
-    setSelectedStyle(index);
+    // Save current style settings before switching
+    if (!isReset && selectedStyle !== index) {
+      saveStyleSettings(selectedStyle);
+    }
     
-    // Always apply the template styles when a style is selected
-    const template = styleTemplates[index];
+    // Check if we have saved settings for this style
+    const savedSettings = styleSettings[index];
     
-    // Apply all the properties from the template
-    setBackgroundColor(template.backgroundColor);
-    setTextColor(index === 2 ? '#ffffff' : '#000000');
-    setAvatarBorderColor(template.avatarBorderColor);
-    setBorderRadius(template.borderRadius);
-    setPadding(template.padding);
-    
-    // Set showBackground based on template or style
-    if (template.showBackground !== undefined) {
-      setShowBackground(template.showBackground);
+    if (savedSettings && !isReset) {
+      // Apply saved settings
+      setBackgroundColor(savedSettings.backgroundColor);
+      setBackgroundOpacity(savedSettings.backgroundOpacity);
+      setTextColor(savedSettings.textColor);
+      setAvatarBorderColor(savedSettings.avatarBorderColor);
+      setBorderRadius(savedSettings.borderRadius);
+      setPadding(savedSettings.padding);
+      setPaddingTop(savedSettings.paddingTop);
+      setPaddingRight(savedSettings.paddingRight);
+      setPaddingBottom(savedSettings.paddingBottom);
+      setPaddingLeft(savedSettings.paddingLeft);
+      setMarginTop(savedSettings.marginTop || '0');
+      setMarginRight(savedSettings.marginRight || '0');
+      setMarginBottom(savedSettings.marginBottom || '12');
+      setMarginLeft(savedSettings.marginLeft || '0');
+      setShowBackground(savedSettings.showBackground);
+      setShowBreakOnLarge(savedSettings.showBreakOnLarge);
+      setAvatarSize(savedSettings.avatarSize);
+      setAvatarCount(savedSettings.avatarCount);
+      setBadgePosition(savedSettings.badgePosition);
+      setShowBadge(savedSettings.showBadge);
+      setFontSizeDesktop(savedSettings.fontSizeDesktop);
+      setFontSizeTablet(savedSettings.fontSizeTablet);
+      setFontSizeMobile(savedSettings.fontSizeMobile);
+      setTextWrapDesktop(savedSettings.textWrapDesktop);
+      setTextWrapTablet(savedSettings.textWrapTablet);
+      setTextWrapMobile(savedSettings.textWrapMobile);
+      setCustomText(savedSettings.customText);
+      setFirstName1(savedSettings.firstName1);
+      setFirstName2(savedSettings.firstName2);
+      setFirstName3(savedSettings.firstName3);
+      setAvatarImage1(savedSettings.avatarImage1);
+      setAvatarImage2(savedSettings.avatarImage2);
+      setAvatarImage3(savedSettings.avatarImage3);
+      setBrandNameBold(savedSettings.brandNameBold);
+      setNamesFormatBold(savedSettings.namesFormatBold);
+      setUseFullWidth(savedSettings.useFullWidth);
     } else {
-      setShowBackground(index !== 1); // All styles except Style 2 have backgrounds
-    }
-    
-    // Set custom text if provided in the template
-    if (template.customText) {
-      setCustomText(template.customText);
-    }
-    
-    // Set avatar count if specified in the template
-    if (template.avatarCount !== undefined) {
-      setAvatarCount(template.avatarCount);
-    }
-    
-    // Set badge position from template or based on style
-    if (template.badgePosition) {
-      setBadgePosition(template.badgePosition);
-    } else {
+      // Apply default template
+      const template = styleTemplates[index];
+      
+      // Apply all the properties from the template
+      setBackgroundColor(template.backgroundColor);
+      setTextColor(index === 2 ? '#ffffff' : '#000000');
+      setAvatarBorderColor(template.avatarBorderColor);
+      setBorderRadius(template.borderRadius);
+      setPadding(template.padding);
+      
+      // Set showBackground based on template or style
+      if (template.showBackground !== undefined) {
+        setShowBackground(template.showBackground);
+      } else {
+        setShowBackground(index !== 1); // All styles except Style 2 have backgrounds
+      }
+      
+      // Set custom text if provided in the template
+      if (template.customText) {
+        setCustomText(template.customText);
+      }
+      
+      // Set avatar count if specified in the template
+      if (template.avatarCount !== undefined) {
+        setAvatarCount(template.avatarCount);
+      }
+      
+      // Set badge position from template or based on style
+      if (template.badgePosition) {
+        setBadgePosition(template.badgePosition);
+      } else {
+        switch(index) {
+          case 0: // Style 1
+            setBadgePosition('overAvatar');
+            break;
+          case 1: // Style 2
+            setBadgePosition('standard');
+            break;
+          case 2: // Style 3
+            setBadgePosition('overAvatar');
+            break;
+          default:
+            setBadgePosition('standard');
+        }
+      }
+      
+      // Set specific names based on style
       switch(index) {
         case 0: // Style 1
-          setBadgePosition('overAvatar');
+          setFirstName1('Tim');
+          setFirstName2('Stephan');
           break;
         case 1: // Style 2
-          setBadgePosition('standard');
+          setFirstName1('Tim');
+          setFirstName2('Anna');
+          setFirstName3('Ben');
           break;
         case 2: // Style 3
-          setBadgePosition('overAvatar');
+          setFirstName1('Tim');
           break;
-        default:
-          setBadgePosition('standard');
+      }
+      
+      // Set avatar images if provided in the template
+      if (template.avatarImage1) {
+        setAvatarImage1(template.avatarImage1);
+      }
+      if (template.avatarImage2) {
+        setAvatarImage2(template.avatarImage2);
+      }
+      if (template.avatarImage3) {
+        setAvatarImage3(template.avatarImage3);
+      }
+      
+      // Always update both single padding and individual padding values
+      // This ensures consistent state across all padding-related variables
+      const paddingValue = template.padding.replace('px', '');
+      setPaddingTop(paddingValue);
+      setPaddingRight(paddingValue);
+      setPaddingBottom(paddingValue);
+      setPaddingLeft(paddingValue);
+      
+      // Reset margin values
+      setMarginTop('0');
+      setMarginRight('0');
+      setMarginBottom('12');
+      setMarginLeft('0');
+      
+      // Set single padding mode to ensure UI is consistent with selection
+      setUseSinglePadding(true);
+      
+      // Set text wrap for desktop based on style
+      if (index === 2) { // Style 3
+        setTextWrapDesktop(75); // Set desktop text wrap to 75% for Style 3
+      } else {
+        setTextWrapDesktop(40); // Default for other styles
       }
     }
     
-    // Set specific names based on style
-    switch(index) {
-      case 0: // Style 1
-        setFirstName1('Tim');
-        setFirstName2('Stephan');
-        break;
-      case 1: // Style 2
-        setFirstName1('Tim');
-        setFirstName2('Anna');
-        setFirstName3('Ben');
-        break;
-      case 2: // Style 3
-        setFirstName1('Tim');
-        break;
-    }
-    
-    // Set avatar images if provided in the template
-    if (template.avatarImage1) {
-      setAvatarImage1(template.avatarImage1);
-    }
-    if (template.avatarImage2) {
-      setAvatarImage2(template.avatarImage2);
-    }
-    if (template.avatarImage3) {
-      setAvatarImage3(template.avatarImage3);
-    }
-    
-    // Always update both single padding and individual padding values
-    // This ensures consistent state across all padding-related variables
-    const paddingValue = template.padding.replace('px', '');
-    setPaddingTop(paddingValue);
-    setPaddingRight(paddingValue);
-    setPaddingBottom(paddingValue);
-    setPaddingLeft(paddingValue);
-    
-    // Set single padding mode to ensure UI is consistent with selection
-    setUseSinglePadding(true);
-    
-    // Set text wrap for desktop based on style
-    if (index === 2) { // Style 3
-      setTextWrapDesktop(75); // Set desktop text wrap to 75% for Style 3
-    } else {
-      setTextWrapDesktop(40); // Default for other styles
-    }
+    // Always update the style index
+    setSelectedStyle(index);
   };
   
   // Define sectionData object for reuse
@@ -393,10 +535,18 @@ export default function SocialProofSection({
 
   // Function to manually trigger data update to parent
   const triggerDataUpdate = useCallback(() => {
+    // Save current style settings before triggering update
+    saveStyleSettings(selectedStyle);
+    
     if (onDataChange) {
-      onDataChange(sectionData);
+      // Include style settings in the data update
+      const updatedData = {
+        ...sectionData,
+        styleSettings: styleSettings
+      };
+      onDataChange(updatedData);
     }
-  }, [onDataChange, sectionData]);
+  }, [onDataChange, sectionData, selectedStyle, styleSettings]);
 
   // Expose the update function globally so the save button can call it
   useEffect(() => {
@@ -409,6 +559,26 @@ export default function SocialProofSection({
       }
     };
   }, [triggerDataUpdate]);
+  
+  // Save current style settings whenever any style-related state changes
+  useEffect(() => {
+    // Small delay to avoid too many updates
+    const timer = setTimeout(() => {
+      saveStyleSettings(selectedStyle);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [
+    backgroundColor, textColor, avatarBorderColor, borderRadius, padding, 
+    paddingTop, paddingRight, paddingBottom, paddingLeft,
+    marginTop, marginRight, marginBottom, marginLeft,
+    showBackground, avatarSize, badgePosition, showBadge, 
+    fontSizeDesktop, fontSizeTablet, fontSizeMobile,
+    textWrapDesktop, textWrapTablet, textWrapMobile,
+    customText, firstName1, firstName2, firstName3,
+    avatarImage1, avatarImage2, avatarImage3,
+    brandNameBold, namesFormatBold, useFullWidth
+  ]);
 
   // Handle avatar display names based on avatar count
   const getDisplayNames = () => {
@@ -827,7 +997,7 @@ export default function SocialProofSection({
       {/* Style Templates */}
       <div className="border-b pb-4">
         <h3 className="text-sm font-semibold mb-3 text-[#1c2838]">Vordefinierter Stil</h3>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-2 mb-2">
           {styleTemplates.map((template, index) => (
             <button
               key={index}
@@ -844,7 +1014,20 @@ export default function SocialProofSection({
             </button>
           ))}
         </div>
-        <p className="text-xs text-gray-500 mt-2">Wähle einen vordefinierten Stil als Ausgangspunkt für deine Anpassungen.</p>
+        <div className="flex justify-between items-center">
+          <p className="text-xs text-gray-500">Wähle einen vordefinierten Stil als Ausgangspunkt.</p>
+          <button
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); resetStyleToDefault(selectedStyle); }}
+            className="text-xs bg-white border border-gray-300 rounded px-2 py-1 hover:bg-gray-50 transition-colors flex items-center"
+          >
+            <svg className="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 12C2 7.28595 5.28595 4 10 4C14.714 4 18 7.28595 18 12C18 16.714 14.714 20 10 20C5.28595 20 2 16.714 2 12Z" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M15 12C15 9.79086 13.2091 8 11 8C8.79086 8 7 9.79086 7 12C7 14.2091 8.79086 16 11 16C13.2091 16 15 14.2091 15 12Z" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M22 12C22 10.1166 21.0609 8.23466 19.1924 6.8497C17.3239 5.46474 14.714 5 12 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+            Standard
+          </button>
+        </div>
       </div>
       
       {/* Avatar Count Selection */}
