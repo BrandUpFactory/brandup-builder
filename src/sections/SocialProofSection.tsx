@@ -43,6 +43,9 @@ interface SocialProofSectionProps {
     showBackground?: boolean;
     backgroundOpacity?: number;
     namesFormatBold?: boolean;
+    styleSettings?: {
+      [key: number]: any
+    };
   };
   onDataChange?: (data: any) => void;
   previewDevice?: 'desktop' | 'tablet' | 'mobile';
@@ -105,6 +108,9 @@ export default function SocialProofSection({
   onPreviewModeChange,
   onProductUrlChange
 }: SocialProofSectionProps) {
+  // Ensure initialData is an object
+  const safeInitialData = initialData || {};
+  
   // State to store style-specific settings
   const [styleSettings, setStyleSettings] = useState<{
     [key: number]: any
@@ -128,8 +134,6 @@ export default function SocialProofSection({
       };
     }
   }, [handleShowTutorial]);
-  // Ensure initialData is an object
-  const safeInitialData = initialData || {};
   
   // Load saved style settings if available
   useEffect(() => {
@@ -305,9 +309,13 @@ export default function SocialProofSection({
     if (!isEffectTriggered) {
       setTimeout(() => {
         if (onDataChange) {
+          // Create a new settings object with the updated data
+          const newStyleSettings = {...styleSettings};
+          newStyleSettings[styleIndex] = styleData;
+          
           const updatedSectionData = {
             ...sectionData,
-            styleSettings: {...styleSettings, [styleIndex]: styleData}
+            styleSettings: newStyleSettings
           };
           onDataChange(updatedSectionData);
           console.log('🔄 SocialProof: Immediate save triggered for style', styleIndex + 1);
@@ -339,12 +347,16 @@ export default function SocialProofSection({
     // Notify user
     alert('Die Einstellungen für Stil ' + (styleIndex + 1) + ' wurden auf Standard zurückgesetzt.');
     
-    // Trigger immediate save
+    // Trigger immediate save with new styleSettings
     setTimeout(() => {
       if (onDataChange) {
+        // Get the latest styleSettings state
+        const newStyleSettings = {...styleSettings};
+        // The reset already removed this style's custom settings
+        
         const updatedData = {
           ...sectionData,
-          styleSettings: styleSettings
+          styleSettings: newStyleSettings
         };
         onDataChange(updatedData);
         console.log('🔄 SocialProof: Reset to defaults triggered for style', styleIndex + 1);
@@ -598,19 +610,72 @@ export default function SocialProofSection({
   
   // Function to manually trigger data update to parent
   const triggerDataUpdate = useCallback(() => {
-    // Save current style settings before triggering update
-    saveStyleSettings(selectedStyle);
-    
-    if (onDataChange) {
-      // Include style settings in the data update
-      const updatedData = {
-        ...sectionData,
-        styleSettings: styleSettings
+    // Get current settings for the selected style
+    if (isLoaded) {
+      // Create a settings object for current style
+      const currentStyleData = {
+        backgroundColor,
+        backgroundOpacity,
+        textColor,
+        avatarBorderColor,
+        borderRadius,
+        padding,
+        paddingTop,
+        paddingRight,
+        paddingBottom,
+        paddingLeft,
+        marginTop,
+        marginRight,
+        marginBottom,
+        marginLeft,
+        showBackground,
+        showBreakOnLarge,
+        avatarSize,
+        avatarCount,
+        badgePosition,
+        showBadge,
+        fontSizeDesktop,
+        fontSizeTablet,
+        fontSizeMobile,
+        textWrapDesktop,
+        textWrapTablet,
+        textWrapMobile,
+        customText,
+        firstName1,
+        firstName2,
+        firstName3,
+        avatarImage1,
+        avatarImage2,
+        avatarImage3,
+        brandNameBold,
+        namesFormatBold,
+        useFullWidth,
       };
-      onDataChange(updatedData);
-      console.log('🔄 SocialProof: Data update triggered', updatedData);
+      
+      // Create new style settings object
+      const newStyleSettings = {...styleSettings};
+      newStyleSettings[selectedStyle] = currentStyleData;
+      
+      if (onDataChange) {
+        // Include style settings in the data update
+        const updatedData = {
+          ...sectionData,
+          styleSettings: newStyleSettings
+        };
+        onDataChange(updatedData);
+        console.log('🔄 SocialProof: Data update triggered', { selectedStyle: selectedStyle + 1 });
+      }
     }
-  }, [onDataChange, sectionData, selectedStyle, styleSettings]);
+  }, [onDataChange, sectionData, selectedStyle,
+    backgroundColor, textColor, avatarBorderColor, borderRadius, padding, 
+    paddingTop, paddingRight, paddingBottom, paddingLeft,
+    marginTop, marginRight, marginBottom, marginLeft,
+    showBackground, avatarSize, badgePosition, showBadge, 
+    fontSizeDesktop, fontSizeTablet, fontSizeMobile,
+    textWrapDesktop, textWrapTablet, textWrapMobile,
+    customText, firstName1, firstName2, firstName3,
+    avatarImage1, avatarImage2, avatarImage3,
+    brandNameBold, namesFormatBold, useFullWidth, isLoaded]);
 
   // Expose the update function globally so the save button can call it
   useEffect(() => {
