@@ -156,6 +156,7 @@ export default function SocialProofSection({
   const [fontSizeTablet, setFontSizeTablet] = useState(safeInitialData.fontSizeTablet || '11px')
   const [fontSizeMobile, setFontSizeMobile] = useState(safeInitialData.fontSizeMobile || '9px')
   const [brandNameBold, setBrandNameBold] = useState(safeInitialData.brandNameBold !== undefined ? safeInitialData.brandNameBold : true)
+  const [namesFormatBold, setNamesFormatBold] = useState(safeInitialData.namesFormatBold !== undefined ? safeInitialData.namesFormatBold : true)
   const [useFullWidth, setUseFullWidth] = useState(safeInitialData.useFullWidth !== undefined ? safeInitialData.useFullWidth : true)
   
   // Text wrapping settings
@@ -329,6 +330,7 @@ export default function SocialProofSection({
     fontSizeTablet,
     fontSizeMobile,
     brandNameBold,
+    namesFormatBold,
     useFullWidth,
     textWrapDesktop,
     textWrapTablet,
@@ -336,7 +338,7 @@ export default function SocialProofSection({
     showBackground
   };
   
-  // This function conditionally applies background styles based on showBackground setting
+  // This function conditionally applies background styles and classes based on showBackground setting
   const getBackgroundStyles = (isImportant = false) => {
     // Return empty string if showBackground is false
     if (!showBackground) return '';
@@ -357,6 +359,11 @@ export default function SocialProofSection({
       background-color: ${bgColor}${important};
       box-shadow: ${backgroundOpacity > 50 ? `0 2px 4px rgba(0, 0, 0, 0.1)${important}` : ''};
     `;
+  };
+  
+  // Function to get the social-proof-preview class based on showBackground
+  const getSocialProofClass = () => {
+    return showBackground ? 'social-proof-preview' : 'social-proof-preview-no-bg';
   };
   
   // NOTE: This function should be used in all HTML generation for consistent styling
@@ -546,8 +553,9 @@ export default function SocialProofSection({
     return customText;
   };
   
-  // Different code output types
+  // Different code output types and platforms
   const [codeOutputType, setCodeOutputType] = useState<'standalone'>('standalone');
+  const [platform, setPlatform] = useState<'shopify' | 'shopware' | 'wordpress'>('shopify');
 
   // Help tooltip component
   const HelpTooltip = ({ text }: { text: string }) => {
@@ -876,6 +884,21 @@ export default function SocialProofSection({
       {/* User Information */}
       <div className="border-b pb-4">
         <h3 className="text-sm font-semibold mb-3 text-[#1c2838]">Benutzerinformationen</h3>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center">
+            <button
+              type="button"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setNamesFormatBold(!namesFormatBold); }}
+              className="flex items-center cursor-pointer bg-transparent border-none p-0 m-0 focus:outline-none"
+            >
+              <div className={`relative w-9 h-5 ${namesFormatBold ? 'bg-[#1c2838]' : 'bg-gray-200'} rounded-full transition-colors`}>
+                <div className={`absolute top-[2px] ${namesFormatBold ? 'right-[2px] translate-x-0' : 'left-[2px] translate-x-0'} bg-white border rounded-full h-4 w-4 transition-all`}></div>
+              </div>
+              <span className="ml-2 text-sm text-gray-600">Namen fett formatieren</span>
+            </button>
+            <HelpTooltip text="Steuert, ob die Namen der Nutzer in Fettschrift angezeigt werden." />
+          </div>
+        </div>
         <div className="space-y-3">
           {avatarCount > 0 && (
             <div className="grid grid-cols-2 gap-3">
@@ -1513,15 +1536,15 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
             }}
           >
             <div 
-              className="social-proof-preview"
+              className={getSocialProofClass()}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                backgroundColor,
+                backgroundColor: showBackground ? backgroundColor : 'transparent',
                 padding: getEffectivePadding(),
                 borderRadius,
                 fontFamily: 'Arial, sans-serif',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                boxShadow: showBackground ? '0 2px 4px rgba(0, 0, 0, 0.1)' : 'none',
                 marginBottom: '12px',
                 color: textColor,
                 fontWeight: 500,
@@ -1662,14 +1685,18 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                 <span style={{ display: 'inline' }}>
                   {badgePosition === 'afterFirst' ? (
                     <span 
-                      style={{ fontWeight: '700' }}
+                      style={{ fontWeight: namesFormatBold ? '700' : 'normal' }}
                       dangerouslySetInnerHTML={{ 
                         __html: getNamesWithBadge('afterFirst', previewDevice === 'mobile')
                       }}
                     />
                   ) : (
                     <>
-                      <strong style={{ fontWeight: '700' }}>{getDisplayNames()}</strong>
+                      {namesFormatBold ? (
+                        <strong style={{ fontWeight: '700' }}>{getDisplayNames()}</strong>
+                      ) : (
+                        <span style={{ fontWeight: 'normal' }}>{getDisplayNames()}</span>
+                      )}
                       {getBadgeOrSpacing(badgePosition, previewDevice === 'mobile')}
                     </>
                   )}
@@ -1712,14 +1739,36 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <h4 className="font-medium text-blue-800 mb-3">📋 So integrierst du die Section:</h4>
-                  <ol className="text-sm text-blue-700 space-y-2 list-decimal list-inside">
-                    <li>Kopiere den generierten HTML/Liquid Code (rechts im Editor)</li>
-                    <li>Gehe zu deinem Shopify Admin → Online Store → Themes</li>
-                    <li>Klicke auf "Aktionen" → "Code bearbeiten" bei deinem aktiven Theme</li>
-                    <li>Öffne die entsprechende Template-Datei (z.B. product.liquid)</li>
-                    <li>Füge den Code an der gewünschten Stelle ein</li>
-                    <li>Speichere die Änderungen</li>
-                  </ol>
+                  {platform === 'shopify' && (
+                    <ol className="text-sm text-blue-700 space-y-2 list-decimal list-inside">
+                      <li>Kopiere den generierten HTML/Liquid Code (rechts im Editor)</li>
+                      <li>Gehe zu deinem Shopify Admin → Online Store → Themes</li>
+                      <li>Klicke auf "Aktionen" → "Code bearbeiten" bei deinem aktiven Theme</li>
+                      <li>Öffne die entsprechende Template-Datei (z.B. product.liquid)</li>
+                      <li>Füge den Code an der gewünschten Stelle ein</li>
+                      <li>Speichere die Änderungen</li>
+                    </ol>
+                  )}
+                  {platform === 'shopware' && (
+                    <ol className="text-sm text-blue-700 space-y-2 list-decimal list-inside">
+                      <li>Kopiere den generierten HTML/Twig Code (rechts im Editor)</li>
+                      <li>Gehe zur Administration deiner Shopware 6 Installation</li>
+                      <li>Navigiere zu "Content" → "Shopping Experiences"</li>
+                      <li>Bearbeite das Layout der gewünschten Seite</li>
+                      <li>Füge ein HTML-Element hinzu und platziere den Code darin</li>
+                      <li>Speichere die Änderungen</li>
+                    </ol>
+                  )}
+                  {platform === 'wordpress' && (
+                    <ol className="text-sm text-blue-700 space-y-2 list-decimal list-inside">
+                      <li>Kopiere den generierten HTML-Code (rechts im Editor)</li>
+                      <li>Logge dich in dein WordPress-Dashboard ein</li>
+                      <li>Bearbeite die gewünschte Seite oder den Beitrag</li>
+                      <li>Füge einen HTML/Custom-Code Block hinzu</li>
+                      <li>Füge den Code in diesen Block ein</li>
+                      <li>Aktualisiere oder veröffentliche die Seite</li>
+                    </ol>
+                  )}
                 </div>
                 
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -1762,9 +1811,33 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
     </div>
   )
 
-  // Code display without switcher
+  // Platform code switcher
   const CodeSwitcher = () => {
-    return null;
+    return (
+      <div className="flex justify-between items-center mb-2">
+        <div className="text-sm font-semibold text-[#1c2838]">Plattform-Code:</div>
+        <div className="flex border rounded-md overflow-hidden">
+          <button 
+            className={`px-3 py-1.5 text-xs ${platform === 'shopify' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
+            onClick={() => setPlatform('shopify')}
+          >
+            Shopify
+          </button>
+          <button 
+            className={`px-3 py-1.5 text-xs border-l ${platform === 'shopware' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
+            onClick={() => setPlatform('shopware')}
+          >
+            Shopware 6
+          </button>
+          <button 
+            className={`px-3 py-1.5 text-xs border-l ${platform === 'wordpress' ? 'bg-[#1c2838] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'}`}
+            onClick={() => setPlatform('wordpress')}
+          >
+            WordPress
+          </button>
+        </div>
+      </div>
+    );
   };
 
   // Self-contained HTML code that works standalone without Shopify
@@ -1824,7 +1897,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
       }
     }
   </style>
-  <div class="social-proof-isolated social-proof-responsive" style="display: flex !important; align-items: center !important; background-color: ${backgroundColor} !important; padding: ${getEffectivePadding()} !important; border-radius: ${borderRadius} !important; font-family: Arial, sans-serif !important; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important; margin: 0 0 12px 0 !important; color: ${textColor} !important; font-weight: 500 !important; width: ${useFullWidth ? '100%' : 'fit-content'} !important; max-width: 100% !important; box-sizing: border-box !important; font-size: ${fontSizeDesktop} !important; line-height: 1.4 !important;">
+  <div class="social-proof-isolated social-proof-responsive ${getSocialProofClass()}" style="display: flex !important; align-items: center !important; ${showBackground ? `background-color: ${backgroundColor} !important;` : ''} padding: ${getEffectivePadding()} !important; border-radius: ${borderRadius} !important; font-family: Arial, sans-serif !important; ${showBackground ? 'box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;' : ''} margin: 0 0 12px 0 !important; color: ${textColor} !important; font-weight: 500 !important; width: ${useFullWidth ? '100%' : 'fit-content'} !important; max-width: 100% !important; box-sizing: border-box !important; font-size: ${fontSizeDesktop} !important; line-height: 1.4 !important;">
     ${avatarCount > 0 ? `
     <div style="display: flex !important; align-items: center !important; flex-shrink: 0 !important;">
       ${avatarCount >= 1 ? `
@@ -1845,10 +1918,23 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
     </div>` : ''}
     <div class="social-proof-text" style="padding: 0 !important;">
       <span style="display: inline !important;">
-        ${badgePosition === 'afterFirst' ? `<strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${getNamesWithBadge('afterFirst', false)}</strong>` : 
-          `<strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${getDisplayNames()}</strong>
-           ${showBadge && badgePosition === 'standard' ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: 14px !important; max-width: none !important; margin: 0 1px !important; vertical-align: baseline !important; transform: translateY(-1px) !important; object-fit: contain !important; display: inline !important; padding: 0 !important; border: none !important;" onerror="this.style.display='none'">` : 
-             (badgePosition === 'overAvatar' ? '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>' : '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>')}`}
+        ${badgePosition === 'afterFirst' ? 
+          (namesFormatBold ? 
+            `<strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${getNamesWithBadge('afterFirst', false)}</strong>` : 
+            `<span style="display: inline !important; margin: 0 !important; padding: 0 !important;">${getNamesWithBadge('afterFirst', false)}</span>`
+          ) : 
+          (namesFormatBold ? 
+            `<strong style="display: inline !important; font-weight: 700 !important; margin: 0 !important; padding: 0 !important;">${getDisplayNames()}</strong>` : 
+            `<span style="display: inline !important; margin: 0 !important; padding: 0 !important;">${getDisplayNames()}</span>`
+          )
+        }
+        ${showBadge && badgePosition === 'standard' ? 
+          `<img src="${verifiedImage}" alt="Verifiziert" style="height: 14px !important; max-width: none !important; margin: 0 1px !important; vertical-align: baseline !important; transform: translateY(-1px) !important; object-fit: contain !important; display: inline !important; padding: 0 !important; border: none !important;" onerror="this.style.display='none'">` : 
+          (badgePosition === 'overAvatar' ? 
+            '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>' : 
+            '<span style="margin: 0 1px !important; display: inline !important; padding: 0 !important;"> </span>'
+          )
+        }
         <span style="font-weight: 400 !important; word-spacing: 0.1em !important; letter-spacing: 0.01em !important; display: inline !important; margin: 0 !important; padding: 0 !important;">${customText}</span>
       </span>
     </div>
@@ -1856,8 +1942,25 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
   })();
 
 
-  // Select the code to display - only standalone now
-  const code = standaloneCode;
+  // Select the code to display based on platform
+  const getPlatformCode = () => {
+    switch (platform) {
+      case 'shopify':
+        return standaloneCode;
+      case 'shopware':
+        // For Shopware, we use the same code but with some adaptations if needed
+        return standaloneCode.replace('{% if customer %}', '{% if context.customer %}')
+                           .replace('{{ shop.name }}', '{{ shopware.shop.name }}');
+      case 'wordpress':
+        // For WordPress, remove Liquid tags and adapt as needed
+        return standaloneCode.replace(/\{\%.*?\%\}/g, '')
+                           .replace(/\{\{.*?\}\}/g, '');
+      default:
+        return standaloneCode;
+    }
+  };
+  
+  const code = getPlatformCode();
   
   // Complete code display with the switcher
   const codeDisplay = (
