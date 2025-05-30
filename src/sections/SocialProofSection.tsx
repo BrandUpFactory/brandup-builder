@@ -36,6 +36,7 @@ interface SocialProofSectionProps {
     textWrapDesktop?: number;
     textWrapTablet?: number;
     textWrapMobile?: number;
+    showBackground?: boolean;
   };
   onDataChange?: (data: any) => void;
   previewDevice?: 'desktop' | 'tablet' | 'mobile';
@@ -48,28 +49,37 @@ interface SocialProofSectionProps {
 // Predefined style templates
 const styleTemplates = [
   {
-    name: 'Modern Light',
+    name: 'Style 1',
     backgroundColor: '#f7f7f7',
     textColor: '#000000',
+    avatarBorderColor: '#1EA1F3',
+    borderRadius: '12px',
+    padding: '15px',
+    avatarCount: 2,
+    badgePosition: 'overAvatar',
+    customText: 'Tim, Stephan und 12.400+ weitere Kunden nutzen unser Tool erfolgreich',
+  },
+  {
+    name: 'Style 2',
+    backgroundColor: '#f7f7f7',
+    textColor: '#000000',
+    avatarBorderColor: '#655C55',
+    borderRadius: '12px',
+    padding: '15px',
+    avatarCount: 3,
+    badgePosition: 'standard',
+    customText: 'Tim, Anna, Ben und 22.910+ weitere Kunden nutzen unsere Sections',
+  },
+  {
+    name: 'Style 3',
+    backgroundColor: '#655C55',
+    textColor: '#ffffff',
     avatarBorderColor: '#ffffff',
     borderRadius: '12px',
     padding: '15px',
-  },
-  {
-    name: 'Bold Dark',
-    backgroundColor: '#1c2838',
-    textColor: '#ffffff',
-    avatarBorderColor: '#3b82f6',
-    borderRadius: '8px',
-    padding: '12px',
-  },
-  {
-    name: 'Soft Gradient',
-    backgroundColor: '#f0f9ff',
-    textColor: '#0c4a6e',
-    avatarBorderColor: '#bae6fd',
-    borderRadius: '16px',
-    padding: '18px',
+    avatarCount: 1,
+    badgePosition: 'overAvatar',
+    customText: 'Tim und 1.100+ Kunden nutzen unsere Sections',
   }
 ];
 
@@ -129,6 +139,7 @@ export default function SocialProofSection({
   const [backgroundColor, setBackgroundColor] = useState(styleTemplates[0].backgroundColor)
   const [avatarBorderColor, setAvatarBorderColor] = useState(styleTemplates[0].avatarBorderColor)
   const [textColor, setTextColor] = useState('#000000') // Force black as default
+  const [showBackground, setShowBackground] = useState(safeInitialData.showBackground !== undefined ? safeInitialData.showBackground : true)
   const [showBreakOnLarge, setShowBreakOnLarge] = useState(safeInitialData.showBreakOnLarge !== undefined ? safeInitialData.showBreakOnLarge : true)
   const [avatarSize, setAvatarSize] = useState(safeInitialData.avatarSize || '32px')
   const [borderRadius, setBorderRadius] = useState(safeInitialData.borderRadius || styleTemplates[0].borderRadius)
@@ -189,25 +200,57 @@ export default function SocialProofSection({
     
     // Always apply the template styles when a style is selected
     const template = styleTemplates[index];
+    
+    // Apply all the properties from the template
     setBackgroundColor(template.backgroundColor);
-    setTextColor(index === 1 ? '#ffffff' : index === 2 ? '#0c4a6e' : '#000000');
+    setTextColor(index === 2 ? '#ffffff' : '#000000');
     setAvatarBorderColor(template.avatarBorderColor);
     setBorderRadius(template.borderRadius);
     setPadding(template.padding);
     
-    // Set badge position based on style
+    // Set custom text if provided in the template
+    if (template.customText) {
+      setCustomText(template.customText);
+    }
+    
+    // Set avatar count if specified in the template
+    if (template.avatarCount !== undefined) {
+      setAvatarCount(template.avatarCount);
+    }
+    
+    // Set badge position from template or based on style
+    if (template.badgePosition) {
+      setBadgePosition(template.badgePosition);
+    } else {
+      switch(index) {
+        case 0: // Style 1
+          setBadgePosition('overAvatar');
+          break;
+        case 1: // Style 2
+          setBadgePosition('standard');
+          break;
+        case 2: // Style 3
+          setBadgePosition('overAvatar');
+          break;
+        default:
+          setBadgePosition('standard');
+      }
+    }
+    
+    // Set specific names based on style
     switch(index) {
-      case 0:
-        setBadgePosition('standard');
+      case 0: // Style 1
+        setFirstName1('Tim');
+        setFirstName2('Stephan');
         break;
-      case 1:
-        setBadgePosition('afterFirst');
+      case 1: // Style 2
+        setFirstName1('Tim');
+        setFirstName2('Anna');
+        setFirstName3('Ben');
         break;
-      case 2:
-        setBadgePosition('overAvatar');
+      case 2: // Style 3
+        setFirstName1('Tim');
         break;
-      default:
-        setBadgePosition('standard');
     }
     
     // Always update both single padding and individual padding values
@@ -254,8 +297,22 @@ export default function SocialProofSection({
     useFullWidth,
     textWrapDesktop,
     textWrapTablet,
-    textWrapMobile
+    textWrapMobile,
+    showBackground
   };
+  
+  // IMPORTANT: When generating the HTML preview and final output code,
+  // make sure to respect the showBackground option:
+  // 1. If showBackground is true, include the background-color style with backgroundColor value
+  // 2. If showBackground is false, don't include the background-color style
+  //
+  // Example for the preview HTML:
+  // <div style="... ${showBackground ? `background-color: ${backgroundColor} !important;` : ''} ...">
+  //
+  // Example for the output HTML:
+  // <div style="... ${showBackground ? `background-color: ${backgroundColor};` : ''} ...">
+  //
+  // This change should be applied to all places where the background-color is set for the social proof component.
 
   // Function to manually trigger data update to parent
   const triggerDataUpdate = useCallback(() => {
@@ -979,6 +1036,22 @@ export default function SocialProofSection({
       <div className="border-b pb-4">
         <h3 className="text-sm font-semibold mb-3 text-[#1c2838]">Styling</h3>
         <div className="space-y-3">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center">
+              <button
+                type="button"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowBackground(!showBackground); }}
+                className="flex items-center cursor-pointer bg-transparent border-none p-0 m-0 focus:outline-none"
+              >
+                <div className={`relative w-9 h-5 ${showBackground ? 'bg-[#1c2838]' : 'bg-gray-200'} rounded-full transition-colors`}>
+                  <div className={`absolute top-[2px] ${showBackground ? 'right-[2px] translate-x-0' : 'left-[2px] translate-x-0'} bg-white border rounded-full h-4 w-4 transition-all`}></div>
+                </div>
+                <span className="ml-2 text-sm text-gray-600">Hintergrund anzeigen</span>
+              </button>
+              <HelpTooltip text="Schaltet den Hintergrund der Social Proof Box ein oder aus." />
+            </div>
+          </div>
+          
           <div className="grid grid-cols-2 gap-3">
             <label className="block text-sm text-[#1c2838]">
               Hintergrundfarbe:
@@ -988,6 +1061,7 @@ export default function SocialProofSection({
                   value={backgroundColor}
                   onChange={(e) => setBackgroundColor(e.target.value)}
                   className="w-8 h-6 border rounded mr-2"
+                  disabled={!showBackground}
                 />
                 <span className="text-xs text-gray-500">{backgroundColor}</span>
               </div>
