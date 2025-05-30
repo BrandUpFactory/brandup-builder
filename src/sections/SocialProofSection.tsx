@@ -37,6 +37,8 @@ interface SocialProofSectionProps {
     textWrapTablet?: number;
     textWrapMobile?: number;
     showBackground?: boolean;
+    backgroundOpacity?: number;
+    namesFormatBold?: boolean;
   };
   onDataChange?: (data: any) => void;
   previewDevice?: 'desktop' | 'tablet' | 'mobile';
@@ -1741,7 +1743,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                   <h4 className="font-medium text-blue-800 mb-3">📋 So integrierst du die Section:</h4>
                   {platform === 'shopify' && (
                     <ol className="text-sm text-blue-700 space-y-2 list-decimal list-inside">
-                      <li>Kopiere den generierten HTML/Liquid Code (rechts im Editor)</li>
+                      <li>Kopiere den generierten Code (rechts im Editor)</li>
                       <li>Gehe zu deinem Shopify Admin → Online Store → Themes</li>
                       <li>Klicke auf "Aktionen" → "Code bearbeiten" bei deinem aktiven Theme</li>
                       <li>Öffne die entsprechende Template-Datei (z.B. product.liquid)</li>
@@ -1751,7 +1753,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                   )}
                   {platform === 'shopware' && (
                     <ol className="text-sm text-blue-700 space-y-2 list-decimal list-inside">
-                      <li>Kopiere den generierten HTML/Twig Code (rechts im Editor)</li>
+                      <li>Kopiere den generierten Code (rechts im Editor)</li>
                       <li>Gehe zur Administration deiner Shopware 6 Installation</li>
                       <li>Navigiere zu "Content" → "Shopping Experiences"</li>
                       <li>Bearbeite das Layout der gewünschten Seite</li>
@@ -1761,7 +1763,7 @@ ${showBadge ? `<img src="${verifiedImage}" alt="Verifiziert" style="height: ${cu
                   )}
                   {platform === 'wordpress' && (
                     <ol className="text-sm text-blue-700 space-y-2 list-decimal list-inside">
-                      <li>Kopiere den generierten HTML-Code (rechts im Editor)</li>
+                      <li>Kopiere den generierten Code (rechts im Editor)</li>
                       <li>Logge dich in dein WordPress-Dashboard ein</li>
                       <li>Bearbeite die gewünschte Seite oder den Beitrag</li>
                       <li>Füge einen HTML/Custom-Code Block hinzu</li>
