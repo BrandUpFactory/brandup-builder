@@ -59,11 +59,11 @@ const styleTemplates = [
     badgePosition: 'overAvatar',
     customText: 'und 12.400+ weitere Kunden nutzen unser Tool erfolgreich',
     avatarImage1: '/Sections/Social_Proof/1.jpg',
-    avatarImage2: '/Sections/Social_Proof/2.jpg',
+    avatarImage2: '/Sections/Social_Proof/3.jpg',
   },
   {
     name: 'Style 2',
-    backgroundColor: '#f7f7f7',
+    backgroundColor: '#ffffff',
     textColor: '#000000',
     avatarBorderColor: '#655C55',
     borderRadius: '12px',
@@ -74,6 +74,7 @@ const styleTemplates = [
     avatarImage1: '/Sections/Social_Proof/1.jpg',
     avatarImage2: '/Sections/Social_Proof/2.jpg',
     avatarImage3: '/Sections/Social_Proof/3.jpg',
+    showBackground: false,
   },
   {
     name: 'Style 3',
@@ -143,6 +144,7 @@ export default function SocialProofSection({
 
   // Section styling - ensure defaults from style template 0
   const [backgroundColor, setBackgroundColor] = useState(styleTemplates[0].backgroundColor)
+  const [backgroundOpacity, setBackgroundOpacity] = useState(safeInitialData.backgroundOpacity || 100)
   const [avatarBorderColor, setAvatarBorderColor] = useState(styleTemplates[0].avatarBorderColor)
   const [textColor, setTextColor] = useState('#000000') // Force black as default
   const [showBackground, setShowBackground] = useState(safeInitialData.showBackground !== undefined ? safeInitialData.showBackground : true)
@@ -214,6 +216,13 @@ export default function SocialProofSection({
     setBorderRadius(template.borderRadius);
     setPadding(template.padding);
     
+    // Set showBackground based on template or style
+    if (template.showBackground !== undefined) {
+      setShowBackground(template.showBackground);
+    } else {
+      setShowBackground(index !== 1); // All styles except Style 2 have backgrounds
+    }
+    
     // Set custom text if provided in the template
     if (template.customText) {
       setCustomText(template.customText);
@@ -280,6 +289,13 @@ export default function SocialProofSection({
     
     // Set single padding mode to ensure UI is consistent with selection
     setUseSinglePadding(true);
+    
+    // Set text wrap for desktop based on style
+    if (index === 2) { // Style 3
+      setTextWrapDesktop(75); // Set desktop text wrap to 75% for Style 3
+    } else {
+      setTextWrapDesktop(40); // Default for other styles
+    }
   };
   
   // Define sectionData object for reuse
@@ -288,6 +304,7 @@ export default function SocialProofSection({
     firstName2,
     firstName3,
     backgroundColor,
+    backgroundOpacity,
     avatarImage1,
     avatarImage2,
     avatarImage3,
@@ -322,10 +339,21 @@ export default function SocialProofSection({
   const getBackgroundStyles = (isImportant = false) => {
     if (!showBackground) return '';
     
+    // Convert hex color to rgba with opacity
+    const hexToRgba = (hex: string, opacity: number) => {
+      hex = hex.replace('#', '');
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${opacity / 100})`;
+    };
+    
     const important = isImportant ? ' !important' : '';
+    const bgColor = hexToRgba(backgroundColor, backgroundOpacity);
+    
     return `
-      background-color: ${backgroundColor}${important};
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)${important};
+      background-color: ${bgColor}${important};
+      box-shadow: ${backgroundOpacity > 50 ? `0 2px 4px rgba(0, 0, 0, 0.1)${important}` : ''};
     `;
   };
   
@@ -780,7 +808,7 @@ export default function SocialProofSection({
                 ${selectedStyle === index ? 'border-[#1c2838] shadow-sm bg-[#1c2838]/5' : 'border-gray-200 hover:bg-gray-50'}`}
               style={{ 
                 backgroundColor: selectedStyle === index ? backgroundColor : template.backgroundColor,
-                color: selectedStyle === index ? textColor : (index === 1 ? '#fff' : '#000'),
+                color: selectedStyle === index ? textColor : (index === 2 ? '#fff' : '#000'),
                 borderRadius: selectedStyle === index ? borderRadius : template.borderRadius
               }}
             >
@@ -1076,7 +1104,7 @@ export default function SocialProofSection({
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-3">
+          <div className={`space-y-3 ${showBackground ? '' : 'opacity-50 pointer-events-none'}`}>
             <label className="block text-sm text-[#1c2838]">
               Hintergrundfarbe:
               <div className="flex items-center mt-1">
@@ -1085,11 +1113,29 @@ export default function SocialProofSection({
                   value={backgroundColor}
                   onChange={(e) => setBackgroundColor(e.target.value)}
                   className="w-8 h-6 border rounded mr-2"
-                  disabled={!showBackground}
                 />
                 <span className="text-xs text-gray-500">{backgroundColor}</span>
               </div>
             </label>
+            
+            <label className="block text-sm text-[#1c2838]">
+              Deckkraft:
+              <div className="flex items-center space-x-2 mt-1">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={backgroundOpacity}
+                  onChange={(e) => setBackgroundOpacity(parseInt(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  onMouseDown={handleRangeInput}
+                />
+                <span className="text-xs text-gray-500 w-8 text-right">{backgroundOpacity}%</span>
+              </div>
+            </label>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3 mt-3">
             
             <label className="block text-sm text-[#1c2838]">
               Textfarbe:
