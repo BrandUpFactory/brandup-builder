@@ -825,16 +825,15 @@ export default function Home() {
               <ul className="space-y-3">
                 <li><Link href="/templates" className="text-gray-600 hover:text-[#8dbbda] transition-colors">Templates</Link></li>
                 <li><Link href="/license" className="text-gray-600 hover:text-[#8dbbda] transition-colors">Lizenz</Link></li>
-                <li><Link href="/pricing" className="text-gray-600 hover:text-[#8dbbda] transition-colors">Preise</Link></li>
               </ul>
             </div>
             
             <div>
               <h3 className="text-sm font-bold text-[#1c2838] uppercase tracking-wider mb-4">Unternehmen</h3>
               <ul className="space-y-3">
-                <li><a href="https://brandupelements.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-[#8dbbda] transition-colors">Über uns</a></li>
-                <li><a href="https://brandupelements.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-[#8dbbda] transition-colors">Kontakt</a></li>
-                <li><Link href="/privacy" className="text-gray-600 hover:text-[#8dbbda] transition-colors">Datenschutz</Link></li>
+                <li><a href="https://www.brandupfactory.com/" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-[#8dbbda] transition-colors">Über uns</a></li>
+                <li><a href="/kontakt" className="text-gray-600 hover:text-[#8dbbda] transition-colors">Kontakt</a></li>
+                <li><a href="/datenschutz" className="text-gray-600 hover:text-[#8dbbda] transition-colors">Datenschutz</a></li>
               </ul>
             </div>
           </div>

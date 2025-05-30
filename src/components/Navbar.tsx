@@ -130,9 +130,9 @@ export default function Navbar() {
         </Link>
       </div>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu Overlay - Background removed */}
       <div 
-        className={`fixed inset-0 bg-black bg-opacity-50 z-30 transition-opacity duration-300 lg:hidden ${
+        className={`fixed inset-0 z-30 transition-opacity duration-300 lg:hidden ${
           mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       />
