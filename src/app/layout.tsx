@@ -2,6 +2,7 @@
 
 import './globals.css'
 import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { useEffect, useState } from 'react'
@@ -27,20 +28,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   }, [])
 
   return (
-    <html lang="en" className="w-full h-full bg-white">
+    <html lang="en" className="w-full min-h-full bg-white">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </head>
-      <body className="flex w-full h-full bg-white overflow-hidden">
+      <body className="flex flex-col w-full min-h-full bg-white overflow-x-hidden">
         {/* Navbar für mobile und desktop */}
         <Navbar />
 
         {/* Main Content - mit bedingter Klasse für Abstand */}
-        <main className={`flex-1 ${isMobile ? 'mt-16' : 'ml-64'} ${isHomepage ? 'p-0' : 'p-4 md:p-8'} overflow-y-auto`}>
+        <main className={`flex-1 ${isMobile ? 'mt-16' : 'ml-64'} ${isHomepage ? 'p-0' : 'p-4 md:p-8'}`}>
           {children}
           <Analytics />        {/* ✅ Analytics von Vercel */}
           <SpeedInsights />    {/* ✅ Speed Insights von Vercel */}
         </main>
+        
+        {/* Footer für alle Seiten */}
+        <div className={`${isMobile ? 'mt-16' : 'ml-64'}`}>
+          <Footer />
+        </div>
       </body>
     </html>
   )
