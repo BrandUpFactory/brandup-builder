@@ -209,11 +209,19 @@ export default function SocialProofSection({
   
   // Initialize component and apply correct template based on selected style
   useEffect(() => {
-    console.log('🔄 SocialProof: Initial style application', { selectedStyle, initialData: !!safeInitialData });
+    console.log('🔄 SocialProof: Initial style application', { selectedStyle, initialData: safeInitialData });
     
     // Apply the template with a short delay to ensure all state is initialized
     const timer = setTimeout(() => {
-      applyStyleTemplate(null, selectedStyle);
+      // Only apply the template if we actually have initialData
+      if (safeInitialData.selectedStyle !== undefined) {
+        console.log('🔄 SocialProof: Using saved style:', safeInitialData.selectedStyle);
+        applyStyleTemplate(null, selectedStyle);
+      } else {
+        // Default to style 0 if no saved style
+        console.log('🔄 SocialProof: No saved style found, using default style 0');
+        applyStyleTemplate(null, 0);
+      }
       
       // Mark component as fully loaded after style is applied
       setTimeout(() => {
@@ -375,6 +383,71 @@ export default function SocialProofSection({
     if (!isReset && selectedStyle !== index && isLoaded) {
       saveStyleSettings(selectedStyle);
       console.log('💾 SocialProof: Saved settings for previous style', selectedStyle + 1);
+      
+      // Ensure the selectedStyle change is saved to parent
+      if (onDataChange) {
+        // Create a fresh copy of current style settings including the newly saved style
+        const currentStyleData = {
+          backgroundColor, backgroundOpacity, textColor, avatarBorderColor,
+          borderRadius, padding, paddingTop, paddingRight, paddingBottom, paddingLeft,
+          marginTop, marginRight, marginBottom, marginLeft, showBackground,
+          showBreakOnLarge, avatarSize, avatarCount, badgePosition, showBadge,
+          fontSizeDesktop, fontSizeTablet, fontSizeMobile,
+          textWrapDesktop, textWrapTablet, textWrapMobile,
+          customText, firstName1, firstName2, firstName3,
+          avatarImage1, avatarImage2, avatarImage3,
+          brandNameBold, namesFormatBold, useFullWidth
+        };
+        
+        // Update style settings with current style
+        const updatedStyleSettings = {...styleSettings};
+        updatedStyleSettings[selectedStyle] = currentStyleData;
+        
+        // Create a complete data update with the new selectedStyle
+        const completeData = {
+          firstName1,
+          firstName2,
+          firstName3,
+          backgroundColor,
+          backgroundOpacity,
+          avatarImage1,
+          avatarImage2,
+          avatarImage3,
+          verifiedImage,
+          showBadge,
+          badgePosition,
+          avatarBorderColor,
+          textColor,
+          showBreakOnLarge,
+          avatarSize,
+          borderRadius,
+          padding: getEffectivePadding(),
+          paddingTop,
+          paddingRight,
+          paddingBottom,
+          paddingLeft,
+          marginTop,
+          marginRight,
+          marginBottom,
+          marginLeft,
+          avatarCount,
+          customText,
+          selectedStyle: index, // Set the new style index
+          fontSizeDesktop,
+          fontSizeTablet,
+          fontSizeMobile,
+          brandNameBold,
+          namesFormatBold,
+          useFullWidth,
+          textWrapDesktop,
+          textWrapTablet,
+          textWrapMobile,
+          showBackground,
+          styleSettings: updatedStyleSettings
+        };
+        
+        onDataChange(completeData);
+      }
     }
     
     // Check if we have saved settings for this style
@@ -521,6 +594,21 @@ export default function SocialProofSection({
     
     // Always update the style index
     setSelectedStyle(index);
+    
+    // After applying a new style template, trigger a save
+    // to ensure that the style selection is persisted
+    if (isLoaded && onDataChange) {
+      setTimeout(() => {
+        // Create a complete data update including the current selected style
+        const completeData = {
+          ...sectionData,
+          selectedStyle: index // Ensure the selected style is saved
+        };
+        
+        onDataChange(completeData);
+        console.log('🔄 SocialProof: Saved style selection', index + 1);
+      }, 300);
+    }
   };
   
   // Define sectionData object for reuse
@@ -562,7 +650,8 @@ export default function SocialProofSection({
     textWrapDesktop,
     textWrapTablet,
     textWrapMobile,
-    showBackground
+    showBackground,
+    styleSettings // Include styleSettings in sectionData
   };
   
   // This function conditionally applies background styles and classes based on showBackground setting
@@ -652,16 +741,57 @@ export default function SocialProofSection({
         useFullWidth,
       };
       
-      // Create new style settings object
+      // Create a fresh copy of style settings
       const newStyleSettings = {...styleSettings};
       newStyleSettings[selectedStyle] = currentStyleData;
       
+      // Save the updated settings in the component state
+      setStyleSettings(newStyleSettings);
+      
       if (onDataChange) {
-        // Include style settings in the data update
+        // Create a separate object for data update to avoid reference issues
         const updatedData = {
-          ...sectionData,
+          firstName1,
+          firstName2,
+          firstName3,
+          backgroundColor,
+          backgroundOpacity,
+          avatarImage1,
+          avatarImage2,
+          avatarImage3,
+          verifiedImage,
+          showBadge,
+          badgePosition,
+          avatarBorderColor,
+          textColor,
+          showBreakOnLarge,
+          avatarSize,
+          borderRadius,
+          padding: getEffectivePadding(),
+          paddingTop,
+          paddingRight,
+          paddingBottom,
+          paddingLeft,
+          marginTop,
+          marginRight,
+          marginBottom,
+          marginLeft,
+          avatarCount,
+          customText,
+          selectedStyle,
+          fontSizeDesktop,
+          fontSizeTablet,
+          fontSizeMobile,
+          brandNameBold,
+          namesFormatBold,
+          useFullWidth,
+          textWrapDesktop,
+          textWrapTablet,
+          textWrapMobile,
+          showBackground,
           styleSettings: newStyleSettings
         };
+        
         onDataChange(updatedData);
         console.log('🔄 SocialProof: Data update triggered', { selectedStyle: selectedStyle + 1 });
       }
@@ -701,13 +831,59 @@ export default function SocialProofSection({
       saveStyleSettings(selectedStyle);
       
       if (onDataChange) {
-        // Include style settings in the data update
+        // Create a fresh copy of current settings to ensure proper serialization
+        const currentStyleData = {
+          backgroundColor,
+          backgroundOpacity,
+          textColor,
+          avatarBorderColor,
+          borderRadius,
+          padding,
+          paddingTop,
+          paddingRight,
+          paddingBottom,
+          paddingLeft,
+          marginTop,
+          marginRight,
+          marginBottom,
+          marginLeft,
+          showBackground,
+          showBreakOnLarge,
+          avatarSize,
+          avatarCount,
+          badgePosition,
+          showBadge,
+          fontSizeDesktop,
+          fontSizeTablet,
+          fontSizeMobile,
+          textWrapDesktop,
+          textWrapTablet,
+          textWrapMobile,
+          customText,
+          firstName1,
+          firstName2,
+          firstName3,
+          avatarImage1,
+          avatarImage2,
+          avatarImage3,
+          brandNameBold,
+          namesFormatBold,
+          useFullWidth,
+        };
+        
+        // Create a fresh copy of styleSettings
+        const newStyleSettings = {...styleSettings};
+        newStyleSettings[selectedStyle] = currentStyleData;
+        
+        // Update the data with fresh objects
         const updatedData = {
           ...sectionData,
-          styleSettings: styleSettings
+          styleSettings: newStyleSettings,
+          selectedStyle // Ensure selectedStyle is saved
         };
+        
         onDataChange(updatedData);
-        console.log('⚡ SocialProof: Auto-save triggered', selectedStyle);
+        console.log('⚡ SocialProof: Auto-save triggered for style', selectedStyle + 1);
       }
       
       // Reset effect flag
